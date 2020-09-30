@@ -69,6 +69,7 @@ def index(request):
     return HttpResponse(out,content_type="text/plain")
 def SignUp(request):
     form_signup = SignUpForm()
+    message = ""
     if request.method == 'POST':
         form_signup = SignUpForm(request.POST)
         if form_signup.is_valid():
