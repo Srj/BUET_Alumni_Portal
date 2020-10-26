@@ -15,7 +15,7 @@ pwd_context = CryptContext(
 )
 
 def encrypt_password(password):
-    return pwd_context.encrypt('007007')
+    return pwd_context.encrypt(password)
 
 
 def password_validator(password):
