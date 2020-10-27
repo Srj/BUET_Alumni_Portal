@@ -25,7 +25,7 @@ SECRET_KEY = 'fcgsok()u1rl(+lzfvv3(-s#-4^&&v36yeh!%u8r36=938rva5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.10.91']
+ALLOWED_HOSTS = ['192.168.10.91','127.0.0.1']
 
 
 # Application definition
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'SignUp',
     'SignIn',
+    'Profile',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
