@@ -96,8 +96,15 @@
             </div>
             <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
               <div class="d-flex justify-content-between">
-                <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
-                <a href="#" class="btn btn-sm btn-default float-right">Message</a>
+                <a href="#"></a>
+
+                <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
+                  {% csrf_token %}
+                  <p hidden>
+                  {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                  </p>
+                  <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
+                </form> 
               </div>
             </div>
             <div class="card-body pt-0 pt-md-4">
@@ -313,11 +320,14 @@
                 </div>
                 <hr class="my-4">
                 <!-- Description -->
+                
+
+
                 <h6 class="heading-small text-muted mb-4">About me</h6>
                 <div class="pl-lg-4">
                   <div class="form-group focused">
                     <label>About Me</label>
-                    <textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ...">A beautiful Dashboard for Bootstrap 4. It is Free and Open Source.</textarea>
+                    <textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>
                   </div>
                 </div>
                 <button type="submit" value="submit" class="btn btn-info">
@@ -325,6 +335,49 @@
                 </button>
                 
               </form>
+              <h6 class="heading-small text-muted mb-4">Interests</h6>
+              <form action="{% url 'Profile:edit_expertise'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Topic Name</label>
+                      {% render_field expert.topic class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Add More
+                </button>
+                       
+              </form> 
+              <form action="{% url 'Profile:delete_expertise'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Topic Name</label>
+                      {% render_field expert.topic class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Delete Topic
+                </button>
+                       
+              </form> 
+                  </div>
+                </div>
             </div>
           </div>
         </div>
@@ -335,7 +388,7 @@
     <div class="row align-items-center justify-content-xl-between">
       <div class="col-xl-6 m-auto text-center">
         <div class="copyright">
-          <p>Made with <a href="https://www.creative-tim.com/product/argon-dashboard" target="_blank">Argon Dashboard</a> by Creative Tim</p>
+          <p></p>
         </div>
       </div>
     </div>

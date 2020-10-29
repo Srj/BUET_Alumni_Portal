@@ -22,7 +22,8 @@ logged_in = False
 
 #---------------------------------Password Validation----------------------------
 def encrypt_password(password):
-    return pwd_context.encrypt(password)
+    return pwd_context.hash(password)
+    # return pwd_context.encrypt(password)     ----Deprecated
 
 def check_encrypted_password(password, hashed):
     return pwd_context.verify(password, hashed)

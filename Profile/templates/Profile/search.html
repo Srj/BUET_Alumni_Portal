@@ -1,0 +1,100 @@
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/search.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" />
+<style>
+  body {
+    background-image: url({{MEDIA_URL}}buet_field.jpg);
+
+  }
+</style> 
+<div class="container">
+  <div class="card">
+    <div class="card-header bg-white border-0">
+      <div class="row align-items-center">
+        <div class="col-8">
+          <div class="pl-lg-4">
+         <div class="row">
+        <form role="form" method="post">
+          {% csrf_token %}
+            <div class="inner-form">
+              
+            </div>
+            <div class="pl-lg-4">
+              <div class="advance-search">
+                <div class="row">
+                  <div class="col-lg-12">
+
+                    {% render_field form.name class="form-control form-control-alternative" %}
+                  </div>
+                  <div class="col-lg-4">
+                    <label class="form-control-label" for="input-country">Location</label>
+                    {% render_field form.location class="form-control form-control-alternative" %}
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="input-field">
+                      <label class="form-control-label" for="input-country">Institution</label>
+                      {% render_field form.institution class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="input-field">
+                      <label class="form-control-label" for="input-country">Interests</label>
+                      {% render_field form.interest class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <div class="result-count">
+                      <span>{{count}} </span>results</div>
+                    <div class="group-btn">
+                  
+                      <button type="submit" value="submit" class="btn btn-info">Search</button>
+                    </div>
+                    </div>
+                  
+                  </div>
+                </div>
+                <div class="row third">
+                  
+                </div>
+              </div>
+            </div>
+          </form>
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+    
+    {% if message %}
+    {{message}}
+    {% endif %}
+    
+                            
+    <div class="row">
+
+      {% for row in data %}
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="our-team">
+              <div class="picture">
+                <img class="img-fluid" src="{{MEDIA_URL}}{{row.PHOTO}}" height=130 weight=130>
+              </div>
+              <div class="team-content">
+                <a href={{row.STD_ID}}><h3 class="name">{{row.FULL_NAME}}</h3></a> 
+                <h4 class="title">Department of {{row.DEPT}}</h4>
+              </div>
+              <ul class="social">
+                <li><a href="{{row.FACEBOOK}}" class="fa fa-facebook" aria-hidden="true"></a></li>
+                <li><a href="{{row.TWITTER}}" class="fa fa-twitter" aria-hidden="true"></a></li>
+                <li><a href="{{row.GOOGLE_SCHOLAR}}" class="fa fa-google-plus" aria-hidden="true"></a></li>
+                <li><a href="{{row.LINKEDIN}}" class="fa fa-linkedin" aria-hidden="true"></a></li>
+              </ul>
+            </div>
+          </div>
+      {% endfor %}
+
+</div>
+ </div>
