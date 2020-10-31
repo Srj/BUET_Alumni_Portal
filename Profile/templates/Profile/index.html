@@ -1,0 +1,179 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/style.css' %}">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container emp-profile">
+            <form method="post" action="{% url 'Profile:edit_profile' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-img">
+                            {% static "Profile/DP/" as baseUrl %}
+                            <img src="{{baseUrl}}{{data.PHOTO}}" height=100 alt=""/>
+                            <div class="file btn btn-lg btn-primary">
+                                Change Photo
+                                <input type="file" name="file"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-head">
+                                    <h4>
+                                        {{data.FULL_NAME}}
+                                    </h4>
+                                    <h6>
+                                        Department of {{data.DEPT}}
+                                    </h6>
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" class="profile-edit-btn" name="btnAddMore" value="Edit Profile"/>
+                    </div>
+                </div>
+                <div class="row">
+                   
+                    <div class="col-md-4">
+                        <div class="profile-work">
+                            <p>WORK LINK</p>
+                            {% if data.FACEBOOK %}
+                                <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
+                            {% endif %}
+                            {% if data.FACEBOOK %}
+                                <a href=/{{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                            {% endif %}
+                            {% if data.LINKEDIN %}
+                                <a href=/{{data.LINKEDIN}}> L<i class="fab fa-linkedin-in"></i></i></a>
+                            {% endif %}
+                            {% if data.GOOGLE_SCHOLAR %}
+                                <a href=/{{data.GOOGLE_SCHOLAR}}>G<i class="fab fa-google"></i>/i></a>
+                            {% endif %}
+                            {% if data.RESEARCHGATE %}
+                                <a href=/{{data.RESEARCHGATE}}>R<i class="fab fa-researchgate"></i></i></a>
+                            {% endif %}
+                            <p>SKILLS</p>
+                            {% for key, value in skills.items %}
+                                    {{key}} ({{value}})<br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="tab-content profile-tab" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Student Id</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.STD_ID}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Email</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.EMAIL}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Phone</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.MOBILE}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Hall</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.HALL}}</p>
+                                            </div>
+                                        </div>
+                                        {% if data.LVL %}
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label>Level-Term</label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p>{{data.LVL}}-{{data.TERM}}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if data.MSC %}
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label>M.Sc From</label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p>{{data.MSC}}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        {% if data.PHD %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>PhD From</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.PHD}}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if data.HOUSE_NO and data.ROAD_NO and data.ZIP_CODE %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Address</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>House-{{data.HOUSE_NO}}, Road-{{data.ROAD_NO}}, Zip Code-{{data.ZIP_CODE}} </p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if data.CITY %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>City</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.CITY}}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if data.COUNTRY %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Country</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.COUNTRY}}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if data.HOME_TOWN %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Home Town </label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>{{data.HOME_TOWN}}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>           
+        </div>

@@ -1,84 +1,44 @@
-from django.shortcuts import render
-from django.http import HttpResponse,HttpResponseRedirect
-from django.urls import reverse
-import cx_Oracle
+from django.shortcuts import render,redirect
 from passlib.context import CryptContext
-# Create your views here.
-
-
-pwd_context = CryptContext(
-        schemes=["pbkdf2_sha256"],
-        default="pbkdf2_sha256",
-        pbkdf2_sha256__default_rounds=30000
-)
-
-dsn_tns = cx_Oracle.makedsn('localhost','1521',service_name='ORCL')
-conn =cx_Oracle.connect(user='PROJECT',password='1234',dsn=dsn_tns)
-
-def encrypt_password(password):
-    return pwd_context.encrypt('007007')
-
-
-def check_encrypted_password(password, hashed):
-    return pwd_context.verify(password, hashed)
-
-def password_validator(password):
-    try:
-        password = str(password)
-    except :
-        return 'Wrong Password'
-
-    if len(password) < 6:
-        return 'Password too short'
-    if len(password) > 20:
-        return 'Password too long'
-    return 'Success'
-
-
+from Alumni_Portal.utils import check_encrypted_password,db
+import cx_Oracle
+from .forms import SignInForm
+from django.http import HttpResponseRedirect
 def index(request):
-    dsn_tns = cx_Oracle.makedsn('localhost','1521',service_name='ORCL')
-    conn =cx_Oracle.connect(user='PROJECT',password='1234',dsn=dsn_tns)
-    c = conn.cursor()
-    print(c)
-    c.execute("SELECT * from PROJECT.USER_REC")   
-    out = ''
-    print(c)
-    for row in c : 
-        out +=str(row) + ' \n '
-    conn.close()
-    return HttpResponse(out,content_type="text/plain")
-def SignUpPage(request):
-    return render(request,'SignIn/SignUp.html')
+    conn = db()
+    std_id = None
+    message = ""
+    form = SignInForm()
+    if request.method == 'GET':
+        if 'std_id' in request.session:
+            print('Session')
+            request.session.clear()
+            return HttpResponseRedirect('/')
 
-def SignUp(request):
-    try:
-        id_ = request.POST['ID']
-        name =request.POST['Name']
-        nickname =request.POST['nickname']
-        password = request.POST['Pass']
-        password2 = request.POST['pass_again']
-        email = request.POST['email']
-        mobile = request.POST['mobile']
-        birth = request.POST['birth']
-        print(name,nickname,password,password2,email, mobile,birth)
-    except KeyError:
-        return HttpResponseRedirect(reverse('SignIn:signuppage'))
+        else:
+            return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
 
 
-    if not password_validator(password) == 'Success':
-        return HttpResponse('Invalid Password')
-    if not password == password2:
-        return HttpResponse('Password doesn\'t Match')
-
-    password = encrypt_password(password)
-
-    c = conn.cursor()
-    print("INSERT INTO PROJECT.USER_REC (USER_ID,FULL_NAME,NICK_NAME,EMAIL,MOBILE,DATE_OF_BIRTH,PASSWORD) VALUES(" + id_ + ",\'" + name + "\',\'" +\
-                                                            nickname+ "\',\'" + email+ "\',\'" +mobile+ "\',\'" + birth+ "\',\'" +password+"\');")
-    c.execute("INSERT INTO PROJECT.USER_REC (USER_ID,FULL_NAME,NICK_NAME,EMAIL,MOBILE,PASSWORD) VALUES(" + id_ + ",\'" + name + "\',\'" +\
-                                                            nickname+ "\',\'" + email+ "\',\'" +mobile+ "\',\'" +password+"\')")   
-    
-    conn.commit()
-    conn.close()
-    print(password)
-    return HttpResponse('Success')
+    elif request.method == 'POST':
+        form = SignInForm(request.POST)
+        
+        print(form.is_valid())
+        if form.is_valid():
+            std_id = form.cleaned_data['std_id']
+            password = form.cleaned_data['password']
+            c = conn.cursor()
+            sql = """ SELECT password from USER_TABLE WHERE STD_ID = :std_id"""
+            row =  c.execute(sql,{'std_id':std_id}).fetchone()
+            if row is None:
+                message = "User Doesn\'t exists ..."
+                return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
+            else:
+                if check_encrypted_password(password,row[0]):
+                    request.session['std_id'] = std_id
+                    return HttpResponseRedirect('/profile')
+                else:
+                    message = "Invalid Password"
+                    std_id = None
+            conn.close()
+    return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
+    #return render(request,'SignIn/SignIn.html',{'form':form, 'msg' : message,'std_id': std_id})

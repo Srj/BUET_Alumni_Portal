@@ -25,7 +25,7 @@ SECRET_KEY = 'fcgsok()u1rl(+lzfvv3(-s#-4^&&v36yeh!%u8r36=938rva5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.10.91','127.0.0.1']
 
 
 # Application definition
@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'SignUp',
     'SignIn',
+    'Profile',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -119,3 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+import os
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # media directory in the root directory 
+MEDIA_URL = '/media/'
+
