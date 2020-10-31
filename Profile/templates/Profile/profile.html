@@ -47,7 +47,7 @@
               <div class="media align-items-center">
                 <span class="avatar avatar-sm rounded-circle">
                   {% static "Profile/DP/" as baseUrl %}
-                  <img alt="Image placeholder" src="{{baseUrl}}{{data.PHOTO}}">
+                  <img  src="{{MEDIA_URL}}{{data.PHOTO}}">
                 </span>
                 <div class="media-body ml-2 d-none d-lg-block">
                   <span class="mb-0 text-sm  font-weight-bold">{{data.FULL_NAME}}</span>
@@ -161,7 +161,7 @@
               </div>
               <div class="text-center">
                 <h3>
-                  {{data.FULL_NAME}}<span class="font-weight-light">, 22</span>
+                  {{data.FULL_NAME}}<span class="font-weight-light">, {{data.AGE}}</span>
                 </h3>
                 <div class="h5 font-weight-300">
                   <i class="ni location_pin mr-2"></i>{{data.CITY}}, {{data.COUNTRY}}<br>
@@ -169,29 +169,50 @@
                       <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
                   {% endif %}
                   {% if data.FACEBOOK %}
-                      <a href=/{{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                      <a href={{data.TWITTER}}><i class="fa fa-twitter"></i></a>
                   {% endif %}
                   {% if data.LINKEDIN %}
-                      <a href=/{{data.LINKEDIN}}> L<i class="fa fa-linkedin-in"></i></i></a>
+                      <a href={{data.LINKEDIN}}> <i class="fa fa-linkedin"></i></i></a>
                   {% endif %}
                   {% if data.GOOGLE_SCHOLAR %}
-                      <a href=/{{data.GOOGLE_SCHOLAR}}>G<i class="fa fa-google"></i>/i></a>
+                      <a href={{data.GOOGLE_SCHOLAR}}><i class="fa fa-google-plus"></i>/i></a>
                   {% endif %}
                   {% if data.RESEARCHGATE %}
-                      <a href=/{{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
+                      <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
                   {% endif %}
                 </div>
                 <div class="h5 mt-4">
-                  <i class="ni business_briefcase-24 mr-2"></i>Undergrad
+                  <i class="ni business_briefcase-24 mr-2"></i>{{current.DESIGNATION}}
                 </div>
                 <div>
-                  <i class="ni education_hat mr-2"></i>Bangladesh University of Engineering & Technology<br><br><b>Interests</b><br>
-                  {% for key, value in skills.items %}
-                                    {{key}} ({{value}})<br/>
-                            {% endfor %}
+                  <i class="ni education_hat mr-2"></i>{{current.NAME}}
+                  
+                  <br><br><b>Work History</b><br>
+            
+                    {% for row in job %}
+                        {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
+                        {% if row.TO_ %}
+                          {{row.TO_.year}})
+                        {% else %}
+                          )
+                        {% endif %}<br/>
+                    {% endfor %}                                  
+                  <br>
+                  <hr class="my-4">
+                  <b>Interests</b><br>
+                  {% if edit %}
+                    {% for key, value in skills.items %}
+                        {{key}} ({{value}})<br/>
+                    {% endfor %}
+                  {% else %}
+                    {% for key, value in skills.items %}
+                        {{key}} ({{value}}) <a href="{% url 'Profile:endorse' std_id=data.STD_ID topic=key %}"><i class="fa fa-plus"></i></a><br/>
+                    {% endfor %}
+                  {% endif %}
+                  
                 </div>
                 <hr class="my-4">
-                <p>This Saifur Rahman Jony. I am currently undergrad at CSE Depertment of BUET. I am interested in Artificial Intelligence, Machine Learning, Networking.</p>
+                {{data.ABOUT}}<br>
                 <a href="#">Show more</a>
               </div>
             </div>
@@ -251,7 +272,7 @@
                     <div class="col-lg-6">
                       <div class="form-group focused">
                         <label class="form-control-label" for="input-last-name">Date of Birth</label><br>
-                        <label class="form-control-label" >{{data.DATE_OF_BIRTH}}</label>
+                        <label class="form-control-label" >{{data.DATE_OF_BIRTH.date}}</label>
                       </div>
                     </div>
                   </div>

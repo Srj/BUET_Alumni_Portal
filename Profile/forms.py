@@ -22,6 +22,12 @@ class EditForm(forms.Form):
     city = forms.CharField(label=('city'),required=False)
     country = forms.CharField(label=('country'),required=False)
     hometown = forms.CharField(label=('home'),required=False)
+    fb = forms.CharField(required=False)
+    twitter = forms.CharField(required=False)
+    linkedin = forms.CharField(required=False)
+    rg = forms.CharField(required=False)
+    google = forms.CharField(required=False)
+    about = forms.CharField(required=False,max_length=512)
 
 class DPForm(forms.Form):
      file = forms.FileField()
@@ -34,5 +40,14 @@ class SearchForm(forms.Form):
     location = forms.CharField(required=False)
     institution = forms.CharField(required=False)
     interest = forms.CharField(required=False)
+    dept = forms.CharField(required=False)
+    hall = forms.CharField(required=False)
+    term = forms.CharField(required=False)
+
+class JobForm(forms.Form):
+    name = forms.CharField(required=True)
+    from_= forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}),required=True)
+    to_ = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}),required=False)
+    designation = forms.CharField(required=True)
 
         
