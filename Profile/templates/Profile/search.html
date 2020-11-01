@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-lg-4">
                           <div class="form-group">
-                            <label class="form-control-label" for="input-country">Term</label><br>
+                            <label class="form-control-label" for="input-country">Level</label><br>
                             {% render_field form.term class="form-control form-control-alternative" %}
                           </div>
                         </div>
@@ -103,7 +103,7 @@
                     </div>
                     <div class="team-content">
                       <a href={{row.STD_ID}}><h3 class="name">{{row.FULL_NAME}}</h3></a> 
-                      <h4 class="title">{{row.DESIGNATION}}, {{row.NAME}}</h4>
+                      <h4 class="title">{{row.DESIGNATION|title }}, {{row.NAME}}</h4>
                     </div>
                     <ul class="social">
                       <li><a href="{{row.FACEBOOK}}" class="fa fa-facebook" aria-hidden="true"></a></li>

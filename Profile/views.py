@@ -77,8 +77,11 @@ def search(request):
             info = {
             'name' : form.cleaned_data['name'],
             'location' : form.cleaned_data['location'],
-            #'institute': form.cleaned_data['institution'],
-            'interest': form.cleaned_data['interest']
+            'institute': form.cleaned_data['institution'],
+            'interest': form.cleaned_data['interest'],
+            'hall':form.cleaned_data['hall'],
+            'term':form.cleaned_data['term'],
+            'dept':form.cleaned_data['dept'],
             }
             
             if not info['name'] is '':
@@ -87,23 +90,55 @@ def search(request):
                 info['location'] = '%' + info['location'].lower() + '%'
             if not info['interest'] is '':
                 info['interest'] = '%' + info['interest'].lower() + '%'
+
+            if not info['hall'] is '':
+                info['hall'] = '%' + info['hall'].lower() + '%'
+            if not info['term'] is '':
+                info['term'] = '%' + info['term'].lower() + '%'
+            if not info['dept'] is '':
+                info['dept'] = '%' + info['dept'].lower() + '%'
+            if not info['institute'] is '':
+                info['institute'] = '%' + info['institute'].lower() + '%'
             values = {}
             print(info)
             c = conn.cursor()
             results = []
             sql = """ 
-                SELECT DISTINCT STD_ID,FULL_NAME,DEPT,FACEBOOK,TWITTER,GOOGLE_SCHOLAR,PHOTO,LINKEDIN,DESIGNATION,INSTITUTE.NAME  FROM (
+                SELECT DISTINCT STD_ID ,FULL_NAME,DEPT,FACEBOOK,TWITTER,GOOGLE_SCHOLAR,PHOTO,LINKEDIN FROM (
                 """
-            sql1 = """SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID)
-                LEFT JOIN POSTGRAD USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) WHERE LOWER(FULL_NAME) LIKE :name OR LOWER(NICK_NAME) LIKE :name OR STD_ID LIKE :name
-                 UNION """
+            sql1 = """SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID)LEFT JOIN POSTGRAD 
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(FULL_NAME) LIKE :name OR LOWER(NICK_NAME) LIKE :name OR STD_ID LIKE :name 
+                 INTERSECT """
 
-            sql2 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN 
-                UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) WHERE LOWER(COUNTRY) 
-                LIKE :location OR LOWER(CITY) LIKE :location OR LOWER(HOME_TOWN) LIKE :location UNION """
+            sql2 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(PROFILE.COUNTRY) LIKE :location OR LOWER(PROFILE.CITY) LIKE :location OR LOWER(HOME_TOWN) LIKE :location 
+                INTERSECT """
 
-            sql3 ="""SELECT DISTINCT *  from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
-                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) WHERE LOWER(TOPIC) LIKE LOWER(:interest) UNION """
+            sql3 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(TOPIC) LIKE LOWER(:interest) 
+                INTERSECT """
+
+            sql4 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(DEPT) LIKE LOWER(:dept) 
+                INTERSECT """
+
+            sql5 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(HALL) LIKE LOWER(:hall) 
+                INTERSECT """
+
+            sql6 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(LVL) LIKE LOWER(:lvl) 
+                INTERSECT """
+            sql7 ="""SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD
+                USING(STD_ID) LEFT JOIN EXPERTISE USING(STD_ID) LEFT JOIN (WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)) USING(STD_ID) 
+                WHERE LOWER(NAME) LIKE LOWER(:institute)
+                INTERSECT """
                 
             if not info['name'] is '':
                 sql += sql1
@@ -114,8 +149,20 @@ def search(request):
             if not info['interest'] is '':
                 sql+=sql3
                 values['interest'] = info['interest']
-            if sql.endswith('UNION '):
-                sql = sql[:-6]+ ') LEFT JOIN (WORKS JOIN INSTITUTE USING(INSTITUTE_ID))  USING(STD_ID) WHERE TO_ IS NULL'
+            if not info['dept'] is '':
+                sql+=sql4
+                values['dept'] = info['dept']
+            if not info['hall'] is '':
+                sql+=sql5
+                values['hall'] = info['hall']
+            if not info['term'] is '':
+                sql+=sql6
+                values['lvl'] = info['term']
+            if not info['institute'] is '':
+                sql+=sql7
+                values['institute'] = info['institute']
+            if sql.endswith('INTERSECT '):
+                sql = sql[:-len('INTERSECT ')]+ ')'
                 print(sql)
             else:
                 msg = 'Please Type'
