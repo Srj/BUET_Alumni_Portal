@@ -1,0 +1,54 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : SYSTEM
+ Source Server Type    : Oracle
+ Source Server Version : 110200
+ Source Schema         : DJANGO_DB
+
+ Target Server Type    : Oracle
+ Target Server Version : 110200
+ File Encoding         : 65001
+
+ Date: 02/11/2020 22:43:19
+*/
+
+
+-- ----------------------------
+-- Table structure for UNDERGRAD
+-- ----------------------------
+DROP TABLE "DJANGO_DB"."UNDERGRAD";
+CREATE TABLE "DJANGO_DB"."UNDERGRAD" (
+  "STD_ID" NUMBER(7,0) NOT NULL,
+  "HALL" VARCHAR2(20 BYTE),
+  "DEPT" VARCHAR2(10 BYTE),
+  "LVL" NUMBER(1,0),
+  "TERM" NUMBER(1,0)
+)
+LOGGING
+NOCOMPRESS
+PCTFREE 10
+INITRANS 1
+STORAGE (
+  INITIAL 65536 
+  NEXT 1048576 
+  MINEXTENTS 1
+  MAXEXTENTS 2147483645
+  BUFFER_POOL DEFAULT
+)
+PARALLEL 1
+NOCACHE
+DISABLE ROW MOVEMENT
+;
+
+-- ----------------------------
+-- Records of UNDERGRAD
+-- ----------------------------
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705004', 'CHATRI', 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705014', NULL, 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705008', 'Titumir', 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705098', 'TITUMIR', 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705002', 'SHOHRAWARDY', 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705056', 'ASHANULLAH', 'CSE', '2', '-2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705015', 'TITUMIR', 'CSE', '2', '2');
+INSERT INTO "DJANGO_DB"."UNDERGRAD" VALUES ('1705039', NULL, 'CSE', '2', '2');
