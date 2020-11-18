@@ -158,7 +158,7 @@
                             {% endfor %}
                 </div>
                 <hr class="my-4">
-                <p>This Saifur Rahman Jony. I am currently undergrad at CSE Depertment of BUET. I am interested in Artificial Intelligence, Machine Learning, Networking.</p>
+                {{data.ABOUT}}
                 <a href="#">Show more</a>
               </div>
             </div>
@@ -318,6 +318,55 @@
                     </div>
                   </div>
                 </div>
+
+                <hr class="my-4">
+                <!-- Address -->
+                <h6 class="heading-small text-muted mb-4">Social Information</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Facebook</label><br>
+                        {% render_field form.fb class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Twitter</label><br>
+                        {% render_field form.twitter class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">LinkedIn</label><br>
+                        {% render_field form.linkedin class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">ResearchGate</label><br>
+                        {% render_field form.rg class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Google Scholar</label><br>
+                        {% render_field form.google class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  
+                </div>
+
+
                 <hr class="my-4">
                 <!-- Description -->
                 
@@ -327,7 +376,8 @@
                 <div class="pl-lg-4">
                   <div class="form-group focused">
                     <label>About Me</label>
-                    <textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>
+                    {% render_field form.about class="form-control form-control-alternative" %}
+                   <!--<textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>--> 
                   </div>
                 </div>
                 <button type="submit" value="submit" class="btn btn-info">
@@ -376,6 +426,82 @@
                 </button>
                        
               </form> 
+              <h6 class="heading-small text-muted mb-4">Job History</h6>
+              <form action="{% url 'Profile:edit_job'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class=pl-lg-4">
+                    <div class="form-group focused">
+                      <label>Institute Name</label>
+                      {% render_field job.name class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Designation</label>
+                      {% render_field job.designation class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>FROM </label>
+                      {% render_field job.from_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>TILL</label>
+                      {% render_field job.to_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Add More
+                </button>                  
+              </form> 
+
+              <h6 class="heading-small text-muted mb-4">Delete History</h6>
+              <form action="{% url 'Profile:delete_job'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="pl-lg-4">
+                    <div class="form-group focused">
+                      <label>Institute Name</label>
+                      {% render_field job.name class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Designation</label>
+                      {% render_field job.designation class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>FROM </label>
+                      {% render_field job.from_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Delete Job History
+                </button>                  
+              </form> 
+              
                   </div>
                 </div>
             </div>

@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('SignUp.urls'),name='SignUp'),
     path('', include('SignIn.urls'),name='SignIn'),
     path('profile/',include('Profile.urls'),name='Profile'),
+    path('post/', include('post.urls'), name='post')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

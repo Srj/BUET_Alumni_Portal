@@ -1,0 +1,113 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'post/style2.css' %}">
+
+
+
+<body>
+
+    <div class="total-container">
+
+        <div class="top-container">
+            <img src='{{MEDIA_URL}}{{detail.photo_path}}'>
+
+            <div class="info-container">
+                <b>{{detail.full_name}}</b><br>
+                
+
+                <b>{{detail.date}}</b> 
+                <i class="fa fa-tag">{{detail.class}}</i> 
+            </div>
+        </div>
+       
+        <div class="post-meta">
+
+            {% if detail.class == 'help' %}
+                Type of Help :  {{detail.type_of_help}} <br>
+                Reason : {{detail.reason}} <br>
+                Cell : {{detail.cell}}
+            {% endif %}
+
+            {% if detail.class == 'research' %}
+                Topic : {{detail.topic_name}} <br>
+                Date of Publication : {{detail.date_of_publication}} <br>
+                Journal : {{detail.journal}} <br>
+                DOI : {{detail.doi}}
+            {% endif %}
+
+            {% if detail.class == 'job' %}
+                company name {{detail.company_name}} <br>
+                location {{detail.location}} <br>
+                designation {{detail.designation}} <br>
+                salary {{detail.salary}} <br>
+                requirements {{detail.requirements}}
+            {% endif %}
+
+
+        </div>
+
+        <pre>{{detail.desc}}</pre>
+
+
+        <div class="do-comment">
+            <form action="{% url 'post:upload_comment' post_id=detail.post_id %}">
+                <textarea rows="3" cols="50" name="comment_body"></textarea>
+                <input type="submit" value="Comment">
+            </form>
+        </div>
+        
+        {% for comment_dict in comment_dicts %}
+
+            <div class="comment">
+                <img src='{{MEDIA_URL}}{{comment_dict.photo_path}}'>
+                
+
+                <div class="comment-text">
+                    <b>{{comment_dict.full_name}}</b><br>
+                    <p>{{comment_dict.text}}</p>
+                    
+                </div>
+                
+            </div>            
+
+            
+        {% endfor %}
+
+        
+        
+        
+        
+    </div>
+
+    
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
