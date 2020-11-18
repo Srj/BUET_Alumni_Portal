@@ -100,6 +100,7 @@
             {% if edit %}
               <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
               <a href="{% url 'SignIn:signin' %}" class="btn btn-info">Log Out</a>
+              <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn ntn-info">Timeline</a>
             {% else %}
               <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
             {% endif %}

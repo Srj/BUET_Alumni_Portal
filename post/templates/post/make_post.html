@@ -1,0 +1,184 @@
+<h2> Write a Post </h2> <br>
+
+{% if type == None %}
+  <form action="{% url 'post:make_post' %}">
+
+    <select name="post_type">
+      <option value="Help" selected> Help </option>
+      <option value="Career"> Career </option>
+      <option value="Research"> Research </option>
+      <option value="Job Post"> Job Post </option>
+    </select>
+    <br>
+    <input type="submit" value="Selected">
+  </form>
+{% endif %}
+
+
+
+{% if type == 'Help' %}
+  <form action="{% url 'post:make_post' %}">
+
+    <select name="post_type">
+      <option value="Help" selected> Help </option>
+      <option value="Career"> Career </option>
+      <option value="Research"> Research </option>
+      <option value="Job Post"> Job Post </option>
+    </select>
+    <br>
+    <input type="submit" value="Selected">
+  </form>
+  <br>
+
+  <form action="{% url 'post:upload_post' %}">
+
+    <label for="type_of_help">Type of Help</label>
+    <input type="text" name="type_of_help" value="Write Here"><br>
+
+    <label for="reason">Reason</label>
+    <textarea name="reason" rows="2" cols="50">Write Here</textarea><br>
+
+    <label for="deadline">Deadline</label>
+    <input type="date" name="deadline"><br>
+
+    <label for="cell">Cell No</label>
+    <input type="text" name="cell" value="Write Here"><br>
+
+    <label for='description'>Description</label>
+    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+
+    <input type="submit" value="Post" >
+
+  </form>
+
+  {% if unfilled %}
+    <h5> {{ unfilled }}</h5>
+  {% endif %}
+
+{% endif %}
+
+
+{% if type == 'Career' %}
+  <form action="{% url 'post:make_post' %}">
+
+    <select name="post_type">
+      <option value="Help" > Help </option>
+      <option value="Career" selected> Career </option>
+      <option value="Research"> Research </option>
+      <option value="Job Post"> Job Post </option>
+    </select>
+    <br>
+    <input type="submit" value="Selected">
+  </form>
+
+  <form action="{% url 'post:upload_post' %}">
+
+    <label for="topic_name">Topic Name</label>
+    <input type="text" name="topic_name" value="Write Here"><br>
+
+    <label for='description'>Description</label>
+    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+
+    <input type="submit" value="Post">
+
+  </form>
+
+  {% if unfilled %}
+    <h5> {{ unfilled }}</h5>
+  {% endif %}
+
+{% endif %}
+
+
+
+
+{% if type == 'Research' %}
+  <form action="{% url 'post:make_post' %}">
+
+    <select name="post_type">
+      <option value="Help"> Help </option>
+      <option value="Career"> Career </option>
+      <option value="Research" selected> Research </option>
+      <option value="Job Post"> Job Post </option>
+    </select>
+    <br>
+    <input type="submit" value="Selected">
+  </form>
+
+  <form action="{% url 'post:upload_post' %}">
+
+    <label for="topic_name">Topic Name</label>
+    <input type="text" name="topic_name" value="Write Here"><br>
+
+
+    <label for="date_of_publication">Date of Publication</label>
+    <input type="date" name="date_of_publication"><br>
+
+    <label for="journal">Journal</label>
+    <input type="text" name="journal" value="Write Here"><br>
+
+    <label for="doi">DOI</label>
+    <input type="text" name="doi" value="Write Here"><br>
+
+    <label for='description'>Description</label>
+    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+
+    <input type="submit" value="Post">
+
+  </form>
+
+  {% if unfilled %}
+    <h5> {{ unfilled }}</h5>
+  {% endif %}
+
+{% endif %}
+
+
+
+{% if type == 'Job Post' %}
+  <form action="{% url 'post:make_post' %}">
+
+    <select name="post_type">
+      <option value="Help"> Help </option>
+      <option value="Career"> Career </option>
+      <option value="Research"> Research </option>
+      <option value="Job Post" selected> Job Post </option>
+    </select>
+    <br>
+    <input type="submit" value="Selected">
+  </form>
+
+
+  <form action="{% url 'post:upload_post' %}">
+
+    <label for="company_name">Company Name</label>
+    <input type="text" name="company_name" value="Write Here"><br>
+
+
+    <label for="designation">Designation</label>
+    <input type="text" name="designation", value='Write Here'><br>
+
+    <label for="location">Location</label>
+    <input type="text" name="location" value="Write Here"><br>
+
+    <label for="salary">Approximate Salary</label>
+    <input type="number" name="salary" value="Optional"><br>
+
+    <label for="min_requirement">Minimum Requirement</label>
+    <textarea name="min_requirement" rows="8" cols="100">Write Here</textarea><br>
+
+
+    <label for='description'>Description</label>
+    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+
+    <input type="submit" value="Post">
+
+  </form>
+
+  {% if unfilled %}
+    <h5> {{ unfilled }}</h5>
+  {% endif %}
+
+
+
+{% endif %}

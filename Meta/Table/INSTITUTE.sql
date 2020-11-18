@@ -4,7 +4,7 @@
  Source Server         : SYSTEM
  Source Server Type    : Oracle
  Source Server Version : 110200
- Source Schema         : DJANGO_DB
+ Source Schema         : PROJECT
 
  Target Server Type    : Oracle
  Target Server Version : 110200
@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for INSTITUTE
 -- ----------------------------
-DROP TABLE "DJANGO_DB"."INSTITUTE";
-CREATE TABLE "DJANGO_DB"."INSTITUTE" (
+DROP TABLE "PROJECT"."INSTITUTE";
+CREATE TABLE "PROJECT"."INSTITUTE" (
   "INSTITUTE_ID" NUMBER(15,0) NOT NULL,
   "NAME" VARCHAR2(50 BYTE) NOT NULL,
   "CITY" VARCHAR2(30 BYTE),
@@ -44,8 +44,8 @@ DISABLE ROW MOVEMENT
 -- ----------------------------
 -- Records of INSTITUTE
 -- ----------------------------
-INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('1', 'Bangladesh University of Engineering & Technology', 'Dhaka', 'Bangladesh', 'University');
-INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('5', 'Mohammadpur Government High School', 'Dhaka', 'Bangladesh', 'School');
-INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('2', 'Khulna University of Engineering & Technology', 'Khulna', 'Bangladesh', 'University');
-INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('3', 'ACI Limited', 'Dhaka', 'Bangladesh', 'Drug Company');
-INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('4', 'Notre Dame College', 'Dhaka', 'Bangladesh', 'College');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('1', 'Bangladesh University of Engineering & Technology', 'Dhaka', 'Bangladesh', 'University');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('5', 'Mohammadpur Government High School', 'Dhaka', 'Bangladesh', 'School');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('2', 'Khulna University of Engineering & Technology', 'Khulna', 'Bangladesh', 'University');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('3', 'ACI Limited', 'Dhaka', 'Bangladesh', 'Drug Company');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('4', 'Notre Dame College', 'Dhaka', 'Bangladesh', 'College');

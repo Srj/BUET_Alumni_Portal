@@ -4,7 +4,7 @@
  Source Server         : SYSTEM
  Source Server Type    : Oracle
  Source Server Version : 110200
- Source Schema         : DJANGO_DB
+ Source Schema         : PROJECT
 
  Target Server Type    : Oracle
  Target Server Version : 110200
@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for EXPERTISE
 -- ----------------------------
-DROP TABLE "DJANGO_DB"."EXPERTISE";
-CREATE TABLE "DJANGO_DB"."EXPERTISE" (
+DROP TABLE "PROJECT"."EXPERTISE";
+CREATE TABLE "PROJECT"."EXPERTISE" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "TOPIC" VARCHAR2(30 BYTE) NOT NULL
 )
@@ -41,13 +41,13 @@ DISABLE ROW MOVEMENT
 -- ----------------------------
 -- Records of EXPERTISE
 -- ----------------------------
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705002', 'Algorithm');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705004', 'Algorithm');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Algorithm');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Computer Vision');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Deep Learning');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Machine Learning');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Natural Language Processing');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705008', 'Networking');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705015', 'Machine Learning');
-INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705056', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705002', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705004', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Computer Vision');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Deep Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Machine Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Natural Language Processing');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Networking');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705015', 'Machine Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705056', 'Algorithm');

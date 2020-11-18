@@ -1,0 +1,228 @@
+{% load static %}
+{% load widget_tweaks %}
+
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+
+
+<body>
+    <div class="total-container">
+
+        <div class="right-container">
+            <img src="{{MEDIA_URL}}zaber.jpg">
+            <h3>Zaber Ibn Abdul Hakim</h3>
+            <b>UnderGrad</b>
+            <p>BUET</p>
+
+            <!-- THIS DIV IS LEFT FOR JONY TO WORK ON -->
+
+            
+
+        </div>
+
+        <div class="left-container" id="lol">
+            
+            <div class="topnav">
+                <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
+                <a href="#news">Event</a>
+                <a href="#contact">Community</a>
+            </div>
+
+            <div class="make-post-btn">
+                <a href="{% url 'post:make_post' %}">
+                    <i class="fa fa-plus" style="font-size: 1.5em;"></i>
+                </a>
+            </div>
+            This is student post {{search_post_typ}}
+            {% if search_post_typ is None %}
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="none-form">
+                    {% if search_std_id is None %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                    {% else %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                    {% endif %}
+
+                    <label for="search_post_typ">Post Type</label>
+                    <select name="search_post_typ">
+                        <option value="" selected disabled>Select an Item</option>
+                        <option value="Help"> Help </option>
+                        <option value="Career"> Career </option>
+                        <option value="Research"> Research </option>
+                        <option value="Job Post"> Job Post </option>
+                    </select>
+
+                    <input type="submit" value="Search">
+                </form>
+            {% endif %}
+
+            {% if search_post_typ == 'Help' %}
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="help-form">
+                    {% if search_std_id is None %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                    {% else %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                    {% endif %}
+
+                    <label for="search_post_typ">Post Type</label>
+                    <select name="search_post_typ">
+                        <option value="Help" selected> Help </option>
+                        <option value="Career"> Career </option>
+                        <option value="Research"> Research </option>
+                        <option value="Job Post"> Job Post </option>
+                    </select>
+
+                    <input type="submit" value="Search">
+                </form>
+            {% endif %}
+
+            {% if search_post_typ == 'Career' %}
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="career-form">
+                    {% if search_std_id is None %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                    {% else %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                    {% endif %}
+
+                    <label for="search_post_typ">Post Type</label>
+                    <select name="search_post_typ">
+                        <option value="Help"> Help </option>
+                        <option value="Career"> Career </option>
+                        <option value="Research"> Research </option>
+                        <option value="Job Post"> Job Post </option>
+                    </select>
+
+                    <input type="submit" value="Search">
+                </form>
+            {% endif %}
+
+
+            {% if search_post_typ == 'Research' %}
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="research-form">
+                    {% if search_std_id is None %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                    {% else %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                    {% endif %}
+
+                    <label for="search_post_typ">Post Type</label>
+                    <select name="search_post_typ">
+                        <option value="Help"> Help </option>
+                        <option value="Career"> Career </option>
+                        <option value="Research" selected> Research </option>
+                        <option value="Job Post"> Job Post </option>
+                    </select>
+
+                    <input type="submit" value="Search">
+                </form>
+            {% endif %}
+
+
+            {% if search_post_typ == 'Job Post' %}
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="job-form">
+                    {% if search_std_id is None %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                    {% else %}
+                        <label for="search_std_id">Student ID</label>
+                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                    {% endif %}
+
+                    <label for="search_post_typ">Post Type</label>
+                    <select name="search_post_typ">
+                        <option value="Help"> Help </option>
+                        <option value="Career"> Career </option>
+                        <option value="Research"> Research </option>
+                        <option value="Job Post" selected> Job Post </option>
+                    </select>
+
+                    <input type="submit" value="Search">
+                </form>
+            {% endif %}
+
+            <!--<script>
+                function submitForm(){
+
+                    var data = JSON.parse("{{json_data|escapejs}}")
+
+                    if (!data){
+                        document.getElementById("none-form").submit();
+                    }  
+                    else if (data == "Help"){
+                        document.getElementById("help-form").submit();
+                    } 
+                    else if (data == "Career"){
+                        document.getElementById("career-form").submit();
+                    } 
+                    else if (data == "Research"){
+                        document.getElementById("research-form").submit();
+                    } 
+                    else if (data == "Job Post"){
+                        document.getElementById("job-form").submit();
+                    } 
+                }
+            </script>-->
+
+            
+
+            {% if not is_begin %}
+                <a href="{% url 'post:all_post' start_from=prev_id change=1 %}">
+                    <i class="fa fa-arrow-up"></i>
+                </a>
+            {% endif %}
+
+            <div class="all-post">
+                
+                {% if no_post %}
+                    <b> No Post to show </b><br>
+                {% else %}
+
+                    {% for post_dict in post_dicts %}
+
+                        <a href="{% url 'post:detail_post' post_id=post_dict.post_id %}">
+
+                            <div class='short-post-container'>
+                                <img src='{{MEDIA_URL}}{{post_dict.photo_path}}'>
+                                <div class="text-stuffs">
+                                    <h3>{{post_dict.full_name}}</h3>
+                                    
+                                    <p>
+                                        {{post_dict.desc|truncatechars:100}}
+                                    </p>
+                                    <b>{{post_dict.date}}</b> 
+                                    <i class="fa fa-tag">{{post_dict.class}}</i> 
+                                </div>
+                                
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+                {% endif %}
+
+
+            </div>
+            
+            
+            {% if not the_end %}
+                <a href="{% url 'post:all_post' start_from=next_id change=1 %}">
+                    <i class="fa fa-arrow-down" ></i>
+                </a>
+            {% endif %}
+
+            
+
+        </div>
+
+    </div>
+
+</body>
