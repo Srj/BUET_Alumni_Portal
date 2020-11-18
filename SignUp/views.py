@@ -22,6 +22,7 @@ def index(request):
             'mobile' : form_signup.cleaned_data['mobile'],
             'birthdate': form_signup.cleaned_data['birthdate'],
             }
+            print(info)
 
             c = conn.cursor()
             sql = """ INSERT INTO USER_TABLE (STD_ID,FULL_NAME,NICK_NAME,EMAIL,MOBILE,DATE_OF_BIRTH,PASSWORD)
@@ -31,6 +32,7 @@ def index(request):
                 conn.commit()
                 conn.close()
                 print('Registered')
+                return redirect('SignIn:signin')
             except cx_Oracle.IntegrityError:
                 message = "User already exists ..."
                 print('Error')

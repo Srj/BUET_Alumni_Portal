@@ -11,12 +11,11 @@ def index(request):
     form = SignInForm()
     if request.method == 'GET':
         if 'std_id' in request.session:
-            print('Session')
-            request.session.clear()
-            return HttpResponseRedirect('/')
+            print('Cannot Log Out')
+            return redirect('Profile:profile')
 
         else:
-            return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
+            return render(request,'SignIn/index.html',{'form':form, 'msg' : 'Please Sign In','std_id': None})
 
 
     elif request.method == 'POST':
@@ -42,3 +41,12 @@ def index(request):
             conn.close()
     return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
     #return render(request,'SignIn/SignIn.html',{'form':form, 'msg' : message,'std_id': std_id})
+
+def logout(request):
+    print('In LogOuts')
+    if 'std_id' in request.session:
+        try:
+            del request.session['std_id']
+        except KeyError:
+            print('Logged Out Not ')
+    return redirect('/')

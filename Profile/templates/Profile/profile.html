@@ -41,10 +41,11 @@
           </div>
         </form>
         <!-- User -->
+        
         <ul class="navbar-nav align-items-center d-none d-md-flex">
-          <li class="nav-item dropdown">
+          <!-- <li class="nav-item dropdown">
             <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <div class="media align-items-center">
+             <div class="media align-items-center">
                 <span class="avatar avatar-sm rounded-circle">
                   {% static "Profile/DP/" as baseUrl %}
                   <img  src="{{MEDIA_URL}}{{data.PHOTO}}">
@@ -53,7 +54,7 @@
                   <span class="mb-0 text-sm  font-weight-bold">{{data.FULL_NAME}}</span>
                 </div>
               </div>
-            </a>
+            </a>-->
 
             <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
               <div class=" dropdown-header noti-title">
@@ -88,18 +89,18 @@
       </div>
     </nav>
     <!-- Header -->
-    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url(https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
       <!-- Mask -->
       <span class="mask bg-gradient-default opacity-8"></span>
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
           <div class="col-lg-7 col-md-10">
-            <h1 class="display-2 text-white">Hello {{data.NICK_NAME}}</h1>
-            <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with your work and manage your projects or assigned tasks</p>
+            <h1 class="display-2 text-white"><!--Hello {{data.NICK_NAME}}--></h1>
+            <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile has made with your work and manage your projects or assigned tasks</p>
             {% if edit %}
               <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
-              <a href="{% url 'SignIn:signin' %}" class="btn btn-info">Log Out</a>
+              <a href="{% url 'SignIn:logout' %}" class="btn btn-info">Log Out</a>
             {% else %}
               <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
             {% endif %}
@@ -109,8 +110,8 @@
       </div>
     </div>
     <!-- Page content -->
-    <div class="container-fluid mt--7">
-      <div class="row">
+    <div class="container-fluid mt--7 justify-content-center">
+      <div class="row justify-content-center">
         <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
           <div class="card card-profile shadow">
             <div class="row justify-content-center">
@@ -141,7 +142,7 @@
               </div>
             </div>
             <div class="card-body pt-0 pt-md-4">
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col">
                   <div class="card-profile-stats d-flex justify-content-center mt-md-5">
                     <div>
@@ -158,13 +159,12 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
+              
               <div class="text-center">
-                <h3>
-                  {{data.FULL_NAME}}<span class="font-weight-light">, {{data.AGE}}</span>
-                </h3>
                 <div class="h5 font-weight-300">
-                  <i class="ni location_pin mr-2"></i>{{data.CITY}}, {{data.COUNTRY}}<br>
+                  <br><br>
+                  <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
                   {% if data.FACEBOOK %}
                       <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
                   {% endif %}
@@ -181,13 +181,32 @@
                       <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
                   {% endif %}
                 </div>
+                <h3>
+                  {{data.FULL_NAME}}
+                  {% if data.AGE %}
+                    <span class="font-weight-light">, {{data.AGE}}</span>
+                  {% endif %}
+                  
+                </h3>
+                <h4>Batch {{data.STD_ID|make_list|slice:":2"|join:''}}, Department of {{data.DEPT}}</h4>
+                <h5>{{data.HALL}} Hall</h5>
+                <br>
+                {% if data.LVL %}
+                  <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at {{data.LVL}}-{{data.TERM}}</b></h6>
+                {% else %}
+                  <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{current.DESIGNATION|title }} at<i class="ni education_hat mr-2"></i>{{current.NAME}}</b></h6>
+                {% endif %}
+                <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}}, {{data.COUNTRY}}<br></b></h6>
+                <br>
+                {{data.ABOUT}}<br>
+                
+                <hr class="my-4">
                 <div class="h5 mt-4">
-                  <i class="ni business_briefcase-24 mr-2"></i>{{current.DESIGNATION|title }}
+                  
                 </div>
                 <div>
-                  <i class="ni education_hat mr-2"></i>{{current.NAME}}
                   
-                  <br><br><b>Work History</b><br>
+              <b>Work History</b><br>
             
                     {% for row in job %}
                         {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
@@ -211,14 +230,12 @@
                   {% endif %}
                   
                 </div>
-                <hr class="my-4">
-                {{data.ABOUT}}<br>
-                <a href="#">Show more</a>
+                
               </div>
             </div>
           </div>
         </div>
-        <div class="col-xl-8 order-xl-1">
+        <!-- <div class="col-xl-8 order-xl-1">
           <div class="card">
             <div class="card-header bg-white border-0">
               <div class="row align-items-center">
@@ -331,7 +348,7 @@
 
                 </div>
                 <hr class="my-4">
-                <!-- Address -->
+                Address 
                 <h6 class="heading-small text-muted mb-4">Contact information</h6>
                 <div class="pl-lg-4">
                   <div class="row">
@@ -367,16 +384,11 @@
               </form>
             </div>
           </div>
-        </div>
+        </div>-->
+
+
       </div>
     </div>
   </div>
-  <footer class="footer">
-    <div class="row align-items-center justify-content-xl-between">
-      <div class="col-xl-6 m-auto text-center">
-        <div class="copyright">
-        </div>
-      </div>
-    </div>
-  </footer>
+
 </body>

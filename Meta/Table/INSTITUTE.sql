@@ -1,7 +1,7 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : SYSTEM
+ Source Server         : Django
  Source Server Type    : Oracle
  Source Server Version : 110200
  Source Schema         : DJANGO_DB
@@ -10,7 +10,7 @@
  Target Server Version : 110200
  File Encoding         : 65001
 
- Date: 02/11/2020 22:42:28
+ Date: 14/11/2020 01:11:14
 */
 
 
@@ -49,3 +49,4 @@ INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('5', 'Mohammadpur Government High Sc
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('2', 'Khulna University of Engineering & Technology', 'Khulna', 'Bangladesh', 'University');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('3', 'ACI Limited', 'Dhaka', 'Bangladesh', 'Drug Company');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('4', 'Notre Dame College', 'Dhaka', 'Bangladesh', 'College');
+INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('21', 'Banani Bidyaniketan', 'Dhaka', 'Bangladesh', 'School');

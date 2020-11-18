@@ -25,7 +25,7 @@ def index(request):
         sql = """ SELECT * from USER_TABLE LEFT JOIN PROFILE USING(STD_ID) LEFT JOIN UNDERGRAD USING(STD_ID) LEFT JOIN POSTGRAD USING(STD_ID) WHERE STD_ID = :std_id"""
         row =  c.execute(sql,{'std_id':std_id}).fetchone()
         columnNames = [d[0] for d in c.description]
-        print(row)
+        # print(row)
         
         try:
             data = dict(zip(columnNames,row))
@@ -33,7 +33,7 @@ def index(request):
             print(calculateAge(data['DATE_OF_BIRTH']))
         except:
             print('NULL')
-        print(data)
+        # print(data)
 
         #--------------Skills--------------
         sql = """ SELECT  EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
@@ -55,7 +55,7 @@ def index(request):
                 job_list.append(dict(zip(columnNames,job)))
             except:
                 print('NULL')
-        print(job_list)
+        # print(job_list)
 
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id AND TO_ IS NULL ORDER BY FROM_"""
         rows =  c.execute(sql,{'std_id':std_id})
@@ -66,7 +66,10 @@ def index(request):
         except:
             print('NULL')
         
-    return render(request,'Profile/profile.html',{'data':data,'skills':skills,'edit':True,'dp':dp_form,'current':current,'job':job_list})
+        return render(request,'Profile/profile.html',{'data':data,'skills':skills,'edit':True,'dp':dp_form,'current':current,'job':job_list})
+    else:
+        return redirect('SignIn:signin')
+
 
 def search(request):
     conn = db()
@@ -259,7 +262,7 @@ def edit(request):
             row =  c.execute(sql,{'std_id':user['std_id']}).fetchone()
             if row is None:
                 sql = """ INSERT INTO PROFILE (STD_ID,HOUSE_NO,ROAD_NO,ZIP_CODE,CITY,COUNTRY,HOME_TOWN,ABOUT,FACEBOOK,TWITTER, LINKEDIN ,RESEARCHGATE, GOOGLE_SCHOLAR)
-                        VALUES(:std_id,:house,:road,:zip,:city,:country,:hometown,:about,:fb,:twitter,:linkedin,:rg,"google)"""
+                        VALUES(:std_id,:house,:road,:zip,:city,:country,:hometown,:about,:fb,:twitter,:linkedin,:rg,:google)"""
                 try:
                     c.execute(sql,profile)
                     conn.commit()
@@ -337,7 +340,19 @@ def edit(request):
     for row in rows:
         skills[row[0]] = row[1]
     job_form = JobForm()
-    return render(request,'Profile/edit.html',{'form':form_signup,'data':data,'skills':skills, 'job':job_form,'msg' : message,'dp':dp_form,'expert':expertise,'skill_error':skill_error})
+#------------------------------------Job History---------------------------------
+    sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    jobs = rows.fetchall()
+    columnNames = [d[0] for d in c.description]
+    job_list = []
+    for job in jobs:
+        try:
+            job_list.append(dict(zip(columnNames,job)))
+        except:
+            print('NULL')
+
+    return render(request,'Profile/edit.html',{'form':form_signup,'data':data,'jobs':job_list,'skills':skills, 'job':job_form,'msg' : message,'dp':dp_form,'expert':expertise,'skill_error':skill_error})
 
 def visit_profile(request,std_id):
     if 'std_id' in request.session:
