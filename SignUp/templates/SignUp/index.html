@@ -1,0 +1,182 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>BUET Alumni Portal</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="{% static 'SignUp/images/icons/favicon.ico' %}"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/bootstrap/css/bootstrap.min.css' %}">
+<!--========================================================SignUp================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/fonts/Linearicons-Free-v1.0.0/icon-font.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/fonts/iconic/css/material-design-iconic-font.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/animate/animate.css' %}">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/css-hamburgers/hamburgers.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/animsition/css/animsition.min.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/select2/select2.min.css' %}">
+<!--===============================================================================================-->	
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/vendor/daterangepicker/daterangepicker.css' %}">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/css/util.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'SignUp/css/main.css' %}">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<!--===============================================================================================-->
+</head>
+<body style="background-color: #999999;">
+	
+	<div class="limiter">
+		<div class="container-login100">
+			<div class="login100-more" style="background-image: url('{% static 'SignUp/images/bg-01.jpg' %}');"></div>  
+
+			<div class="wrap-login100 p-l-50 p-r-50 p-t-72 p-b-50">
+				<form class="login100-form validate-form" role="form" method="post" novalidate>
+					{% csrf_token %}
+					
+					<span class="login100-form-title p-b-59">
+						Sign Up
+					</span>
+
+<!--					{% if msg %}
+						<div class="alert-validate::before">
+							<span class="warning-input100">{{msg}}</span>
+							<br>
+							<br>
+						</div>
+					{% endif %}
+					-->
+					{% if form.non_field_errors %}
+						<div class="alert alert-danger" role="alert">
+						{% for error in form.non_field_errors %}
+							{{ error }}
+						{% endfor %}
+						</div>
+  					{% endif %}
+
+					{% for field in form.visible_fields %}
+
+						<div class="wrap-input100">
+							<span class="label-input100">{{ field.label_tag }}</span>
+						{% if form.is_bound %}
+							{% if field.errors %}
+								{% render_field field class="input100 is-invalid" %}
+								{% for error in field.errors %}
+									<div class="invalid-feedback">
+										{{ error }}
+									</div>
+								{% endfor %}
+							{% else %}
+								{% render_field field class="input100 is-valid" %}
+							{% endif %}
+						{% else %}
+							{% render_field field class="form-control" %}
+						{% endif %}
+							<span class="focus-input100"></span>
+						</div>
+
+					{% endfor %}
+
+<!-- 					<div class="wrap-input100 validate-input" data-validate="Full Name is required">
+						<span class="label-input100">Full Name</span>
+						<input class="input100" type="text" name="name" placeholder="Name...">
+						<span class="focus-input100"></span>
+					</div>
+
+
+					<div class="wrap-input100 validate-input">
+						<span class="label-input100">Nick Name</span>
+						<input class="input100" type="text" name="name" placeholder="Nick Name...">
+						<span class="focus-input100"></span>
+					</div>
+
+
+					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+						<span class="label-input100">Email</span>
+						<input class="input100" type="text" name="email" placeholder="Email addess...">
+						<span class="focus-input100"></span>
+					</div>
+
+
+					<div class="wrap-input100 validate-input" data-validate = "Password is required">
+						<span class="label-input100">Password</span>
+						<input class="input100" type="text" name="pass" placeholder="*************">
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input" data-validate = "Repeat Password is required">
+						<span class="label-input100">Repeat Password</span>
+						<input class="input100" type="text" name="repeat-pass" placeholder="*************">
+						<span class="focus-input100"></span>
+					</div>
+
+					<div class="wrap-input100 validate-input">
+						<span class="label-input100">Date of Birth</span>
+						<input class="input100" type="date" name="date">
+						<span class="focus-input100"></span>
+					</div>
+-->					
+<!--
+					<div class="flex-m w-full p-b-33">
+						<div class="contact100-form-checkbox">
+							<input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+							<label class="label-checkbox100" for="ckb1">
+								<span class="txt1">
+									I agree to the
+									<a href="#" class="txt2 hov1">
+										Terms of User
+									</a>
+								</span>
+							</label>
+						</div>
+
+						
+					</div>
+-->
+					<div class="container-login100-form-btn">
+						<div class="wrap-login100-form-btn">
+							<div class="login100-form-bgbtn"></div>
+							<button type="submit" value="submit" class="login100-form-btn">
+								Sign Up
+							</button>
+						</div>
+						<a href="{% url "SignIn:signin" %}?action=signin" class="dis-block txt3 hov1 p-r-30 p-t-10 p-b-10 p-l-30">
+							Sign in
+							<i class="fa fa-long-arrow-right m-l-5"></i>
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/animsition/js/animsition.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/bootstrap/js/popper.js' %}"></script>
+	<script src="{% static 'SignUp/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/select2/select2.min.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/daterangepicker/moment.min.js' %}"></script>
+	<script src="{% static 'SignUp/vendor/daterangepicker/daterangepicker.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/vendor/countdowntime/countdowntime.js' %}"></script>
+<!--===============================================================================================-->
+	<script src="{% static 'SignUp/js/main.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% block content %}
+{{msg}}
+{% if std_id is None %}
+    <form role="form" method="post"> 
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" value="submit" class="btn btn-info">Sign In</button>
+    </form>
+{% else %}
+    {{std_id}} successfully logged in.
+    <a href="{% url "SignIn:signin" %}?action=logout">Log Out</a>
+{% endif %}
+
+{%  endblock %}

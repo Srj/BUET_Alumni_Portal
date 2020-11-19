@@ -1,0 +1,1161 @@
+{% load static %}
+{% load widget_tweaks %}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
+<!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet"> -->
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+<style>
+  body {
+    color: #566787;
+    background: #f5f5f5;
+    font-family: 'Varela Round', sans-serif;
+    font-size: 13px;
+  }
+
+  .table-responsive {
+    margin: 30px 0;
+  }
+
+  .table-wrapper {
+    min-width: 1000px;
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+  }
+
+  .table-title {
+    padding-bottom: 15px;
+    background: #435d7d;
+    color: #fff;
+    padding: 16px 30px;
+    margin: -20px -25px 10px;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .table-title h2 {
+    margin: 5px 0 0;
+    font-size: 24px;
+  }
+
+  .table-title .btn-group {
+    float: right;
+  }
+
+  .table-title .btn {
+    color: #fff;
+    float: right;
+    font-size: 13px;
+    border: none;
+    min-width: 50px;
+    border-radius: 2px;
+    border: none;
+    outline: none !important;
+    margin-left: 10px;
+  }
+
+  .table-title .btn i {
+    float: left;
+    font-size: 21px;
+    margin-right: 5px;
+  }
+
+  .table-title .btn span {
+    float: left;
+    margin-top: 2px;
+  }
+
+  table.table tr th,
+  table.table tr td {
+    border-color: #e9e9e9;
+    padding: 12px 15px;
+    vertical-align: middle;
+  }
+
+  table.table tr th:first-child {
+    width: 60px;
+  }
+
+  table.table tr th:last-child {
+    width: 100px;
+  }
+
+  table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fcfcfc;
+  }
+
+  table.table-striped.table-hover tbody tr:hover {
+    background: #f5f5f5;
+  }
+
+  table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  table.table td:last-child i {
+    opacity: 0.9;
+    font-size: 22px;
+    margin: 0 5px;
+  }
+
+  table.table td a {
+    font-weight: bold;
+    color: #566787;
+    display: inline-block;
+    text-decoration: none;
+    outline: none !important;
+  }
+
+  table.table td a:hover {
+    color: #2196F3;
+  }
+
+  table.table td a.edit {
+    color: #FFC107;
+  }
+
+  table.table td a.delete {
+    color: #F44336;
+  }
+
+  table.table td i {
+    font-size: 19px;
+  }
+
+  table.table .avatar {
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+
+  .pagination {
+    float: right;
+    margin: 0 0 5px;
+  }
+
+  .pagination li a {
+    border: none;
+    font-size: 13px;
+    min-width: 30px;
+    min-height: 30px;
+    color: #999;
+    margin: 0 2px;
+    line-height: 30px;
+    border-radius: 2px !important;
+    text-align: center;
+    padding: 0 6px;
+  }
+
+  .pagination li a:hover {
+    color: #666;
+  }
+
+  .pagination li.active a,
+  .pagination li.active a.page-link {
+    background: #03A9F4;
+  }
+
+  .pagination li.active a:hover {
+    background: #0397d6;
+  }
+
+  .pagination li.disabled i {
+    color: #ccc;
+  }
+
+  .pagination li i {
+    font-size: 16px;
+    padding-top: 6px
+  }
+
+  .hint-text {
+    float: left;
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  /* Custom checkbox */
+  .custom-checkbox {
+    position: relative;
+  }
+
+  .custom-checkbox input[type="checkbox"] {
+    opacity: 0;
+    position: absolute;
+    margin: 5px 0 0 3px;
+    z-index: 9;
+  }
+
+  .custom-checkbox label:before {
+    width: 18px;
+    height: 18px;
+  }
+
+  .custom-checkbox label:before {
+    content: '';
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: text-top;
+    background: white;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    box-sizing: border-box;
+    z-index: 2;
+  }
+
+  .custom-checkbox input[type="checkbox"]:checked+label:after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid #000;
+    border-width: 0 3px 3px 0;
+    transform: inherit;
+    z-index: 3;
+    transform: rotateZ(45deg);
+  }
+
+  .custom-checkbox input[type="checkbox"]:checked+label:before {
+    border-color: #03A9F4;
+    background: #03A9F4;
+  }
+
+  .custom-checkbox input[type="checkbox"]:checked+label:after {
+    border-color: #fff;
+  }
+
+  .custom-checkbox input[type="checkbox"]:disabled+label:before {
+    color: #b8b8b8;
+    cursor: auto;
+    box-shadow: none;
+    background: #ddd;
+  }
+
+  /* Modal styles */
+  .modal .modal-dialog {
+    max-width: 400px;
+  }
+
+  .modal .modal-header,
+  .modal .modal-body,
+  .modal .modal-footer {
+    padding: 20px 30px;
+  }
+
+  .modal .modal-content {
+    border-radius: 3px;
+  }
+
+  .modal .modal-footer {
+    background: #ecf0f1;
+    border-radius: 0 0 3px 3px;
+  }
+
+  .modal .modal-title {
+    display: inline-block;
+  }
+
+  .modal .form-control {
+    border-radius: 2px;
+    box-shadow: none;
+    border-color: #dddddd;
+  }
+
+  .modal textarea.form-control {
+    resize: vertical;
+  }
+
+  .modal .btn {
+    border-radius: 2px;
+    min-width: 100px;
+  }
+
+  .modal form label {
+    font-weight: normal;
+  }
+</style>
+<script>
+  $('#deleteEmployeeModal').on('show.bs.modal', function (e) {
+
+    //get data-id attribute of the clicked element
+    var bookId = $(e.relatedTarget).data('book-id');
+
+    //populate the textbox
+    $(e.currentTarget).find('input[name="bookId"]').val(bookId);
+  });
+
+
+  $(document).ready(function () {
+    // Activate tooltip
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Select/Deselect checkboxes
+    var checkbox = $('table tbody input[type="checkbox"]');
+    $("#selectAll").click(function () {
+      if (this.checked) {
+        checkbox.each(function () {
+          this.checked = true;
+        });
+      } else {
+        checkbox.each(function () {
+          this.checked = false;
+        });
+      }
+    });
+    checkbox.click(function () {
+      if (!this.checked) {
+        $("#selectAll").prop("checked", false);
+      }
+    });
+  });
+</script>
+
+<body>
+  <div class="main-content">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
+          href="https://www.creative-tim.com/product/argon-dashboard" target="_blank">User profile</a>
+        <!-- Form -->
+        <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+          <div class="form-group mb-0">
+            <div class="input-group input-group-alternative">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+              </div>
+              <input class="form-control" placeholder="Search" type="text">
+            </div>
+          </div>
+        </form>
+        <!-- User -->
+        <ul class="navbar-nav align-items-center d-none d-md-flex">
+          <li class="nav-item dropdown">
+            <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              <div class="media align-items-center">
+                <span class="avatar avatar-sm rounded-circle">
+                  <!-- <img alt="Image placeholder" src="https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg"> -->
+                </span>
+                <div class="media-body ml-2 d-none d-lg-block">
+                  <span class="mb-0 text-sm  font-weight-bold">{{data.full_name}}</span>
+                </div>
+              </div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+              <div class=" dropdown-header noti-title">
+                <h6 class="text-overflow m-0">Welcome!</h6>
+              </div>
+              <a href="../examples/profile.html" class="dropdown-item">
+                <i class="ni ni-single-02"></i>
+                <span>My profile</span>
+              </a>
+              <a href="../examples/profile.html" class="dropdown-item">
+                <i class="ni ni-settings-gear-65"></i>
+                <span>Settings</span>
+              </a>
+              <a href="../examples/profile.html" class="dropdown-item">
+                <i class="ni ni-calendar-grid-58"></i>
+                <span>Activity</span>
+              </a>
+              <a href="../examples/profile.html" class="dropdown-item">
+                <i class="ni ni-support-16"></i>
+                <span>Support</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#!" class="dropdown-item">
+                <i class="ni ni-user-run"></i>
+                <span>Logout</span>
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Header -->
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+      style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
+      <!-- Mask -->
+      <span class="mask bg-gradient-default opacity-8"></span>
+      <!-- Header container -->
+      <div class="container-fluid d-flex align-items-center">
+        <div class="row">
+          <div class="col-lg-7 col-md-10">
+            <h1 class="display-2 text-white">Hello {{data.NICK_NAME}}</h1>
+            <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with your
+              work and manage your projects or assigned tasks</p>
+            <a href="{% url 'Profile:profile' %}" class="btn btn-info">Profile</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <div class="row">
+        <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+          <div class="card card-profile shadow">
+            <div class="row justify-content-center">
+              <div class="col-lg-3 order-lg-2">
+                <div class="card-profile-image">
+                  <a href="#">
+                    {% static "Profile/DP/" as baseUrl %}
+                    <img src="{{baseUrl}}{{data.PHOTO}}" class="rounded-circle">
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+              <div class="d-flex justify-content-between">
+                <a href="#"></a>
+
+                <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <p hidden>
+                    {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                  </p>
+                  <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' />
+                </form>
+              </div>
+            </div>
+            <div class="card-body pt-0 pt-md-4">
+              <div class="row">
+                <div class="col">
+                  <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                    <div>
+                      <span class="heading">0</span>
+                      <span class="description">Friends</span>
+                    </div>
+                    <div>
+                      <span class="heading">1</span>
+                      <span class="description">Photos</span>
+                    </div>
+                    <div>
+                      <span class="heading">0</span>
+                      <span class="description">Comments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center">
+                <h3>
+                  {{data.FULL_NAME}}<span class="font-weight-light">, 22</span>
+                </h3>
+                <div class="h5 font-weight-300">
+                  <i class="ni location_pin mr-2"></i>{{data.CITY}}, {{data.COUNTRY}}<br>
+                  {% if data.FACEBOOK %}
+                  <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
+                  {% endif %}
+                  {% if data.FACEBOOK %}
+                  <a href=/{{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                  {% endif %}
+                  {% if data.LINKEDIN %}
+                  <a href=/{{data.LINKEDIN}}> L<i class="fab fa-linkedin-in"></i></i></a>
+                  {% endif %}
+                  {% if data.GOOGLE_SCHOLAR %}
+                  <a href=/{{data.GOOGLE_SCHOLAR}}>G<i class="fab fa-google"></i>/i></a>
+                  {% endif %}
+                  {% if data.RESEARCHGATE %}
+                  <a href=/{{data.RESEARCHGATE}}>R<i class="fab fa-researchgate"></i></i></a>
+                  {% endif %}
+                </div>
+                <div class="h5 mt-4">
+                  <i class="ni business_briefcase-24 mr-2"></i>Undergrad
+                </div>
+                <div>
+                  <i class="ni education_hat mr-2"></i>Bangladesh University of Engineering &
+                  Technology<br><br><b>Interests</b><br>
+                  {% for key, value in skills.items %}
+                  {{key}} ({{value}})<br />
+                  {% endfor %}
+                </div>
+                <hr class="my-4">
+                {{data.ABOUT}}
+                <a href="#">Show more</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-8 order-xl-1">
+          <div class="card bg-secondary shadow">
+            <div class="card-header bg-white border-0">
+              <div class="row align-items-center">
+                <div class="col-8">
+                  <h3 class="mb-0">My account</h3>
+                </div>
+                <div class="col-4 text-right">
+                  <a href="#!" class="btn btn-sm btn-primary">Settings</a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <form role="form" method="post" novalidate>
+                {% csrf_token %}
+                <h6 class="heading-small text-muted mb-4">User information</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-username">Full Name</label><br>
+                        {% render_field form.fullname class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-email">Nick Name</label><br>
+                        {% render_field form.nickname class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">Email Address</label><br>
+                        {% render_field form.email class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">Student ID</label><br>
+                        <label class="form-control-label">{{data.STD_ID}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">Mobile No</label><br>
+                        {% render_field form.mobile class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">Date of Birth</label><br>
+                        {% render_field form.birthdate class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">Depertment </label><br>
+                        {% render_field form.dept class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">HALL</label><br>
+                        {% render_field form.hall class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  {% render_field field class="form-control form-control-alternative" %}
+
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">LEVEL</label><br>
+                        {% render_field form.level class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">TERM</label><br>
+                        {% render_field form.term class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">M.Sc </label><br>
+                        {% render_field form.msc class="form-control" %}
+                      </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">PhD</label><br>
+                        {% render_field form.phd class="form-control" %}
+                      </div>
+                    </div>
+                  </div>
+
+
+                </div>
+                <hr class="my-4">
+                <!-- Address -->
+                <h6 class="heading-small text-muted mb-4">Contact information</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">House No</label><br>
+                        {% render_field form.house class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-country">Road No</label><br>
+                        {% render_field form.road class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-country">Zip Code</label><br>
+                        {% render_field form.zipcode class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">City</label><br>
+                        {% render_field form.city class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-country">Country</label><br>
+                        {% render_field form.country class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-country">Home Town</label><br>
+                        {% render_field form.hometown class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+                <!-- Address -->
+                <h6 class="heading-small text-muted mb-4">Social Information</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Facebook</label><br>
+                        {% render_field form.fb class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Twitter</label><br>
+                        {% render_field form.twitter class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">LinkedIn</label><br>
+                        {% render_field form.linkedin class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">ResearchGate</label><br>
+                        {% render_field form.rg class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-city">Google Scholar</label><br>
+                        {% render_field form.google class="form-control form-control-alternative" %}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <hr class="my-4">
+                <!-- Description -->
+
+
+
+                <h6 class="heading-small text-muted mb-4">About me</h6>
+                <div class="pl-lg-4">
+                  <div class="form-group focused">
+                    <label>About Me</label>
+                    {% render_field form.about class="form-control form-control-alternative" %}
+                    <!--<textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>-->
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Update Profile
+                </button>
+
+              </form>
+
+              <div class="container">
+                <div class="table-responsive">
+                  <div class="table-wrapper">
+                    <div class="table-title">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <h2>Interests</h2>
+                        </div>
+                        <div class="col-xs-6">
+                          <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+                              class="material-icons">&#xE147;</i> <span>Add New Topic</span></a>
+                          <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
+                              class="material-icons">&#xE15C;</i> <span>Delete Topic</span></a>
+                        </div>
+                      </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <th>
+                            <span class="custom-checkbox">
+                              <input type="checkbox" id="selectAll">
+                              <label for="selectAll"></label>
+                            </span>
+                          </th>
+                          <th>Topic Name</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+
+
+                        {% for key, value in skills.items %}
+                        <tr>
+                          <td>
+                            <span class="custom-checkbox">
+                              <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                              <label for="checkbox1"></label>
+                            </span>
+                          </td>
+                          <td id={{key}}>{{key}}</td>
+                          <td>
+                            <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
+                                data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"
+                                data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              
+
+
+              <div class="container">
+                <div class="table-responsive">
+                  <div class="table-wrapper">
+                    <div class="table-title">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <h2>Work History</h2>
+                        </div>
+                        <div class="col-xs-6">
+                          <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+                              class="material-icons">&#xE147;</i> <span>Add New History</span></a>
+                          <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
+                              class="material-icons">&#xE15C;</i> <span>Delete Work</span></a>
+                        </div>
+                      </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <th>
+                            <span class="custom-checkbox">
+                              <input type="checkbox" id="selectAll">
+                              <label for="selectAll"></label>
+                            </span>
+                          </th>
+                          <th>Institute Name</th>
+                          <th>Designation</th>
+                          <th>From</th>
+                          <th>Till</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+
+
+                        {% for row in jobs %}
+                        <tr>
+                          <td>
+                            <span class="custom-checkbox">
+                              <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                              <label for="checkbox1"></label>
+                            </span>
+                          </td>
+                          <td >{{row.NAME}}</td>
+                          <td >{{row.DESIGNATION}}</td>
+                          <td >{{row.FROM_.year}}</td>
+                          <td >{% if row.TO_ %}
+                            {{row.TO_.year}}
+                          {% else %}
+                            -
+                          {% endif %}</td>
+                          <td>
+                            <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
+                                data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"
+                                data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Edit Modal HTML -->
+              <div id="addEmployeeModal" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{% url 'Profile:edit_expertise' %}" method="post">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h4 class="modal-title">Add Topic</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label>Topic Name</label>
+                          {% render_field expert.topic class="form-control" %}
+                          <!-- <input type="text" class="form-control" required> -->
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn btn-success" value="Add">
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Edit Modal HTML -->
+
+              <div id="editEmployeeModal" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form>
+                      <div class="modal-header">
+                        <h4 class="modal-title">Edit Topic</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label>Topic Name</label>
+                          <input type="text" class="form-control" required>
+                        </div>
+                        <div class="modal-footer">
+                          <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                          <input type="submit" class="btn btn-info" value="Save">
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Delete Modal HTML -->
+
+              <div id="deleteEmployeeModal" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{% url 'Profile:delete_expertise'  %}" method="post">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h4 class="modal-title">Delete Topic</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to delete these Records?</p>
+                        <p class="text-warning"><small>This action cannot be undone.</small></p>
+                      </div>
+                      <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn btn-danger" value="Delete">
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Edit Modal HTML -->
+              <div id="addEmploy" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{% url 'Profile:edit_job'  %}" method="post">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h4 class="modal-title">Add Job</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label>Topic Name</label>
+                          {% render_field expert.topic class="form-control" %}
+                          <!-- <input type="text" class="form-control" required> -->
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn btn-success" value="Add">
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Edit Modal HTML -->
+
+              <div id="editEmpeeModal" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form>
+                      <div class="modal-header">
+                        <h4 class="modal-title">Edit Topic</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label>Topic Name</label>
+                          <input type="text" class="form-control" required>
+                        </div>
+                        <div class="modal-footer">
+                          <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                          <input type="submit" class="btn btn-info" value="Save">
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Delete Modal HTML -->
+
+              <div id="deleteoyeeModal" class="modal fade">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{% url 'Profile:delete_expertise'  %}" method="post">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h4 class="modal-title">Delete Topic</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to delete these Records?</p>
+                        <p class="text-warning"><small>This action cannot be undone.</small></p>
+                      </div>
+                      <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                        <input type="submit" class="btn btn-danger" value="Delete">
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              <!-- <h6 class="heading-small text-muted mb-4">Interests</h6>
+              <form action="{% url 'Profile:edit_expertise'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Topic Name</label>
+                      {% render_field expert.topic class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Add More
+                </button>
+                       
+              </form> 
+              <form action="{% url 'Profile:delete_expertise'  %}" method="post"> 
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                  </div>
+                {% endif %}
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Topic Name</label>
+                      {% render_field expert.topic class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Delete Topic
+                </button>
+                       
+              </form>  -->
+
+
+              <h6 class="heading-small text-muted mb-4">Job History</h6>
+              <form action="{% url 'Profile:edit_job'  %}" method="post">
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                </div>
+                {% endif %}
+                <div class="row">
+                  <div class=pl-lg-4">
+                    <div class="form-group focused">
+                      <label>Institute Name</label>
+                      {% render_field job.name class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Designation</label>
+                      {% render_field job.designation class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>FROM </label>
+                      {% render_field job.from_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>TILL</label>
+                      {% render_field job.to_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Add More
+                </button>
+              </form>
+
+              <h6 class="heading-small text-muted mb-4">Delete History</h6>
+              <form action="{% url 'Profile:delete_job'  %}" method="post">
+                {% csrf_token %}
+                {%if skill_error%}
+                <div class="alert alert-danger" role="alert">
+                  {{skill_error }}
+                </div>
+                {% endif %}
+                <div class="row">
+                  <div class="pl-lg-4">
+                    <div class="form-group focused">
+                      <label>Institute Name</label>
+                      {% render_field job.name class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>Designation</label>
+                      {% render_field job.designation class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group focused">
+                      <label>FROM </label>
+                      {% render_field job.from_ class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" value="submit" class="btn btn-info">
+                  Delete Job History
+                </button>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <footer class="footer">
+    <div class="row align-items-center justify-content-xl-between">
+      <div class="col-xl-6 m-auto text-center">
+        <div class="copyright">
+          <p></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
