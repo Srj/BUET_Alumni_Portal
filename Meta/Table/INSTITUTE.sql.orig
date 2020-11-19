@@ -4,7 +4,7 @@
  Source Server         : Django
  Source Server Type    : Oracle
  Source Server Version : 110200
- Source Schema         : DJANGO_DB
+ Source Schema         : PROJECT
 
  Target Server Type    : Oracle
  Target Server Version : 110200
@@ -44,9 +44,17 @@ DISABLE ROW MOVEMENT
 -- ----------------------------
 -- Records of INSTITUTE
 -- ----------------------------
+<<<<<<< HEAD
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('1', 'Bangladesh University of Engineering & Technology', 'Dhaka', 'Bangladesh', 'University');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('5', 'Mohammadpur Government High School', 'Dhaka', 'Bangladesh', 'School');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('2', 'Khulna University of Engineering & Technology', 'Khulna', 'Bangladesh', 'University');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('3', 'ACI Limited', 'Dhaka', 'Bangladesh', 'Drug Company');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('4', 'Notre Dame College', 'Dhaka', 'Bangladesh', 'College');
 INSERT INTO "DJANGO_DB"."INSTITUTE" VALUES ('21', 'Banani Bidyaniketan', 'Dhaka', 'Bangladesh', 'School');
+=======
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('1', 'Bangladesh University of Engineering & Technology', 'Dhaka', 'Bangladesh', 'University');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('5', 'Mohammadpur Government High School', 'Dhaka', 'Bangladesh', 'School');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('2', 'Khulna University of Engineering & Technology', 'Khulna', 'Bangladesh', 'University');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('3', 'ACI Limited', 'Dhaka', 'Bangladesh', 'Drug Company');
+INSERT INTO "PROJECT"."INSTITUTE" VALUES ('4', 'Notre Dame College', 'Dhaka', 'Bangladesh', 'College');
+>>>>>>> 2fa4655ce99bcb0a9f19be6911825a7334197b95

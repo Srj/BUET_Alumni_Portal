@@ -4,7 +4,7 @@
  Source Server         : Django
  Source Server Type    : Oracle
  Source Server Version : 110200
- Source Schema         : DJANGO_DB
+ Source Schema         : PROJECT
 
  Target Server Type    : Oracle
  Target Server Version : 110200
@@ -41,6 +41,7 @@ DISABLE ROW MOVEMENT
 -- ----------------------------
 -- Records of EXPERTISE
 -- ----------------------------
+<<<<<<< HEAD
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705095', 'Robotics');
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705096', 'Algorithms');
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705096', 'Cryptography');
@@ -527,3 +528,15 @@ INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705069', 'Image Processing');
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705069', 'Internet of Things (IoT)');
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705069', 'Networking');
 INSERT INTO "DJANGO_DB"."EXPERTISE" VALUES ('1705069', 'Research');
+=======
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705002', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705004', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Algorithm');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Computer Vision');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Deep Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Machine Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Natural Language Processing');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705008', 'Networking');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705015', 'Machine Learning');
+INSERT INTO "PROJECT"."EXPERTISE" VALUES ('1705056', 'Algorithm');
+>>>>>>> 2fa4655ce99bcb0a9f19be6911825a7334197b95

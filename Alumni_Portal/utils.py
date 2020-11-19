@@ -13,7 +13,7 @@ pwd_context = CryptContext(
 #--------------------------Connect Database----------------------------- 
 def db():
     dsn_tns = cx_Oracle.makedsn('localhost','1521',service_name='ORCL')
-    return cx_Oracle.connect(user='django_db',password='007007',dsn=dsn_tns)
+    return cx_Oracle.connect(user='PROJECT',password='4321',dsn=dsn_tns)
 
 
 #----------------Logged In----------------

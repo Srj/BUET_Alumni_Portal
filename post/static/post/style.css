@@ -1,0 +1,98 @@
+.total-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    
+}
+
+.total-container .right-container{
+    height: 100%;
+    width: 30%;
+    
+}
+
+.total-container .left-container{
+    height: 100%;
+    width: 70%;
+    
+}
+
+.total-container .right-container img{
+    height: 60px;
+    width: 70px
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+.topnav {
+    overflow: hidden;
+    background-color: #333;
+}
+
+.topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.left-container{
+    
+}
+
+
+
+
+
+.short-post-container img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.short-post-container{
+    display: flex;
+    justify-content: flex-start;
+    border: gray;
+    border-style: solid;
+    align-items: center;
+    max-width: 600px;
+    border-radius: 20px;
+}
+.short-post-container .text-stuffs {
+    
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.short-post-container > .text-stuffs > * {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.short-post-container .text-stuffs i{
+    padding-left: 50px;
+}
+
+.all-post{
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.all-post a{
+    text-decoration: none;
+    color: black;
+}
