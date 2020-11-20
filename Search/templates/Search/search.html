@@ -1,0 +1,212 @@
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'Search/search.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet" />
+<style>
+  body {
+    background-image: url({{MEDIA_URL}}buet_field.jpg);
+
+  }
+</style> 
+<div class="container h-100 p-5">
+  <div class="row justify-content-md-center">
+    <div class="col-12 pb-5">
+        <div class="card bg-secondary pb-5 ">
+          <div class="card-header bg-white border-0">
+            <div class="row align-items-center">
+              <div class="col-8">
+                <h3 class="mb-0">Search Alumni</h3>
+              </div>
+              <div class="col-4 text-right">
+                <a href="{% url 'Profile:profile' %}" class="btn btn-sm btn-primary">Back to Profile</a>
+              </div>
+            </div>
+          </div> <!---->
+          <div class="card-body">
+                    <form role="form" method="post">
+                      {% csrf_token %}
+                    <h6 class="heading-small text-muted mb-4">Search Profile</h6>
+                    <div class="pl-lg-4">
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="form-group focused">
+                            <label class="form-control-label" for="input-city">Name/ID</label><br>
+                            {% render_field form.name class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-4">
+                          <div class="form-group focused">
+                            <label class="form-control-label" for="input-city">Department</label><br>
+                            {% render_field form.dept class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                        <div class="col-lg-4">
+                          <div class="form-group focused">
+                            <label class="form-control-label" for="input-country">Hall</label><br>
+                            {% render_field form.hall class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                        <div class="col-lg-4">
+                          <div class="form-group">
+                            <label class="form-control-label" for="input-country">Level</label><br>
+                            {% render_field form.term class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-4">
+                          <div class="form-group focused">
+                            <label class="form-control-label" for="input-city">Institute</label><br>
+                            {% render_field form.institution class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                        <div class="col-lg-4">
+                          <div class="form-group focused">
+                            <label class="form-control-label" for="input-country">Interests</label><br>
+                            {% render_field form.interest class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                        <div class="col-lg-4">
+                          <div class="form-group">
+                            <label class="form-control-label" for="input-country">Location</label><br>
+                            {% render_field form.location class="form-control form-control-alternative" %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-row-reverse">
+                      <div class="col-lg-2">
+                        <div class="form-group focused">
+                    <button type="submit" value="submit" class="btn btn-info">Search</button>
+                        </div>
+                      </div>
+                    </div>
+                    </form>
+          </div>
+        </div> <!-- Card -->
+    </div>
+
+
+
+      {% for row in data %}
+
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="our-team">
+                    <div class="picture">
+                      <img class="img-fluid" src="{{MEDIA_URL}}{{row.PHOTO}}" height=130 weight=130>
+                    </div>
+                    <div class="team-content">
+                      <a href={% url 'Profile:visit_profile' std_id=row.STD_ID %}><h3 class="name">{{row.FULL_NAME}}</h3></a> 
+                      {% if row.DESIGNATION %}
+                        <h4 class="title">{{row.DESIGNATION}},<br>{{row.COMPANY}}</h4>
+                      {% endif %}
+                    </div>
+                    <ul class="social">
+                      <li><a href="{{row.FACEBOOK}}" class="fa fa-facebook" aria-hidden="true"></a></li>
+                      <li><a href="{{row.TWITTER}}" class="fa fa-twitter" aria-hidden="true"></a></li>
+                      <li><a href="{{row.GOOGLE_SCHOLAR}}" class="fa fa-google-plus" aria-hidden="true"></a></li>
+                      <li><a href="{{row.LINKEDIN}}" class="fa fa-linkedin" aria-hidden="true"></a></li>
+                    </ul>
+                </div>
+          </div>
+          
+      {% endfor %}
+
+    </div> 
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+
+<div class="container">
+  <div class="card">
+    <div class="card-header bg-white border-0">
+      <div class="row align-items-center">
+        <div class="col-8">
+          <div class="pl-lg-4">
+         <div class="row">
+        <form role="form" method="post">
+          {% csrf_token %}
+            <div class="inner-form">
+              
+            </div>
+            <div class="pl-lg-4">
+              <div class="advance-search">
+                <div class="row">
+                  <div class="col-lg-12">
+                      {% render_field form.name class="form-control form-control-alternative" %}
+                  </div>
+                  <div class="col-lg-4">
+                    <label class="form-control-label" for="input-country">Location</label>
+                    {% render_field form.location class="form-control form-control-alternative" %}
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="input-field">
+                      <label class="form-control-label" for="input-country">Institution</label>
+                      {% render_field form.institution class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="input-field">
+                      <label class="form-control-label" for="input-country">Interests</label>
+                      {% render_field form.interest class="form-control form-control-alternative" %}
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <div class="result-count">
+                      <span>{{count}} </span>results</div>
+                    <div class="group-btn">
+                  
+                      <button type="submit" value="submit" class="btn btn-info">Search</button>
+                    </div>
+                    </div>
+                  
+                  </div>
+                </div>
+                <div class="row third">
+                  
+                </div>
+              </div>
+            </div>
+          </form>
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+-->    
+
+
+      
