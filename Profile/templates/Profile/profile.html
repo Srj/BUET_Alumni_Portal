@@ -100,16 +100,12 @@
             <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile has made with your work and manage your projects or assigned tasks</p>
             {% if edit %}
               <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
-<<<<<<< HEAD
-              <a href="{% url 'SignIn:logout' %}" class="btn btn-info">Log Out</a>
-=======
-              <a href="{% url 'SignIn:signin' %}" class="btn btn-info">Log Out</a>
+              <a href="{% url 'SignIn:logout'%}" class="btn ntn-info">Log Out</a>
               <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn ntn-info">Timeline</a>
->>>>>>> 2fa4655ce99bcb0a9f19be6911825a7334197b95
             {% else %}
               <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
             {% endif %}
-              <a href="{% url 'Profile:search' %}" class="btn btn-info">Search</a>
+              <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
           </div>
         </div>
       </div>
@@ -199,7 +195,7 @@
                 {% if data.LVL %}
                   <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at {{data.LVL}}-{{data.TERM}}</b></h6>
                 {% else %}
-                  <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{current.DESIGNATION|title }} at<i class="ni education_hat mr-2"></i>{{current.NAME}}</b></h6>
+                  <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{data.DESIGNATION|title }} at<i class="ni education_hat mr-2"></i>{{data.COMPANY}}</b></h6>
                 {% endif %}
                 <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}}, {{data.COUNTRY}}<br></b></h6>
                 <br>

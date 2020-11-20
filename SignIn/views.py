@@ -4,6 +4,7 @@ from Alumni_Portal.utils import check_encrypted_password,db
 import cx_Oracle
 from .forms import SignInForm
 from django.http import HttpResponseRedirect
+
 def index(request):
     conn = db()
     std_id = None
@@ -11,7 +12,7 @@ def index(request):
     form = SignInForm()
     if request.method == 'GET':
         if 'std_id' in request.session:
-            print('Cannot Log Out')
+            print('Signed In' + str(request.session['std_id']))
             return redirect('Profile:profile')
 
         else:
@@ -34,19 +35,21 @@ def index(request):
             else:
                 if check_encrypted_password(password,row[0]):
                     request.session['std_id'] = std_id
+                    print('Signed In' + str(request.session['std_id']))
                     return HttpResponseRedirect('/profile')
                 else:
                     message = "Invalid Password"
                     std_id = None
             conn.close()
     return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
-    #return render(request,'SignIn/SignIn.html',{'form':form, 'msg' : message,'std_id': std_id})
+   
 
 def logout(request):
-    print('In LogOuts')
+   
     if 'std_id' in request.session:
         try:
             del request.session['std_id']
+            print('Logged Out' + str(request.session['std_id']))
         except KeyError:
-            print('Logged Out Not ')
+            print('Cannot Log out')
     return redirect('/')

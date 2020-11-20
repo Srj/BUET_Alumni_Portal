@@ -24,7 +24,9 @@ urlpatterns = [
     path('', include('SignUp.urls'),name='SignUp'),
     path('', include('SignIn.urls'),name='SignIn'),
     path('profile/',include('Profile.urls'),name='Profile'),
-    path('post/', include('post.urls'), name='post')
+    path('post/', include('post.urls'), name='post'),
+    path('Timeline/', include('Timeline.urls'), name='Timeline'),
+    path('Search/', include('Search.urls'), name='Search'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
