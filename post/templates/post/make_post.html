@@ -1,91 +1,250 @@
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
+
+
+
+
 <h2> Write a Post </h2> <br>
 
-{% if type == None %}
-  <form action="{% url 'post:make_post' %}">
 
-    <select name="post_type">
-      <option value="Help" selected> Help </option>
-      <option value="Career"> Career </option>
-      <option value="Research"> Research </option>
-      <option value="Job Post"> Job Post </option>
-    </select>
-    <br>
-    <input type="submit" value="Selected">
+
+{% if type == None %}
+  <form action="{% url 'post:make_post' %}" class="select-class-container">
+
+    <div class="column">
+      <select name="post_type">
+        <option value="Help" selected> Help </option>
+        <option value="Career"> Career </option>
+        <option value="Research"> Research </option>
+        <option value="Job Post"> Job Post </option>
+      </select>
+    </div>
+    
+    <div class="column">
+      <input type="submit" value="Selected">
+    </div>
+    
   </form>
 {% endif %}
 
 
 
 {% if type == 'Help' %}
-  <form action="{% url 'post:make_post' %}">
+  <form action="{% url 'post:make_post' %}" class="select-class-container">
 
-    <select name="post_type">
-      <option value="Help" selected> Help </option>
-      <option value="Career"> Career </option>
-      <option value="Research"> Research </option>
-      <option value="Job Post"> Job Post </option>
-    </select>
-    <br>
-    <input type="submit" value="Selected">
+    <div class="column">
+      <select name="post_type">
+        <option value="Help" selected> Help </option>
+        <option value="Career"> Career </option>
+        <option value="Research"> Research </option>
+        <option value="Job Post"> Job Post </option>
+      </select>
+    </div>
+    
+    <div class="column">
+      <input type="submit" value="Selected">
+    </div>
+    
   </form>
   <br>
 
-  <form action="{% url 'post:upload_post' %}">
+  <form action="{% url 'post:upload_post' %}" class="upload-info-container">
+    
 
-    <label for="type_of_help">Type of Help</label>
-    <input type="text" name="type_of_help" value="Write Here"><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="type_of_help">Type of Help</label>
+      </div>
 
-    <label for="reason">Reason</label>
-    <textarea name="reason" rows="2" cols="50">Write Here</textarea><br>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="type_of_help" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "type_of_help" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="type_of_help" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="type_of_help" value="{{filled_data.type_of_help}}">
+          </div>
+        {% endif %}
+      {% endif %}
 
-    <label for="deadline">Deadline</label>
-    <input type="date" name="deadline"><br>
+    </div>
+    
+    <div class="row">
+      <div class="col-25">
+        <label for="reason">Reason</label>
+      </div>
+      
 
-    <label for="cell">Cell No</label>
-    <input type="text" name="cell" value="Write Here"><br>
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="reason" rows="2" cols="50" placeholder="Write Here"></textarea>
+        </div> 
+      {% else %}
+        {% if "reason" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="reason" rows="2" cols="50" placeholder="This Field Must Be Filled !!!", style="border: 2px solid red;"></textarea>
+          </div> 
+        {% else %}
+          <div class="col-75">
+            <textarea name="reason" rows="2" cols="50">{{filled_data.reason}}</textarea>
+          </div> 
+        {% endif %}
 
-    <label for='description'>Description</label>
-    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+      {% endif %}
+      
+    </div>
+    
+    
+    
+    <div class="row">
+      <div class="col-25">
+        <label for="cell">Cell No</label>
+      </div>
 
-    <input type="submit" value="Post" >
+      
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="cell" placeholder="123456..">
+        </div>
+      {% else %}
+        {% if "cell" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="cell" placeholder="This Field Must Be Filled !!!", style="border: 2px solid red;">
+          </div>
+        {% else %}
+          {% if cell_wrong %}
+            <div class="col-75">
+              <input type="text" name="cell" placeholder="Incorrect Data Type !!!", style="border: 2px solid red;">
+            </div>
+          {% else %}
+            <div class="col-75">
+              <input type="text" name="cell" value="{{filled_data.cell}}">
+            </div>
+          {% endif %}
+        {% endif %}
+
+      {% endif %}
+      
+    </div>
+    
+    <div class="row">
+      <div class="col-25">
+        <label for='description'>Description</label>
+      </div>
+
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="description" rows="8" cols="100" placeholder="Write Here"></textarea>
+        </div>
+      {% else %}
+        {% if "description" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;"></textarea>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100">{{filled_data.description}}</textarea>
+          </div>
+        {% endif %}
+
+      {% endif %}
+    </div>
+
+    
+    
+    <div class="row">
+      <input type="submit" value="Post" >
+    </div>
+    
 
   </form>
 
-  {% if unfilled %}
-    <h5> {{ unfilled }}</h5>
-  {% endif %}
+  
 
 {% endif %}
 
 
 {% if type == 'Career' %}
-  <form action="{% url 'post:make_post' %}">
+  <form action="{% url 'post:make_post' %}" class="select-class-container">
 
-    <select name="post_type">
-      <option value="Help" > Help </option>
-      <option value="Career" selected> Career </option>
-      <option value="Research"> Research </option>
-      <option value="Job Post"> Job Post </option>
-    </select>
-    <br>
-    <input type="submit" value="Selected">
+    <div class="column">
+      <select name="post_type">
+        <option value="Help"> Help </option>
+        <option value="Career" selected> Career </option>
+        <option value="Research"> Research </option>
+        <option value="Job Post"> Job Post </option>
+      </select>
+    </div>
+    
+    <div class="column">
+      <input type="submit" value="Selected">
+    </div>
+    
   </form>
 
-  <form action="{% url 'post:upload_post' %}">
+  <form action="{% url 'post:upload_post' %}" class="upload-info-container">
 
-    <label for="topic_name">Topic Name</label>
-    <input type="text" name="topic_name" value="Write Here"><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="topic_name">Topic Name</label>
+      </div>
 
-    <label for='description'>Description</label>
-    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="topic_name" placeholder="Write Here"><br>
+        </div>
+      {% else %}
+        {% if "topic_name" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="topic_name" placeholder="This Field Must Be Field !!!" style="border: 2px solid red;"><br>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="topic_name" value="{{filled_data.topic_name}}"><br>
+          </div>
+        {% endif %}
 
-    <input type="submit" value="Post">
+      {% endif %}
+    </div>
+    
+    
+    <div class="row">
+      <div class="col-25">
+        <label for='description'>Description</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="description" rows="8" cols="100" placeholder="Write Here"></textarea>
+        </div>
+      {% else %}
+        {% if "description" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;"></textarea>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100">{{filled_data.description}}</textarea>
+          </div>
+        {% endif %}
+
+      {% endif %}
+      
+    </div>
+    
+    <div class="row">
+      <input type="submit" value="Post">
+    </div>
+    
 
   </form>
 
-  {% if unfilled %}
-    <h5> {{ unfilled }}</h5>
-  {% endif %}
+  
 
 {% endif %}
 
@@ -93,91 +252,328 @@
 
 
 {% if type == 'Research' %}
-  <form action="{% url 'post:make_post' %}">
+  <form action="{% url 'post:make_post' %}" class="select-class-container">
 
-    <select name="post_type">
-      <option value="Help"> Help </option>
-      <option value="Career"> Career </option>
-      <option value="Research" selected> Research </option>
-      <option value="Job Post"> Job Post </option>
-    </select>
-    <br>
-    <input type="submit" value="Selected">
+    <div class="column">
+      <select name="post_type">
+        <option value="Help"> Help </option>
+        <option value="Career"> Career </option>
+        <option value="Research" selected> Research </option>
+        <option value="Job Post"> Job Post </option>
+      </select>
+    </div>
+    
+    <div class="column">
+      <input type="submit" value="Selected">
+    </div>
   </form>
 
-  <form action="{% url 'post:upload_post' %}">
+  <form action="{% url 'post:upload_post' %}" class="upload-info-container">
+    
+    <div class="row">
+      <div class="col-25">
+        <label for="topic_name">Topic Name</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="topic_name" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "topic_name" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="topic_name" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="topic_name" value="{{filled_data.topic_name}}">
+          </div>
+        {% endif %}
 
-    <label for="topic_name">Topic Name</label>
-    <input type="text" name="topic_name" value="Write Here"><br>
+      {% endif %}
+      
+    </div>
+    
+    
 
 
-    <label for="date_of_publication">Date of Publication</label>
-    <input type="date" name="date_of_publication"><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="date_of_publication">Date of Publication</label>
+      </div>
+      <div class="col-75">
+        <input type="date" name="date_of_publication" >
+      </div>
+    </div>
 
-    <label for="journal">Journal</label>
-    <input type="text" name="journal" value="Write Here"><br>
+    
+    
+    
 
-    <label for="doi">DOI</label>
-    <input type="text" name="doi" value="Write Here"><br>
 
-    <label for='description'>Description</label>
-    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
+    <div class="row">
+      <div class="col-25">
+        <label for="journal">Journal</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="journal" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "journal" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="journal" placeholder="This Field Must be Filled !!!", style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="journal" value="{{filled_data.journal}}">
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+    
+    
 
-    <input type="submit" value="Post">
+
+    <div class="row">
+      <div class="col-25">
+        <label for="doi">DOI</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="doi" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "doi" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="doi" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="doi" value="{{filled_data.doi}}">
+          </div>
+        {% endif %}
+
+      {% endif %}
+      
+    </div>
+    
+    
+
+
+    <div class="row">
+      <div class="col-25">
+        <label for='description'>Description</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="description" rows="8" cols="100" placeholder="Write Here"></textarea>
+        </div>
+      {% else %}
+        {% if "description" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;"></textarea>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100">{{filled_data.description}}</textarea>
+          </div>
+        {% endif %}
+
+      {% endif %}
+      
+    </div>
+    
+    
+    <div class="row">
+      <input type="submit" value="Post">
+    </div>
+    
 
   </form>
 
-  {% if unfilled %}
-    <h5> {{ unfilled }}</h5>
-  {% endif %}
+  
+
+  
 
 {% endif %}
 
 
 
 {% if type == 'Job Post' %}
-  <form action="{% url 'post:make_post' %}">
+  <form action="{% url 'post:make_post' %}" class="select-class-container">
 
-    <select name="post_type">
-      <option value="Help"> Help </option>
-      <option value="Career"> Career </option>
-      <option value="Research"> Research </option>
-      <option value="Job Post" selected> Job Post </option>
-    </select>
+    <div class="column">
+      <select name="post_type">
+        <option value="Help"> Help </option>
+        <option value="Career"> Career </option>
+        <option value="Research"> Research </option>
+        <option value="Job Post" selected> Job Post </option>
+      </select>
+    </div>
+    
+    <div class="column">
+      <input type="submit" value="Selected">
+    </div>
+    
+  </form>
+
+  <form action="{% url 'post:upload_post' %}" class="upload-info-container">
+
+    <div class="row">
+      <div class="col-25">
+        <label for="company_name">Company Name</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="company_name" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "company_name" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="company_name" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="company_name" value="{{filled_data.company_name}}">
+          </div>
+        {% endif %}
+
+      {% endif %}
+      
+    </div>
+
+
+    <div class="row">
+      <div class="col-25">
+        <label for="designation">Designation</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="designation", placeholder='Write Here'>
+        </div>
+      {% else %}
+        {% if "designation" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="designation", placeholder='This Field Must be Filled !!!' style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="designation", value='{{filled_data.designation}}'>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+
+    <div class="row">
+      <div class="col-25">
+        <label for="location">Location</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="location" placeholder="Write Here">
+        </div>
+      {% else %}
+        {% if "location" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="location" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;">
+          </div>
+        {% else %}
+          <div class="col-75">
+            <input type="text" name="location" value="{{filled_data.location}}">
+          </div>
+        {% endif %}
+      {% endif %}
+      
+    </div>
+
+
+    <div class="row">
+      <div class="col-25">
+        <label for="salary">Approximate Salary(Optional)</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <input type="text" name="salary" placeholder="0000000"><br>
+        </div>
+      {% else %}
+        {% if "salary" in unfilled_list %}
+          <div class="col-75">
+            <input type="text" name="salary" placeholder="0000000"><br>
+          </div>
+        {% else %}
+          {% if salary_wrong %}
+            <div class="col-75">
+              <input type="text" name="salary" placeholder="Incorrect Data Type" style="border: 2px solid red;"><br>
+            </div>
+          {% else %}
+            <div class="col-75">
+              <input type="text" name="salary" value="{{filled_data.salary}}"><br>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+      
+      
+    </div>
+    
+    
+
+
+    <div class="row">
+      <div class="col-25">
+        <label for="min_requirement">Minimum Requirement</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="min_requirement" rows="8" cols="100" placeholder="Write Here"></textarea>
+        </div>
+      {% else %}
+        {% if "min_requirement" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="min_requirement" rows="8" cols="100" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;"></textarea>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <textarea name="min_requirement" rows="8" cols="100">{{filled_data.min_requirement}}</textarea>
+          </div>
+        {% endif %}
+      {% endif %}
+      
+    </div>
+    
+
+    <div class="row">
+      <div class="col-25">
+        <label for='description'>Description</label>
+      </div>
+      {% if not unfilled %}
+        <div class="col-75">
+          <textarea name="description" rows="8" cols="100" placeholder="Write Here"></textarea>
+        </div>
+      {% else %}
+        {% if "description" in unfilled_list %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100" placeholder="This Field Must Be Filled !!!" style="border: 2px solid red;"></textarea>
+          </div>
+        {% else %}
+          <div class="col-75">
+            <textarea name="description" rows="8" cols="100">{{filled_data.description}}</textarea>
+          </div>
+        {% endif %}
+      {% endif %}
+      
+    </div>
     <br>
-    <input type="submit" value="Selected">
-  </form>
 
-
-  <form action="{% url 'post:upload_post' %}">
-
-    <label for="company_name">Company Name</label>
-    <input type="text" name="company_name" value="Write Here"><br>
-
-
-    <label for="designation">Designation</label>
-    <input type="text" name="designation", value='Write Here'><br>
-
-    <label for="location">Location</label>
-    <input type="text" name="location" value="Write Here"><br>
-
-    <label for="salary">Approximate Salary</label>
-    <input type="number" name="salary" value="Optional"><br>
-
-    <label for="min_requirement">Minimum Requirement</label>
-    <textarea name="min_requirement" rows="8" cols="100">Write Here</textarea><br>
-
-
-    <label for='description'>Description</label>
-    <textarea name="description" rows="8" cols="100">Write Here</textarea><br>
-
-    <input type="submit" value="Post">
+    <div class="row">
+      <input type="submit" value="Post">
+    </div>
+    
 
   </form>
 
-  {% if unfilled %}
-    <h5> {{ unfilled }}</h5>
-  {% endif %}
+  
 
 
 

@@ -1,0 +1,135 @@
+
+.post-desc-header img{
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: slategrey;
+}
+
+.post-desc-header .name{
+    font-weight: 500;
+    color: #fff;
+    font-size: 20;
+}
+.post-desc-header .name a{
+    text-decoration: none;
+    color: rgb(68, 64, 64);
+}
+.post-desc-header .name a:hover{
+    text-decoration: underline;
+    color: rgb(31, 29, 29);
+}
+
+.post-desc-header{
+    width: 80%;
+    height: 80px;
+    padding: 10px;
+}
+.post-desc-header .one{
+    margin-right: 20px;
+    height: 80px;
+    float: left;
+}
+.post-desc-header .two{
+    margin-left: 5%;
+    height: 80px;
+}
+
+.post-desc-header .two .row1{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.post-desc-header .two .row2{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.post-desc-header .two .row2 span{
+    margin-right: 10px;
+}
+.post-desc-header .two .row2 i{
+    margin-left: 10px;
+}
+.text-contrainer{
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(153, 146, 153);
+    background: rgb(240, 237, 240);
+    padding: 10px;
+    margin-left: 7%;
+    width: 60%;
+    border-radius: 5px;
+    
+}
+
+
+.text-contrainer .row-detail{
+    width: 100%;
+    margin-bottom: 15px;
+    display: flex;
+    
+}
+.text-contrainer .row-detail .col-15{
+    width: 15%;
+    float: left;
+    
+}
+.text-contrainer .row-detail .col-85{
+    width: 85%;
+    margin-left: 5%; 
+}
+.text-contrainer .topic{
+    font-size: 16;
+    font-weight: 500;
+}
+
+.text-contrainer .row-detail .col-85 .span{
+    float: left;
+}
+
+pre{
+    margin-top: -1px;
+    white-space: pre-wrap;
+    font-size: 16;
+    font-weight: 500;
+    font-family: 'Times New Roman';
+}
+
+.post-meta{
+    margin-bottom: 30px;
+}
+
+
+
+.comment-upload-container{
+    width: 70%;
+    height: 150px;
+    padding: 10px;
+    display: flex;
+    
+}
+.commenter-photo{
+    
+    height: 150px;
+    float: left;
+    width: 7%;
+    
+}
+.commenter-photo img{
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: slategrey;
+}
+.comment-two{
+    margin-left: 8px;
+    height: 150px;
+    
+}
+textarea{
+    resize: vertical;
+}
+

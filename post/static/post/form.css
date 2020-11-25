@@ -1,0 +1,103 @@
+.form-container {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-color: rgb(129, 121, 121);
+    border-width: 1px;
+    border-style: solid;
+}
+.form-container > * {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.form-container .column{
+    display: inline-block;
+}
+
+
+
+.select-class-container{
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-color: rgb(129, 121, 121);
+    border-width: 1px;
+    border-style: solid;
+}
+
+.select-class-container > * {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.select-class-container .column{
+    display: inline-block;
+}
+
+.upload-info-container label{
+    
+}
+
+.upload-info-container input[type=text], .upload-info-container textarea{
+    
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    
+}
+
+.upload-info-container{
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-color: rgb(129, 121, 121);
+    border-width: 1px;
+    border-style: solid;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.row{
+    width: 100%;
+    vertical-align: middle;
+}
+.row > *{
+    display: inline-block;
+}
+label, textarea{
+    vertical-align: middle;
+}
+
+.col-25 {
+    
+    width: 25%;
+    margin-top: 6px;
+}
+
+.upload-info-container input[type=submit] {
+    background-color: #5f665f;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+
+.upload-info-container input[type=submit]:hover {
+    background-color: #181a18;
+}
+
+.upload-info-container > * {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+
+/*.col-75 {
+    float: left;
+    width: 75%;
+    margin-top: 6px;
+}*/

@@ -4,6 +4,8 @@
 
 
 <link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
 
 
@@ -22,98 +24,116 @@
 
         </div>
 
-        <div class="left-container" id="lol">
+        <div class="left-container">
             
-            <div class="topnav">
+            <div class="topnav" style="margin-bottom: 20px;">
                 <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
                 <a href="#news">Event</a>
                 <a href="#contact">Community</a>
             </div>
 
-            <div class="make-post-btn">
-                <a href="{% url 'post:make_post' %}">
-                    <i class="fa fa-plus" style="font-size: 1.5em;"></i>
-                </a>
-            </div>
-            This is student post {{search_post_typ}}
             {% if search_post_typ is None %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="none-form">
-                    {% if search_std_id is None %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
-                    {% else %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
-                    {% endif %}
-
-                    <label for="search_post_typ">Post Type</label>
-                    <select name="search_post_typ">
-                        <option value="" selected disabled>Select an Item</option>
-                        <option value="Help"> Help </option>
-                        <option value="Career"> Career </option>
-                        <option value="Research"> Research </option>
-                        <option value="Job Post"> Job Post </option>
-                    </select>
-
-                    <input type="submit" value="Search">
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                    <div class="column">
+                        {% if search_std_id is None %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="">
+                        {% else %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="column">
+                        <label for="search_post_typ">Post Type</label>
+                        <select name="search_post_typ">
+                            <option value="" selected disabled>Select an Item</option>
+                            <option value="Help"> Help </option>
+                            <option value="Career"> Career </option>
+                            <option value="Research"> Research </option>
+                            <option value="Job Post"> Job Post </option>
+                        </select>
+                    </div>
+                    
+                    <div class="column">
+                        <input type="submit" value="Search">
+                    </div>
+                    
                 </form>
             {% endif %}
 
             {% if search_post_typ == 'Help' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="help-form">
-                    {% if search_std_id is None %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
-                    {% else %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
-                    {% endif %}
-
-                    <label for="search_post_typ">Post Type</label>
-                    <select name="search_post_typ">
-                        <option value="Help" selected> Help </option>
-                        <option value="Career"> Career </option>
-                        <option value="Research"> Research </option>
-                        <option value="Job Post"> Job Post </option>
-                    </select>
-
-                    <input type="submit" value="Search">
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                    <div class="column">
+                        {% if search_std_id is None %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="">
+                        {% else %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="column">
+                        <label for="search_post_typ">Post Type</label>
+                        <select name="search_post_typ">
+                            <option value="Help" selected> Help </option>
+                            <option value="Career"> Career </option>
+                            <option value="Research"> Research </option>
+                            <option value="Job Post"> Job Post </option>
+                        </select>
+                    </div>
+                    
+                    <div class="column">
+                        <input type="submit" value="Search">
+                    </div>
+                    
                 </form>
             {% endif %}
 
             {% if search_post_typ == 'Career' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="career-form">
-                    {% if search_std_id is None %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
-                    {% else %}
-                        <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
-                    {% endif %}
-
-                    <label for="search_post_typ">Post Type</label>
-                    <select name="search_post_typ">
-                        <option value="Help"> Help </option>
-                        <option value="Career"> Career </option>
-                        <option value="Research"> Research </option>
-                        <option value="Job Post"> Job Post </option>
-                    </select>
-
-                    <input type="submit" value="Search">
+                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                    <div class="column">
+                        {% if search_std_id is None %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="">
+                        {% else %}
+                            <label for="search_std_id">Student ID</label>
+                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="column">
+                        <label for="search_post_typ">Post Type</label>
+                        <select name="search_post_typ">
+                            <option value="Help"> Help </option>
+                            <option value="Career" selected> Career </option>
+                            <option value="Research"> Research </option>
+                            <option value="Job Post"> Job Post </option>
+                        </select>
+                    </div>
+                    
+                    <div class="column">
+                        <input type="submit" value="Search">
+                    </div>
+                    
                 </form>
             {% endif %}
 
 
             {% if search_post_typ == 'Research' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="research-form">
+            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                <div class="column">
                     {% if search_std_id is None %}
                         <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                        <input type="text" name="search_std_id" value="">
                     {% else %}
                         <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                        <input type="text" name="search_std_id" value="{{search_std_id}}">
                     {% endif %}
-
+                </div>
+                
+                <div class="column">
                     <label for="search_post_typ">Post Type</label>
                     <select name="search_post_typ">
                         <option value="Help"> Help </option>
@@ -121,22 +141,29 @@
                         <option value="Research" selected> Research </option>
                         <option value="Job Post"> Job Post </option>
                     </select>
-
+                </div>
+                
+                <div class="column">
                     <input type="submit" value="Search">
-                </form>
+                </div>
+                
+            </form>
             {% endif %}
 
 
             {% if search_post_typ == 'Job Post' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" id="job-form">
+            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                <div class="column">
                     {% if search_std_id is None %}
                         <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50"></textarea><br>
+                        <input type="text" name="search_std_id" value="">
                     {% else %}
                         <label for="search_std_id">Student ID</label>
-                        <textarea name="search_std_id" rows="1" cols="50">{{search_std_id}}</textarea><br>
+                        <input type="text" name="search_std_id" value="{{search_std_id}}">
                     {% endif %}
-
+                </div>
+                
+                <div class="column">
                     <label for="search_post_typ">Post Type</label>
                     <select name="search_post_typ">
                         <option value="Help"> Help </option>
@@ -144,79 +171,120 @@
                         <option value="Research"> Research </option>
                         <option value="Job Post" selected> Job Post </option>
                     </select>
-
+                </div>
+                
+                <div class="column">
                     <input type="submit" value="Search">
-                </form>
+                </div>
+                
+            </form>
             {% endif %}
-
-            <!--<script>
-                function submitForm(){
-
-                    var data = JSON.parse("{{json_data|escapejs}}")
-
-                    if (!data){
-                        document.getElementById("none-form").submit();
-                    }  
-                    else if (data == "Help"){
-                        document.getElementById("help-form").submit();
-                    } 
-                    else if (data == "Career"){
-                        document.getElementById("career-form").submit();
-                    } 
-                    else if (data == "Research"){
-                        document.getElementById("research-form").submit();
-                    } 
-                    else if (data == "Job Post"){
-                        document.getElementById("job-form").submit();
-                    } 
-                }
-            </script>-->
 
             
 
-            {% if not is_begin %}
-                <a href="{% url 'post:all_post' start_from=prev_id change=1 %}">
-                    <i class="fa fa-arrow-up"></i>
+            <div class="write-post-container">
+                <a href="{% url 'post:make_post' %}">
+                    <button>Write Post</button>
                 </a>
-            {% endif %}
+            </div>
 
-            <div class="all-post">
-                
-                {% if no_post %}
-                    <b> No Post to show </b><br>
-                {% else %}
 
-                    {% for post_dict in post_dicts %}
+            {% if no_post %}
+                <b> No Post to show </b><br>
+            {% else %}
 
-                        <a href="{% url 'post:detail_post' post_id=post_dict.post_id %}">
-
-                            <div class='short-post-container'>
-                                <img src='{{MEDIA_URL}}{{post_dict.photo_path}}'>
-                                <div class="text-stuffs">
-                                    <h3>{{post_dict.full_name}}</h3>
-                                    
-                                    <p>
-                                        {{post_dict.desc|truncatechars:100}}
-                                    </p>
-                                    <b>{{post_dict.date}}</b> 
-                                    <i class="fa fa-tag">{{post_dict.class}}</i> 
-                                </div>
-                                
-                            </div>
-
-                        </a>
-
-                    {% endfor %}
+                {% if not is_begin %}
+                    <a href="{% url 'post:all_post' start_from=prev_id change=1 %}">
+                        <button class="previous" style="margin-top: 10px;">Previous</button>
+                    </a>
                 {% endif %}
 
+                <div class="all-post">
 
-            </div>
-            
-            
-            {% if not the_end %}
-                <a href="{% url 'post:all_post' start_from=next_id change=1 %}">
-                    <i class="fa fa-arrow-down" ></i>
-                </a>
+                    <div class="profile-content">
+                        <!-- begin tab-content -->
+                        <div class="tab-content p-0">
+                           <!-- begin #profile-post tab -->
+                           <div class="tab-pane fade active show" id="profile-post">
+                              <!-- begin timeline -->
+                              <ul class="timeline">
+                                {% for post_dict in post_dicts %}
+
+                                    
+                                    <li>
+                                        
+                                        <!-- begin timeline-time -->
+                                        <div class="timeline-time">
+                                            {% if post_dict.date == 'Just Now' %}
+                                                <span class="date">{{post_dict.date}}</span>
+                                            {% else %}
+                                                <span class="date">{{post_dict.date}}</span>
+                                                <span class="date">Ago</span>
+                                            {% endif %}
+                                        </div>
+                                        <!-- end timeline-time -->
+                                        <!-- begin timeline-icon -->
+                                        <div class="timeline-icon">
+                                        <a href="javascript:;">&nbsp;</a>
+                                        </div>
+                                        <!-- end timeline-icon -->
+                                        <!-- begin timeline-body -->
+                                        <div class="timeline-body">
+                                        <div class="timeline-header">
+                                            <span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>
+                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a> <small></small></span>
+                                            <!-- <span class="pull-right text-muted">18 Views</span> -->
+                                        </div>
+                                        <div class="timeline-content">
+                                            <p>
+                                                {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
+                                            </p>
+                                        </div>
+                                        <div class="timeline-likes">
+                                                <div class="stats">
+                                                    {% if post_dict.num_comments == 0 %}
+                                                        <span class="stats-text">0 Comments</span>
+                                                    {% else %}
+                                                        <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><span class="stats-text">{{post_dict.num_comments}} Comments</span></a>
+                                                    {% endif %}
+                                                </div>
+                                        </div>
+                                        
+                                        <div class="timeline-footer">
+                                            <a  href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}" class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i> Comment</a> 
+                                            <div class="tags">
+                                                <i class="fa fa-tag">   {{post_dict.class}}</i> 
+                                            </div>
+                                            
+                                        </div>
+                                        </div>
+                                        <!-- end timeline-body -->
+                                    </li>
+                                    
+
+                                    
+                                {% endfor %}
+                            
+                
+                              </ul>
+                              <!-- end timeline -->
+                            
+                           </div>
+                           <!-- end #profile-post tab -->
+                        </div>
+                        <!-- end tab-content -->
+                    </div>
+
+                    
+                </div>
+                
+                
+                {% if not the_end %}
+                    <a href="{% url 'post:all_post' start_from=next_id change=1 %}">
+                        <button class="next">Next</button>
+                    </a>
+                {% endif %}
+
             {% endif %}
 
             
