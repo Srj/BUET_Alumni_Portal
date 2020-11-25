@@ -354,7 +354,7 @@ def edit(request):
 
     return render(request,'Profile/edit.html',{'form':form_signup,'data':data,'jobs':job_list,'skills':skills, 'job':job_form,'msg' : message,'dp':dp_form,'expert':expertise,'skill_error':skill_error})
 
-def visit_profile(request,std_id):
+def visit_profile(request, std_id):
     if 'std_id' in request.session:
         user = request.session['std_id']
         enable_edit = False

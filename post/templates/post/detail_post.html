@@ -3,77 +3,286 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'post/style2.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/comment.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/post_detail.css' %}">
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
 
 
 
 <body>
 
-    <div class="total-container">
+    <div class="total-container-inside">
 
-        <div class="top-container">
-            <img src='{{MEDIA_URL}}{{detail.photo_path}}'>
-
-            <div class="info-container">
-                <b>{{detail.full_name}}</b><br>
-                
-
-                <b>{{detail.date}}</b> 
-                <i class="fa fa-tag">{{detail.class}}</i> 
+        <div class="post-desc-header">
+            <div class="one">
+                <img src="{{MEDIA_URL}}{{detail.photo_path}}">
+            </div>
+            <div class="two">
+                <div class="row1">
+                    <span class="name"><a href="#">{{detail.full_name}}</a></span>
+                </div>
+                <div class="row2">
+                    <span><b>{{detail.date}}</b></span>
+                    <i class="fa fa-tag">{{detail.class}}</i>
+                </div>
             </div>
         </div>
+
+
        
         <div class="post-meta">
 
-            {% if detail.class == 'help' %}
-                Type of Help :  {{detail.type_of_help}} <br>
-                Reason : {{detail.reason}} <br>
-                Cell : {{detail.cell}}
+            {% if detail.class == 'Help' %}
+
+                <div class="text-contrainer">
+                    <div class="row-detail">
+                        <div class="col-15">
+                            <span class="topic">Type of help</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.type_of_help}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Reason</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.reason}}</span>
+                        </div>
+                    </div>
+
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Cell</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.cell}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Description</span>
+                        </div>
+                        <div class="col-85">
+                            <pre>{{detail.desc}}</pre>
+                        </div>
+                    </div>
+                
+                </div>
             {% endif %}
 
-            {% if detail.class == 'research' %}
-                Topic : {{detail.topic_name}} <br>
-                Date of Publication : {{detail.date_of_publication}} <br>
-                Journal : {{detail.journal}} <br>
-                DOI : {{detail.doi}}
+            {% if detail.class == 'Research' %}
+                <div class="text-contrainer">
+                    <div class="row-detail">
+                        <div class="col-15">
+                            <span class="topic">Topic Name</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.topic_name}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Date of Publication</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.date_of_publication}} </span>
+                        </div>
+                    </div>
+
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Journal</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.journal}}</span>
+                        </div>
+                    </div>
+
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">DOI</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.doi}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Description</span>
+                        </div>
+                        <div class="col-85">
+                            <pre>{{detail.desc}}</pre>
+                        </div>
+                    </div>
+                
+                </div>
             {% endif %}
 
-            {% if detail.class == 'job' %}
-                company name {{detail.company_name}} <br>
-                location {{detail.location}} <br>
-                designation {{detail.designation}} <br>
-                salary {{detail.salary}} <br>
-                requirements {{detail.requirements}}
+            {% if detail.class == 'Job' %}
+                
+                <div class="text-contrainer">
+                    <div class="row-detail">
+                        <div class="col-15">
+                            <span class="topic">Comapny Name</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.company_name}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Location</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.location}}</span>
+                        </div>
+                    </div>
+
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Designation</span>
+                        </div>
+                        <div class="col-85">
+                            <span>{{detail.designation}}</span>
+                        </div>
+                    </div>
+
+                    {% if detail.salary is not None %}
+                        <div class="row-detail">
+                            <div  class="col-15">
+                                <span class="topic">Expected Salary</span>
+                            </div>
+                            <div class="col-85">
+                                <span>{{detail.salary}}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Requirements</span>
+                        </div>
+                        <div class="col-85">
+                            <pre>{{detail.requirements}}</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Description</span>
+                        </div>
+                        <div class="col-85">
+                            <pre>{{detail.desc}}</pre>
+                        </div>
+                    </div>
+                
+                </div>
+            {% endif %}
+
+            {% if detail.class == 'Career'%}
+                <div class="text-contrainer">
+                    <div class="row-detail">
+                        <div  class="col-15">
+                            <span class="topic">Description</span>
+                        </div>
+                        <div class="col-85">
+                            <pre>{{detail.desc}}</pre>
+                        </div>
+                    </div>
+                
+                </div>
             {% endif %}
 
 
         </div>
 
-        <pre>{{detail.desc}}</pre>
+        
+
+        <div class="comment-upload-container">
+            <div class="commenter-photo">
+                <img src="{{MEDIA_URL}}{{detail.commenter_photo}}">
+            </div>
+            <div class="comment-two">
+                <form action="{% url 'post:upload_comment' post_id=detail.post_id %}" class="upload-comment-form">
+                
+                    <div class="row">
+                        <div class="col-85">
+                            <textarea rows="3" cols="50" name="comment_body"></textarea>
+                        </div>
+                        <div class="col-25">
+                            <input type="submit" value="Comment">
+                        </div>
+                    </div>
+        
+                </form>
+            </div>
+            
+        </div>
+
+        
+        
+
+        {% if not is_begin %}
+            <a href="{% url 'post:detail_post' post_id=post_id start_from=prev_id %}">
+                <button class="previous">Previous</button>
+            </a>
+        {% endif %}
+
+        <div class="comment-container bootstrap snippets bootdey">
+            <div class="row-comment">
+                <div class="col-md-12">
+                    <div class="blog-comment">
+                        
+                        <ul class="comments">
 
 
-        <div class="do-comment">
-            <form action="{% url 'post:upload_comment' post_id=detail.post_id %}">
-                <textarea rows="3" cols="50" name="comment_body"></textarea>
-                <input type="submit" value="Comment">
-            </form>
+                            {% for comment_dict in comment_dicts %}
+
+
+                                <li class="clearfix">
+                                    <img src="{{MEDIA_URL}}{{comment_dict.photo_path}}" class="avatar" alt="">
+                                    <div class="post-comments">
+                                        <span class="username"><a href="#" class="name">{{comment_dict.full_name}}</a></span>
+                                        {% if comment_dict.timestamp == "Just Now" %}
+                                            <span class="time">{{comment_dict.timestamp}}</span>
+                                        {% else %}
+                                            <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                        {% endif %}
+                                        <hr>
+                                        
+                                        <p>
+                                            {{comment_dict.text}}
+                                        </p>
+                                    </div>
+                                </li>
+
+                                
+                            {% endfor %}
+                        
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        {% for comment_dict in comment_dicts %}
+        
 
-            <div class="comment">
-                <img src='{{MEDIA_URL}}{{comment_dict.photo_path}}'>
-                
-
-                <div class="comment-text">
-                    <b>{{comment_dict.full_name}}</b><br>
-                    <p>{{comment_dict.text}}</p>
-                    
-                </div>
-                
-            </div>            
-
-            
-        {% endfor %}
+        {% if not the_end %}
+            <a href="{% url 'post:detail_post' post_id=post_id start_from=next_id %}">
+                <button class="next">Next</button>
+            </a>
+        {% endif %}
 
         
         
