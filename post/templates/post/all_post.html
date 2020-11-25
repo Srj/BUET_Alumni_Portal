@@ -7,16 +7,160 @@
 <link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+<script>
+    function setup() {
+        document.getElementById('buttonid').addEventListener('click', openDialog);
+        function openDialog() {
+            document.getElementById('fileid').click();
+        }
+        document.getElementById('fileid').addEventListener('change', submitForm);
+        function submitForm() {
+            document.getElementById('formid').submit();
+        }
+    }
+  </script> 
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  
+  
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <body onload="setup()">
 
-
-<body>
     <div class="total-container">
 
         <div class="right-container">
-            <img src="{{MEDIA_URL}}zaber.jpg">
-            <h3>Zaber Ibn Abdul Hakim</h3>
-            <b>UnderGrad</b>
-            <p>BUET</p>
+            
+            <div class="card  border-0" border: none> 
+                <div class="row justify-content-center">
+                  <div class="col-lg-3 order-lg-2">
+                    
+                  </div>
+                </div>
+                <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                  <div class="d-flex justify-content-between">
+                    
+                    
+                  </div>
+                </div>
+                <div class="card-body pt-0 pt-md-4">
+                  <!-- <div class="row">
+                    <div class="col">
+                      <div class="card-profile-stats d-flex justify-content-center mt-md-5">
+                        <div>
+                          <span class="heading">0</span>
+                          <span class="description">Friends</span>
+                        </div>
+                        <div>
+                          <span class="heading">1</span>
+                          <span class="description">Photos</span>
+                        </div>
+                        <div>
+                          <span class="heading">0</span>
+                          <span class="description">Comments</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                  
+                  <div class="text-center">
+                    
+                    <div class="h5 font-weight-300">
+                        
+                              <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">             
+
+
+                        {% if edit %}
+                        <a href="#"></a>
+                        <br>
+                        <br>
+                      <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
+                        {% csrf_token %}
+                        <p hidden>
+                        {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                        </p>
+                        <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
+                      </form> 
+      
+                      {% else %}
+                        <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
+                        <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
+                      {% endif %}
+                      <br><br>
+                      <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
+                      {% if data.FACEBOOK %}
+                          <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
+                      {% endif %}
+                      {% if data.FACEBOOK %}
+                          <a href={{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                      {% endif %}
+                      {% if data.LINKEDIN %}
+                          <a href={{data.LINKEDIN}}> <i class="fa fa-linkedin"></i></i></a>
+                      {% endif %}
+                      {% if data.GOOGLE_SCHOLAR %}
+                          <a href={{data.GOOGLE_SCHOLAR}}><i class="fa fa-google-plus"></i>/i></a>
+                      {% endif %}
+                      {% if data.RESEARCHGATE %}
+                          <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
+                      {% endif %}
+                    </div>
+                    <h3>
+                      {{data.FULL_NAME}}
+                      {% if data.AGE %}
+                        <span class="font-weight-light">, {{data.AGE}}</span>
+                      {% endif %}
+                      
+                    </h3>
+                    <h4>Batch {{data.STD_ID|make_list|slice:":2"|join:''}}, Department of {{data.DEPT}}</h4>
+                    <h5>{{data.HALL}} Hall</h5>
+                    <br>
+                    {% if data.LVL %}
+                      <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at {{data.LVL}}-{{data.TERM}}</b></h6>
+                    {% else %}
+                      <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{data.DESIGNATION|title }} at<i class="ni education_hat mr-2"></i>{{data.COMPANY}}</b></h6>
+                    {% endif %}
+                    <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}}, {{data.COUNTRY}}<br></b></h6>
+                    <br>
+                    {{data.ABOUT}}<br>
+                    
+                    <hr class="my-4">
+                    <div class="h5 mt-4">
+                      
+                    </div>
+                    <div>
+                      
+                  <b>Work History</b><br>
+                
+                        {% for row in job %}
+                            {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
+                            {% if row.TO_ %}
+                              {{row.TO_.year}})
+                            {% else %}
+                              )
+                            {% endif %}<br/>
+                        {% endfor %}                                  
+                      <br>
+                      <hr class="my-4">
+                      <b>Interests</b><br>
+                      {% if edit %}
+                        {% for key, value in skills.items %}
+                            {{key}} ({{value}})<br/>
+                        {% endfor %}
+                      {% else %}
+                        {% for key, value in skills.items %}
+                            {{key}} ({{value}}) <a href="{% url 'Profile:endorse' std_id=data.STD_ID topic=key %}"><i class="fa fa-plus"></i></a><br/>
+                        {% endfor %}
+                      {% endif %}
+                      
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
 
             <!-- THIS DIV IS LEFT FOR JONY TO WORK ON -->
 

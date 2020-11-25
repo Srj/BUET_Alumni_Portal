@@ -7,8 +7,11 @@ import datetime
 from django.core.files.storage import FileSystemStorage
 from datetime import date
 import json
+from django import forms
 # Create your views here.
 
+class DPForm(forms.Form):
+     file = forms.FileField()
 
 def modify_c(c):
     data = []
@@ -314,6 +317,39 @@ def all_post(request, start_from, change):
             all_post_dicts.append(post_dict)
 
         
+        
+        #-------------------------------------Profile Card---------------------------------
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
+        columnNames = [d[0] for d in c.description]
+        
+        try:
+            data = dict(zip(columnNames,row))
+        except:
+            print('Cannot Parse Profile')
+
+        #-----------------------------------Skills------------------------------------
+        sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
+    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+        skills = {}
+        for row in rows:
+            skills[row[0]] = row[1]
+        dp_form = DPForm()
+
+        #--------------------------------------Job History--------------------------------
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = rows.fetchall()
+        columnNames = [d[0] for d in c.description]
+        job_list = []
+        for job in jobs:
+            try:
+                job_list.append(dict(zip(columnNames,job)))
+            except:
+                print('NULL')
+        
+
         show = {
             'no_post':False,
             'post_dicts':all_post_dicts,
@@ -323,8 +359,12 @@ def all_post(request, start_from, change):
             'prev_id':(begin_post-10) if begin_post > 10 else 0,
             'search_post_typ':search_post_typ,
             'search_std_id':search_std_id,
-        }
-        
+            'data':data,
+            'skills':skills,
+            'edit':True,
+            'dp':dp_form,
+            'job':job_list,
+        }        
         return render(request, 'post/all_post.html', show)
 
 
