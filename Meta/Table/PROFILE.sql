@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for PROFILE
 -- ----------------------------
-DROP TABLE "PROJECT"."PROFILE";
-CREATE TABLE "PROJECT"."PROFILE" (
+DROP TABLE "DJANGO_DB"."PROFILE";
+CREATE TABLE "DJANGO_DB"."PROFILE" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "HOUSE_NO" VARCHAR2(10 BYTE),
   "ROAD_NO" VARCHAR2(10 BYTE),

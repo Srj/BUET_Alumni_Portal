@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for WORKS
 -- ----------------------------
-DROP TABLE "PROJECT"."WORKS";
-CREATE TABLE "PROJECT"."WORKS" (
+DROP TABLE "DJANGO_DB"."WORKS";
+CREATE TABLE "DJANGO_DB"."WORKS" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "INSTITUTE_ID" NUMBER(15,0) NOT NULL,
   "FROM_" DATE NOT NULL,

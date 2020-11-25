@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for POSTGRAD
 -- ----------------------------
-DROP TABLE "PROJECT"."POSTGRAD";
-CREATE TABLE "PROJECT"."POSTGRAD" (
+DROP TABLE "DJANGO_DB"."POSTGRAD";
+CREATE TABLE "DJANGO_DB"."POSTGRAD" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "MSC" VARCHAR2(30 BYTE),
   "PHD" VARCHAR2(30 BYTE)

@@ -31,11 +31,11 @@ def index(request):
                 c.execute(sql,info)
                 conn.commit()
                 conn.close()
-                print('Registered')
+                print('Registered User' + str(info['std_id']))
                 return redirect('SignIn:signin')
             except cx_Oracle.IntegrityError:
                 message = "User already exists ..."
-                print('Error')
+                print('"User already exists ...')
     else:
         form_signup = SignUpForm()
     return render(request,'SignUp/index.html',{'form':form_signup, 'msg' : message})
