@@ -334,7 +334,7 @@
           p +=
     "<p>Are you sure you want to delete " + a + "?</p>";
           p+=
-          "<input type='text' name='topic' required id='id_topic' value='"+ a + "'>";
+          "<input type='hidden' name='topic' required id='id_topic' value='"+ a + "'>";
                       
 
           //CLEARING THE PREFILLED DATA 
@@ -362,15 +362,15 @@
           var p = ""; 
           // CREATING DATA TO SHOW ON MODEL 
           p +=
-    "<p>Are you sure you want to delete " + a + "?</p>";
+    "<p>Are you sure you want to delete " +b+", " + a + " from "+ c + " ?</p>";
           p+=
-          "<input type='text' name='name' required id='id_name' value='"+ a + "'>";
+          "<input  type='hidden' name='name' required id='id_name' value='"+ a + "'>";
           p +=
-          "<input type='text' name='designation' required id='id_designation' value='" + b +"'>"
+          "<input  type='hidden' name='designation' required id='id_designation' value='" + b +"'>"
           p+=
-          "<input type='date' name='from_' required id='id_from_' value=" + c +">";
+          "<input type='hidden' name='from_' required id='id_from_' value=" + c +">";
           p+=
-          "<input type='date' name='to_' id='id_to_' value=" + d + ">";
+          "<input type='hidden' name='to_' id='id_to_' value=" + d + ">";
 
                       
 
@@ -391,10 +391,10 @@
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
       <div class="container-fluid">
         <!-- Brand -->
-        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-          href="https://www.creative-tim.com/product/argon-dashboard" target="_blank">User profile</a>
+        <!-- <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
+          href="https://www.creative-tim.com/product/argon-dashboard" target="_blank">User profile</a> -->
         <!-- Form -->
-        <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+        <!-- <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
           <div class="form-group mb-0">
             <div class="input-group input-group-alternative">
               <div class="input-group-prepend">
@@ -403,16 +403,16 @@
               <input class="form-control" placeholder="Search" type="text">
             </div>
           </div>
-        </form>
+        </form> -->
         <!-- User -->
         <ul class="navbar-nav align-items-center d-none d-md-flex">
           <li class="nav-item dropdown">
             <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
               <div class="media align-items-center">
-                <span class="avatar avatar-sm rounded-circle">
-                  <!-- <img alt="Image placeholder" src="https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg"> -->
-                </span>
+                <!-- <span class="avatar avatar-sm rounded-circle">
+                   <img alt="Image placeholder" src="https://demos.creative-tim.com/argon-dashboard/assets/img/theme/team-4.jpg"> 
+                </span> -->
                 <div class="media-body ml-2 d-none d-lg-block">
                   <span class="mb-0 text-sm  font-weight-bold">{{data.full_name}}</span>
                 </div>
@@ -454,7 +454,7 @@
       <!-- Mask -->
       <span class="mask bg-gradient-default opacity-8"></span>
       <!-- Header container -->
-      <div class="container-fluid d-flex align-items-center">
+      <div class="container-fluid d-flex align-items-center justify-content-center">
         <div class="row">
           <div class="col-lg-7 col-md-10">
             <h1 class="display-2 text-white">Hello {{data.NICK_NAME}}</h1>
@@ -684,13 +684,18 @@
                     <!--<textarea rows="4" class="form-control form-control-alternative" placeholder="A few words about you ..."></textarea>-->
                   </div>
                 </div>
-                <button type="submit" value="submit" class="btn btn-info">
-                  Update Profile
-                </button>
+                <br>
+                <div class="pl-lg-4">
+                  <div class="form-group focused">
+                    <button type="submit" value="submit" class="btn btn-success">
+                      Update Profile
+                    </button>
+                </div>
+                
 
               </form>
-
-              <div class="container">
+              <br>
+              <!-- <div class="container"> -->
                 <div class="table-responsive">
                   <div class="table-wrapper">
                     <div class="table-title">
@@ -743,7 +748,7 @@
                     </table>
                   </div>
                 </div>
-              </div>
+              <!-- </div> -->
 
               
 
@@ -852,9 +857,15 @@
                       </div>
                       <div class="modal-body">
                         <div class="form-group">
-                          <label>Topic Name</label>
-                          {% render_field expert.topic class="form-control" %}
-                          <!-- <input type="text" class="form-control" required> -->
+                          <div class="row">
+                            <div class="pl-lg-4">
+                              <div class="form-group focused">
+                                <label>Topic Name</label>
+                              {% render_field expert.topic class="form-control" %}
+                              </div>
+                            </div>
+                          </div>
+                          
                         </div>
                       </div>
                       <div class="modal-footer">
@@ -905,7 +916,7 @@
                       <div class="modal-body">
                         <div class="form-group">
                           <div class="row">
-                            <div class="pl-lg-4">
+                            <div class="pl-lg-6">
                               <div class="form-group focused">
                                 <label>Institute Name</label>
                                 {% render_field job.name class="form-control form-control-alternative" %}
@@ -913,32 +924,37 @@
                             </div>
                           </div>
                           <div class="row">
-                            <div class="col-lg-4">
+                            <div class="pl-lg-6">
                               <div class="form-group focused">
                                 <label>Designation</label>
                                 {% render_field job.designation class="form-control form-control-alternative" %}
                               </div>
                             </div>
-                            <div class="col-lg-4">
+                          </div>
+                          <div class="row">
+                            <div class="pl-lg-6">
                               <div class="form-group focused">
                                 <label>FROM </label>
                                 {% render_field job.from_ class="form-control form-control-alternative" %}
                               </div>
                             </div>
-                            <div class="col-lg-4">
+                          </div>
+                          <div class="row">
+                            <div class="pl-lg-6">
                               <div class="form-group focused">
                                 <label>TILL</label>
                                 {% render_field job.to_ class="form-control form-control-alternative" %}
                               </div>
                             </div>
-                      
+                          </div>
+                          <br>
+                          <div class="row">
+                            <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                            <input type="submit" class="btn btn-success" value="Add">
+                          </div>
                           </div>
                           
                         </div>
-                      </div>
-                      <div class="modal-footer">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                        <input type="submit" class="btn btn-success" value="Add">
                       </div>
                     </form>
                   </div>

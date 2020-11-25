@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for UNDERGRAD
 -- ----------------------------
-DROP TABLE "PROJECT"."UNDERGRAD";
-CREATE TABLE "PROJECT"."UNDERGRAD" (
+DROP TABLE "DJANGO_DB"."UNDERGRAD";
+CREATE TABLE "DJANGO_DB"."UNDERGRAD" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "HALL" VARCHAR2(20 BYTE),
   "DEPT" VARCHAR2(10 BYTE),

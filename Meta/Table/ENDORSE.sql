@@ -4,7 +4,7 @@
  Source Server         : Django
  Source Server Type    : Oracle
  Source Server Version : 110200
- Source Schema         : PROJECT
+ Source Schema         : DJANGO_DB
 
  Target Server Type    : Oracle
  Target Server Version : 110200
@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for ENDORSE
 -- ----------------------------
-DROP TABLE "PROJECT"."ENDORSE";
-CREATE TABLE "PROJECT"."ENDORSE" (
+DROP TABLE "DJANGO_DB"."ENDORSE";
+CREATE TABLE "DJANGO_DB"."ENDORSE" (
   "GIVER_ID" NUMBER(7,0) NOT NULL,
   "TAKER_ID" NUMBER(7,0) NOT NULL,
   "TOPIC" VARCHAR2(30 BYTE) NOT NULL,

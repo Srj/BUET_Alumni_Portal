@@ -17,8 +17,8 @@
 -- ----------------------------
 -- Table structure for EXPERTISE
 -- ----------------------------
-DROP TABLE "PROJECT"."EXPERTISE";
-CREATE TABLE "PROJECT"."EXPERTISE" (
+DROP TABLE "DJANGO_DB"."EXPERTISE";
+CREATE TABLE "DJANGO_DB"."EXPERTISE" (
   "STD_ID" NUMBER(7,0) NOT NULL,
   "TOPIC" VARCHAR2(30 BYTE) NOT NULL
 )
