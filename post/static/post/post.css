@@ -320,7 +320,7 @@ select.form-control:not([size]):not([multiple]) {
 .form-control.input-inline {
     display: inline;
     width: auto;
-    padding: 0 7px;
+    /* padding: 0 7px; */
 }
 
 
@@ -338,7 +338,7 @@ select.form-control:not([size]):not([multiple]) {
     bottom: 5px;
     width: 5px;
     background: #2d353c;
-    left: 20%;
+    left: 15%;
     margin-left: -2.5px
 }
 
@@ -353,7 +353,7 @@ select.form-control:not([size]):not([multiple]) {
 .timeline .timeline-time {
     position: absolute;
     left: 0;
-    width: 18%;
+    /* width: 5%; */
     text-align: right;
     top: 30px
 }
@@ -376,7 +376,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .timeline .timeline-icon {
-    left: 15%;
+    left: 1%;
     position: absolute;
     width: 10%;
     text-align: center;
@@ -398,11 +398,11 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .timeline .timeline-body {
-    margin-left: 23%;
-    margin-right: 17%;
+    margin-left: 10%;
+    margin-right: 2%;
     background: #fff;
     position: relative;
-    padding: 20px 25px;
+    padding: 2px 2px;
     border-radius: 6px
 }
 

@@ -491,7 +491,36 @@ def detail_post(request, post_id, start_from):
     c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = :std_id", {'std_id': user_id})
     for row in c:
         post_detail['commenter_photo'] = row[0]
+    #-------------------------------------Profile Card---------------------------------
+    sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+    row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
+    columnNames = [d[0] for d in c.description]
     
+    try:
+        data = dict(zip(columnNames,row))
+    except:
+        print('Cannot Parse Profile')
+
+    #-----------------------------------Skills------------------------------------
+    sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
+EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    skills = {}
+    for row in rows:
+        skills[row[0]] = row[1]
+    dp_form = DPForm()
+
+    #--------------------------------------Job History--------------------------------
+    sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    jobs = rows.fetchall()
+    columnNames = [d[0] for d in c.description]
+    job_list = []
+    for job in jobs:
+        try:
+            job_list.append(dict(zip(columnNames,job)))
+        except:
+            print('NULL')
     
 
 
@@ -504,7 +533,12 @@ def detail_post(request, post_id, start_from):
                     'the_end':the_end,
                     'next_id':end_comment,
                     'prev_id':(begin_comment-10) if begin_comment > 10 else 0,
-                    'post_id':post_id
+                    'post_id':post_id,
+                    'data':data,
+                    'skills':skills,
+                    'edit':True,
+                    'dp':dp_form,
+                    'job':job_list,
                 }
             )
 
@@ -548,7 +582,44 @@ def form_unfilled_message(unfilled_data):
     return txt
 
 def make_post(request):
-    return render(request, 'post/make_post.html', {'type':request.GET.get('post_type'), 'unfilled':None})
+    conn = db()
+    c = conn.cursor()
+    #-------------------------------------Profile Card---------------------------------
+    sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+    row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
+    columnNames = [d[0] for d in c.description]
+    
+    try:
+        data = dict(zip(columnNames,row))
+    except:
+        print('Cannot Parse Profile')
+
+    #-----------------------------------Skills------------------------------------
+    sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
+EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    skills = {}
+    for row in rows:
+        skills[row[0]] = row[1]
+    dp_form = DPForm()
+
+    #--------------------------------------Job History--------------------------------
+    sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    jobs = rows.fetchall()
+    columnNames = [d[0] for d in c.description]
+    job_list = []
+    for job in jobs:
+        try:
+            job_list.append(dict(zip(columnNames,job)))
+        except:
+            print('NULL')
+    return render(request, 'post/make_post.html', {'type':request.GET.get('post_type'), 'unfilled':None, 
+                    'data':data,
+                    'skills':skills,
+                    'edit':True,
+                    'dp':dp_form,
+                    'job':job_list,})
 
 
 def upload_post(request):

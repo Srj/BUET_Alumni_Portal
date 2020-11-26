@@ -31,65 +31,125 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <body onload="setup()">
 
-    <div class="total-container">
-
-        <div class="right-container">
+    <div class="main-content">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+          <div class="container-fluid">
+            <!-- Brand -->
+            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET Alumni Portal</a>
+            <!-- Form -->
+            <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+              <div class="form-group mb-0">
+               
+              </div>
+            </form>
+            <!-- User -->
             
-            <div class="card  border-0" border: none> 
+            <ul class="navbar-nav align-items-center d-none d-md-flex">
+              <!-- <li class="nav-item dropdown">
+                <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <div class="media align-items-center">
+                    <span class="avatar avatar-sm rounded-circle">
+                      {% static "Profile/DP/" as baseUrl %}
+                      <img  src="{{MEDIA_URL}}{{data.PHOTO}}">
+                    </span>
+                    <div class="media-body ml-2 d-none d-lg-block">
+                      <span class="mb-0 text-sm  font-weight-bold">{{data.FULL_NAME}}</span>
+                    </div>
+                  </div>
+                </a>-->
+    
+                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+                  <div class=" dropdown-header noti-title">
+                    
+                    <h1 class="text-overflow m-0">Welcome!</h1>
+                  </div>
+                  
+                  <a href="../examples/profile.html" class="dropdown-item">
+                    <i class="ni ni-single-02"></i>
+                    <span>My profile</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                    <i class="ni ni-settings-gear-65"></i>
+                    <span>Settings</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                    <i class="ni ni-calendar-grid-58"></i>
+                    <span>Activity</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                    <i class="ni ni-support-16"></i>
+                    <span>Support</span>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a href="#!" class="dropdown-item">
+                    <i class="ni ni-user-run"></i>
+                    <span>Logout</span>
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        <!-- Header -->
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
+          <!-- Mask -->
+          <span class="mask bg-gradient-default opacity-8"></span>
+          <!-- Header container -->
+          <div class="container-fluid d-flex align-items-center ">
+            <div class="row">
+              <div class="col-lg-7 col-md-10">
+                <h1 class="display-2 text-white"><!--Hello {{data.NICK_NAME}}--></h1>
+                <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile has made with your work and manage your projects or assigned tasks</p>
+                {% if edit %}
+                  <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
+                  <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
+                  <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
+                {% else %}
+                  <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
+                {% endif %}
+                  <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Page content -->
+        <div class="container-fluid mt--7 justify-content-center">
+          <div class="row justify-content-left">
+            <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+              <div class="card card-profile shadow">
                 <div class="row justify-content-center">
                   <div class="col-lg-3 order-lg-2">
-                    
+                    <div class="card-profile-image">
+                      <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">             
+                    </div>
                   </div>
                 </div>
                 <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                   <div class="d-flex justify-content-between">
-                    
+                    {% if edit %}
+                      <a href="#"></a>
+    
+                    <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
+                      {% csrf_token %}
+                      <p hidden>
+                      {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                      </p>
+                      <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
+                    </form> 
+    
+                    {% else %}
+                      <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
+                      <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
+                    {% endif %}
                     
                   </div>
                 </div>
                 <div class="card-body pt-0 pt-md-4">
-                  <!-- <div class="row">
-                    <div class="col">
-                      <div class="card-profile-stats d-flex justify-content-center mt-md-5">
-                        <div>
-                          <span class="heading">0</span>
-                          <span class="description">Friends</span>
-                        </div>
-                        <div>
-                          <span class="heading">1</span>
-                          <span class="description">Photos</span>
-                        </div>
-                        <div>
-                          <span class="heading">0</span>
-                          <span class="description">Comments</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div> -->
+
                   
                   <div class="text-center">
-                    
                     <div class="h5 font-weight-300">
-                        
-                              <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">             
-
-
-                        {% if edit %}
-                        <a href="#"></a>
-                        <br>
-                        <br>
-                      <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
-                        {% csrf_token %}
-                        <p hidden>
-                        {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
-                        </p>
-                        <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
-                      </form> 
-      
-                      {% else %}
-                        <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
-                        <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
-                      {% endif %}
                       <br><br>
                       <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
                       {% if data.FACEBOOK %}
@@ -161,280 +221,285 @@
                   </div>
                 </div>
               </div>
-
-            <!-- THIS DIV IS LEFT FOR JONY TO WORK ON -->
-
-            
-
-        </div>
-
-        <div class="left-container">
-            
-            <div class="topnav" style="margin-bottom: 20px;">
-                <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
-                <a href="#news">Event</a>
-                <a href="#contact">Community</a>
             </div>
-
-            {% if search_post_typ is None %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
-                    <div class="column">
-                        {% if search_std_id is None %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="">
-                        {% else %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="{{search_std_id}}">
-                        {% endif %}
-                    </div>
-                    
-                    <div class="column">
-                        <label for="search_post_typ">Post Type</label>
-                        <select name="search_post_typ">
-                            <option value="" selected disabled>Select an Item</option>
-                            <option value="Help"> Help </option>
-                            <option value="Career"> Career </option>
-                            <option value="Research"> Research </option>
-                            <option value="Job Post"> Job Post </option>
-                        </select>
-                    </div>
-                    
-                    <div class="column">
-                        <input type="submit" value="Search">
-                    </div>
-                    
-                </form>
-            {% endif %}
-
-            {% if search_post_typ == 'Help' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
-                    <div class="column">
-                        {% if search_std_id is None %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="">
-                        {% else %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="{{search_std_id}}">
-                        {% endif %}
-                    </div>
-                    
-                    <div class="column">
-                        <label for="search_post_typ">Post Type</label>
-                        <select name="search_post_typ">
-                            <option value="Help" selected> Help </option>
-                            <option value="Career"> Career </option>
-                            <option value="Research"> Research </option>
-                            <option value="Job Post"> Job Post </option>
-                        </select>
-                    </div>
-                    
-                    <div class="column">
-                        <input type="submit" value="Search">
-                    </div>
-                    
-                </form>
-            {% endif %}
-
-            {% if search_post_typ == 'Career' %}
-                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
-                    <div class="column">
-                        {% if search_std_id is None %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="">
-                        {% else %}
-                            <label for="search_std_id">Student ID</label>
-                            <input type="text" name="search_std_id" value="{{search_std_id}}">
-                        {% endif %}
-                    </div>
-                    
-                    <div class="column">
-                        <label for="search_post_typ">Post Type</label>
-                        <select name="search_post_typ">
-                            <option value="Help"> Help </option>
-                            <option value="Career" selected> Career </option>
-                            <option value="Research"> Research </option>
-                            <option value="Job Post"> Job Post </option>
-                        </select>
-                    </div>
-                    
-                    <div class="column">
-                        <input type="submit" value="Search">
-                    </div>
-                    
-                </form>
-            {% endif %}
-
-
-            {% if search_post_typ == 'Research' %}
-            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
-                <div class="column">
-                    {% if search_std_id is None %}
-                        <label for="search_std_id">Student ID</label>
-                        <input type="text" name="search_std_id" value="">
-                    {% else %}
-                        <label for="search_std_id">Student ID</label>
-                        <input type="text" name="search_std_id" value="{{search_std_id}}">
-                    {% endif %}
-                </div>
+            <div class="col-xl-8 order-xl-1 ">
+                <div class="card bg-secondary shadow">
+                    <div class="card-body pt-0 pt-md-4">        
+                        <div class="text-center">
+                            <div class="topnav" style="margin-bottom: 20px;">
+                                <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
+                                <a href="#news">Event</a>
+                                <a href="#contact">Community</a>
+                            </div>
                 
-                <div class="column">
-                    <label for="search_post_typ">Post Type</label>
-                    <select name="search_post_typ">
-                        <option value="Help"> Help </option>
-                        <option value="Career"> Career </option>
-                        <option value="Research" selected> Research </option>
-                        <option value="Job Post"> Job Post </option>
-                    </select>
-                </div>
-                
-                <div class="column">
-                    <input type="submit" value="Search">
-                </div>
-                
-            </form>
-            {% endif %}
-
-
-            {% if search_post_typ == 'Job Post' %}
-            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
-                <div class="column">
-                    {% if search_std_id is None %}
-                        <label for="search_std_id">Student ID</label>
-                        <input type="text" name="search_std_id" value="">
-                    {% else %}
-                        <label for="search_std_id">Student ID</label>
-                        <input type="text" name="search_std_id" value="{{search_std_id}}">
-                    {% endif %}
-                </div>
-                
-                <div class="column">
-                    <label for="search_post_typ">Post Type</label>
-                    <select name="search_post_typ">
-                        <option value="Help"> Help </option>
-                        <option value="Career"> Career </option>
-                        <option value="Research"> Research </option>
-                        <option value="Job Post" selected> Job Post </option>
-                    </select>
-                </div>
-                
-                <div class="column">
-                    <input type="submit" value="Search">
-                </div>
-                
-            </form>
-            {% endif %}
-
-            
-
-            <div class="write-post-container">
-                <a href="{% url 'post:make_post' %}">
-                    <button>Write Post</button>
-                </a>
-            </div>
-
-
-            {% if no_post %}
-                <b> No Post to show </b><br>
-            {% else %}
-
-                {% if not is_begin %}
-                    <a href="{% url 'post:all_post' start_from=prev_id change=1 %}">
-                        <button class="previous" style="margin-top: 10px;">Previous</button>
-                    </a>
-                {% endif %}
-
-                <div class="all-post">
-
-                    <div class="profile-content">
-                        <!-- begin tab-content -->
-                        <div class="tab-content p-0">
-                           <!-- begin #profile-post tab -->
-                           <div class="tab-pane fade active show" id="profile-post">
-                              <!-- begin timeline -->
-                              <ul class="timeline">
-                                {% for post_dict in post_dicts %}
-
+                            {% if search_post_typ is None %}
+                                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                                    <div class="column">
+                                        {% if search_std_id is None %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="">
+                                        {% else %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                                        {% endif %}
+                                    </div>
                                     
-                                    <li>
-                                        
-                                        <!-- begin timeline-time -->
-                                        <div class="timeline-time">
-                                            {% if post_dict.date == 'Just Now' %}
-                                                <span class="date">{{post_dict.date}}</span>
-                                            {% else %}
-                                                <span class="date">{{post_dict.date}}</span>
-                                                <span class="date">Ago</span>
-                                            {% endif %}
-                                        </div>
-                                        <!-- end timeline-time -->
-                                        <!-- begin timeline-icon -->
-                                        <div class="timeline-icon">
-                                        <a href="javascript:;">&nbsp;</a>
-                                        </div>
-                                        <!-- end timeline-icon -->
-                                        <!-- begin timeline-body -->
-                                        <div class="timeline-body">
-                                        <div class="timeline-header">
-                                            <span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>
-                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a> <small></small></span>
-                                            <!-- <span class="pull-right text-muted">18 Views</span> -->
-                                        </div>
-                                        <div class="timeline-content">
-                                            <p>
-                                                {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
-                                            </p>
-                                        </div>
-                                        <div class="timeline-likes">
-                                                <div class="stats">
-                                                    {% if post_dict.num_comments == 0 %}
-                                                        <span class="stats-text">0 Comments</span>
-                                                    {% else %}
-                                                        <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><span class="stats-text">{{post_dict.num_comments}} Comments</span></a>
-                                                    {% endif %}
-                                                </div>
-                                        </div>
-                                        
-                                        <div class="timeline-footer">
-                                            <a  href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}" class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i> Comment</a> 
-                                            <div class="tags">
-                                                <i class="fa fa-tag">   {{post_dict.class}}</i> 
-                                            </div>
+                                    <div class="column">
+                                        <label for="search_post_typ">Post Type</label>
+                                        <select name="search_post_typ">
+                                            <option value="" selected disabled>Select an Item</option>
+                                            <option value="Help"> Help </option>
+                                            <option value="Career"> Career </option>
+                                            <option value="Research"> Research </option>
+                                            <option value="Job Post"> Job Post </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="column">
+                                        <input type="submit" value="Search">
+                                    </div>
+                                    
+                                </form>
+                            {% endif %}
+                
+                            {% if search_post_typ == 'Help' %}
+                                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                                    <div class="column">
+                                        {% if search_std_id is None %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="">
+                                        {% else %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="column">
+                                        <label for="search_post_typ">Post Type</label>
+                                        <select name="search_post_typ">
+                                            <option value="Help" selected> Help </option>
+                                            <option value="Career"> Career </option>
+                                            <option value="Research"> Research </option>
+                                            <option value="Job Post"> Job Post </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="column">
+                                        <input type="submit" value="Search">
+                                    </div>
+                                    
+                                </form>
+                            {% endif %}
+                
+                            {% if search_post_typ == 'Career' %}
+                                <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                                    <div class="column">
+                                        {% if search_std_id is None %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="">
+                                        {% else %}
+                                            <label for="search_std_id">Student ID</label>
+                                            <input type="text" name="search_std_id" value="{{search_std_id}}">
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="column">
+                                        <label for="search_post_typ">Post Type</label>
+                                        <select name="search_post_typ">
+                                            <option value="Help"> Help </option>
+                                            <option value="Career" selected> Career </option>
+                                            <option value="Research"> Research </option>
+                                            <option value="Job Post"> Job Post </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="column">
+                                        <input type="submit" value="Search">
+                                    </div>
+                                    
+                                </form>
+                            {% endif %}
+                
+                
+                            {% if search_post_typ == 'Research' %}
+                            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                                <div class="column">
+                                    {% if search_std_id is None %}
+                                        <label for="search_std_id">Student ID</label>
+                                        <input type="text" name="search_std_id" value="">
+                                    {% else %}
+                                        <label for="search_std_id">Student ID</label>
+                                        <input type="text" name="search_std_id" value="{{search_std_id}}">
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="column">
+                                    <label for="search_post_typ">Post Type</label>
+                                    <select name="search_post_typ">
+                                        <option value="Help"> Help </option>
+                                        <option value="Career"> Career </option>
+                                        <option value="Research" selected> Research </option>
+                                        <option value="Job Post"> Job Post </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="column">
+                                    <input type="submit" value="Search">
+                                </div>
+                                
+                            </form>
+                            {% endif %}
+                
+                
+                            {% if search_post_typ == 'Job Post' %}
+                            <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
+                                <div class="column">
+                                    {% if search_std_id is None %}
+                                        <label for="search_std_id">Student ID</label>
+                                        <input type="text" name="search_std_id" value="">
+                                    {% else %}
+                                        <label for="search_std_id">Student ID</label>
+                                        <input type="text" name="search_std_id" value="{{search_std_id}}">
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="column">
+                                    <label for="search_post_typ">Post Type</label>
+                                    <select name="search_post_typ">
+                                        <option value="Help"> Help </option>
+                                        <option value="Career"> Career </option>
+                                        <option value="Research"> Research </option>
+                                        <option value="Job Post" selected> Job Post </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="column">
+                                    <input type="submit" value="Search">
+                                </div>
+                                
+                            </form>
+                            {% endif %}
+                
+                            
+                
+                            <div class="write-post-container">
+                                <a href="{% url 'post:make_post' %}">
+                                    <button>Write Post</button>
+                                </a>
+                            </div>
+                
+                
+                            {% if no_post %}
+                                <b> No Post to show </b><br>
+                            {% else %}
+                
+                                {% if not is_begin %}
+                                    <a href="{% url 'post:all_post' start_from=prev_id change=1 %}">
+                                        <button class="previous" style="margin-top: 10px;">Previous</button>
+                                    </a>
+                                {% endif %}
+                
+                                <div class="all-post">
+                
+                                    <div class="profile-content">
+                                        <!-- begin tab-content -->
+                                        <div class="tab-content p-0">
+                                           <!-- begin #profile-post tab -->
+                                           <div class="tab-pane fade active show" id="profile-post">
+                                              <!-- begin timeline -->
+                                              <ul class="timeline">
+                                                {% for post_dict in post_dicts %}
+                
+                                                    
+                                                    <li>
+                                                        
+                                                        <!-- begin timeline-time -->
+                                                        <div class="timeline-time">
+                                                            {% if post_dict.date == 'Just Now' %}
+                                                                <span class="date">{{post_dict.date}}</span>
+                                                            {% else %}
+                                                                <span class="date">{{post_dict.date}}</span>
+                                                                <span class="date">Ago</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <!-- end timeline-time -->
+                                                        <!-- begin timeline-icon -->
+                                                        <div class="timeline-icon">
+                                                        <a href="javascript:;">&nbsp;</a>
+                                                        </div>
+                                                        <!-- end timeline-icon -->
+                                                        <!-- begin timeline-body -->
+                                                        <div class="timeline-body">
+                                                        <div class="timeline-header">
+                                                            <span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>
+                                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a> <small></small></span>
+                                                            <!-- <span class="pull-right text-muted">18 Views</span> -->
+                                                        </div>
+                                                        <div class="timeline-content">
+                                                            <p>
+                                                                {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="timeline-likes">
+                                                                <div class="stats">
+                                                                    {% if post_dict.num_comments == 0 %}
+                                                                        <span class="stats-text">0 Comments</span>
+                                                                    {% else %}
+                                                                        <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><span class="stats-text">{{post_dict.num_comments}} Comments</span></a>
+                                                                    {% endif %}
+                                                                </div>
+                                                        </div>
+                                                        
+                                                        <div class="timeline-footer">
+                                                            <a  href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}" class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i> Comment</a> 
+                                                            <div class="tags">
+                                                                <i class="fa fa-tag">   {{post_dict.class}}</i> 
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        </div>
+                                                        <!-- end timeline-body -->
+                                                    </li>
+                                                    
+                
+                                                    
+                                                {% endfor %}
                                             
+                                
+                                              </ul>
+                                              <!-- end timeline -->
+                                            
+                                           </div>
+                                           <!-- end #profile-post tab -->
                                         </div>
-                                        </div>
-                                        <!-- end timeline-body -->
-                                    </li>
+                                        <!-- end tab-content -->
+                                    </div>
+                
                                     
-
-                                    
-                                {% endfor %}
+                                </div>
+                                
+                                
+                                {% if not the_end %}
+                                    <a href="{% url 'post:all_post' start_from=next_id change=1 %}">
+                                        <button class="next">Next</button>
+                                    </a>
+                                {% endif %}
+                
+                            {% endif %}
+                
                             
                 
-                              </ul>
-                              <!-- end timeline -->
-                            
-                           </div>
-                           <!-- end #profile-post tab -->
                         </div>
-                        <!-- end tab-content -->
+
+                        </div>
                     </div>
-
-                    
+                  
                 </div>
-                
-                
-                {% if not the_end %}
-                    <a href="{% url 'post:all_post' start_from=next_id change=1 %}">
-                        <button class="next">Next</button>
-                    </a>
-                {% endif %}
-
-            {% endif %}
-
-            
-
+            </div>
+    
+    
+          </div>
         </div>
-
-    </div>
+      
 
 </body>
