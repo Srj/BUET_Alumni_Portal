@@ -57,7 +57,7 @@
     border-color: rgb(153, 146, 153);
     background: rgb(240, 237, 240);
     /* padding: 10px; */
-    margin-left: 7%;
+    margin-left: 8%;
     width: 60%;
     border-radius: 5px;
     
@@ -131,5 +131,32 @@ pre{
 }
 textarea{
     resize: vertical;
+}
+
+.upload-comment-form input[type=submit]{
+    background-color: #5f665f;
+    color: white;
+    padding: 3px 3px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.upload-comment-form input[type=submit]:hover{
+    background-color: #181a18;
+}
+
+.text-button{
+    font-size: 18;
+    font-weight: 500;
+}
+
+.comment-scroll{
+    text-decoration: none;
+    color: rgb(219, 219, 235);
+}
+.comment-scroll:hover{
+    text-decoration: underline;
+    color: rgb(141, 184, 224);
 }
 

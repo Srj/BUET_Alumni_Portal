@@ -54,21 +54,22 @@
     border-width: 1px;
     border-style: solid;
 }
-.row:after {
+.form-row:after {
     content: "";
     display: table;
     clear: both;
 }
-.row{
+.form-row{
     width: 100%;
     vertical-align: middle;
 }
-.row > *{
+.form-row > *{
     display: inline-block;
 }
 label, textarea{
-    vertical-align: middle;
+    vertical-align: middle !important;
 }
+
 
 .col-25 {
     
@@ -84,6 +85,7 @@ label, textarea{
     border-radius: 4px;
     cursor: pointer;
     float: right;
+    
 }
 
 .upload-info-container input[type=submit]:hover {

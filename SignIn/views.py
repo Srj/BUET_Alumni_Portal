@@ -4,6 +4,7 @@ from Alumni_Portal.utils import check_encrypted_password,db
 import cx_Oracle
 from .forms import SignInForm
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def index(request):
     conn = db()
@@ -13,7 +14,8 @@ def index(request):
     if request.method == 'GET':
         if 'std_id' in request.session:
             print('Signed In' + str(request.session['std_id']))
-            return redirect('Profile:profile')
+            #return redirect('Profile:profile')
+            return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
 
         else:
             return render(request,'SignIn/index.html',{'form':form, 'msg' : 'Please Sign In','std_id': None})
@@ -36,12 +38,14 @@ def index(request):
                 if check_encrypted_password(password,row[0]):
                     request.session['std_id'] = std_id
                     print('Signed In' + str(request.session['std_id']))
-                    return HttpResponseRedirect('/profile')
+                    #return HttpResponseRedirect('/profile')
+                    return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
                 else:
                     message = "Invalid Password"
                     std_id = None
             conn.close()
     return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})
+    
    
 
 def logout(request):
