@@ -5,16 +5,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'post/style2.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/comment.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/post_detail.css' %}">
-
-
 <link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
 
 
-<link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
+
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
 <script>
     function setup() {
@@ -27,35 +21,44 @@
             document.getElementById('formid').submit();
         }
     }
-  </script> 
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
-  
-  
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  <body onload="setup()">
+</script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+<body onload="setup()">
 
     <div class="main-content">
         <!-- Top navbar -->
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-          <div class="container-fluid">
-            <!-- Brand -->
-            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET Alumni Portal</a>
-            <!-- Form -->
-            <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
-              <div class="form-group mb-0">
-               
-              </div>
-            </form>
-            <!-- User -->
-            
-            <ul class="navbar-nav align-items-center d-none d-md-flex">
-              <!-- <li class="nav-item dropdown">
+            <div class="container-fluid">
+                <!-- Brand -->
+                <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET
+                    Alumni Portal</a>
+                <!-- Form -->
+                <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+                    <div class="form-group mb-0">
+
+                    </div>
+                </form>
+                <!-- User -->
+
+                <ul class="navbar-nav align-items-center d-none d-md-flex">
+                    <!-- <li class="nav-item dropdown">
                 <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                  <div class="media align-items-center">
                     <span class="avatar avatar-sm rounded-circle">
@@ -67,202 +70,213 @@
                     </div>
                   </div>
                 </a>-->
-    
-                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
-                  <div class=" dropdown-header noti-title">
-                    
-                    <h1 class="text-overflow m-0">Welcome!</h1>
-                  </div>
-                  
-                  <a href="../examples/profile.html" class="dropdown-item">
-                    <i class="ni ni-single-02"></i>
-                    <span>My profile</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                    <i class="ni ni-settings-gear-65"></i>
-                    <span>Settings</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                    <i class="ni ni-calendar-grid-58"></i>
-                    <span>Activity</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                    <i class="ni ni-support-16"></i>
-                    <span>Support</span>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a href="#!" class="dropdown-item">
-                    <i class="ni ni-user-run"></i>
-                    <span>Logout</span>
-                  </a>
-                </div>
-              </li>
-            </ul>
-          </div>
+
+                    <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+                        <div class=" dropdown-header noti-title">
+
+                            <h1 class="text-overflow m-0">Welcome!</h1>
+                        </div>
+
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-single-02"></i>
+                            <span>My profile</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-settings-gear-65"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-calendar-grid-58"></i>
+                            <span>Activity</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-support-16"></i>
+                            <span>Support</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#!" class="dropdown-item">
+                            <i class="ni ni-user-run"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                    </li>
+                </ul>
+            </div>
         </nav>
         <!-- Header -->
-        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
-          <!-- Mask -->
-          <span class="mask bg-gradient-default opacity-8"></span>
-          <!-- Header container -->
-          <div class="container-fluid d-flex align-items-center ">
-            <div class="row">
-              <div class="col-lg-7 col-md-10">
-                <h1 class="display-2 text-white"><!--Hello {{data.NICK_NAME}}--></h1>
-                <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile has made with your work and manage your projects or assigned tasks</p>
-                {% if edit %}
-                  <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
-                  <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
-                  <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
-                {% else %}
-                  <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
-                {% endif %}
-                  <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
-              </div>
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+            style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
+            <!-- Mask -->
+            <span class="mask bg-gradient-default opacity-8"></span>
+            <!-- Header container -->
+            <div class="container-fluid d-flex align-items-center ">
+                <div class="row">
+                    <div class="col-lg-7 col-md-10">
+                        <h1 class="display-2 text-white">
+                            <!--Hello {{data.NICK_NAME}}-->
+                        </h1>
+                        <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile
+                            has made with your work and manage your projects or assigned tasks</p>
+                        {% if edit %}
+                        <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
+                        <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
+                        <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
+                        {% else %}
+                        <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
+                        {% endif %}
+                        <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
         <!-- Page content -->
         <div class="container-fluid mt--7 justify-content-center">
-          <div class="row justify-content-left">
-            <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
-              <div class="card card-profile shadow">
-                <div class="row justify-content-center">
-                  <div class="col-lg-3 order-lg-2">
-                    <div class="card-profile-image">
-                      <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">             
-                    </div>
-                  </div>
-                </div>
-                <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
-                  <div class="d-flex justify-content-between">
-                    {% if edit %}
-                      <a href="#"></a>
-    
-                    <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
-                      {% csrf_token %}
-                      <p hidden>
-                      {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
-                      </p>
-                      <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
-                    </form> 
-    
-                    {% else %}
-                      <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
-                      <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
-                    {% endif %}
-                    
-                  </div>
-                </div>
-                <div class="card-body pt-0 pt-md-4">
-
-                  
-                  <div class="text-center">
-                    <div class="h5 font-weight-300">
-                      <br><br>
-                      <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
-                      {% if data.FACEBOOK %}
-                          <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
-                      {% endif %}
-                      {% if data.FACEBOOK %}
-                          <a href={{data.TWITTER}}><i class="fa fa-twitter"></i></a>
-                      {% endif %}
-                      {% if data.LINKEDIN %}
-                          <a href={{data.LINKEDIN}}> <i class="fa fa-linkedin"></i></i></a>
-                      {% endif %}
-                      {% if data.GOOGLE_SCHOLAR %}
-                          <a href={{data.GOOGLE_SCHOLAR}}><i class="fa fa-google-plus"></i>/i></a>
-                      {% endif %}
-                      {% if data.RESEARCHGATE %}
-                          <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
-                      {% endif %}
-                    </div>
-                    <h3>
-                      {{data.FULL_NAME}}
-                      {% if data.AGE %}
-                        <span class="font-weight-light">, {{data.AGE}}</span>
-                      {% endif %}
-                      
-                    </h3>
-                    <h4>Batch {{data.STD_ID|make_list|slice:":2"|join:''}}, Department of {{data.DEPT}}</h4>
-                    <h5>{{data.HALL}} Hall</h5>
-                    <br>
-                    {% if data.LVL %}
-                      <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at {{data.LVL}}-{{data.TERM}}</b></h6>
-                    {% else %}
-                      <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{data.DESIGNATION|title }} at<i class="ni education_hat mr-2"></i>{{data.COMPANY}}</b></h6>
-                    {% endif %}
-                    <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}}, {{data.COUNTRY}}<br></b></h6>
-                    <br>
-                    {{data.ABOUT}}<br>
-                    
-                    <hr class="my-4">
-                    <div class="h5 mt-4">
-                      
-                    </div>
-                    <div>
-                      
-                  <b>Work History</b><br>
-                
-                        {% for row in job %}
-                            {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
-                            {% if row.TO_ %}
-                              {{row.TO_.year}})
-                            {% else %}
-                              )
-                            {% endif %}<br/>
-                        {% endfor %}                                  
-                      <br>
-                      <hr class="my-4">
-                      <b>Interests</b><br>
-                      {% if edit %}
-                        {% for key, value in skills.items %}
-                            {{key}} ({{value}})<br/>
-                        {% endfor %}
-                      {% else %}
-                        {% for key, value in skills.items %}
-                            {{key}} ({{value}}) <a href="{% url 'Profile:endorse' std_id=data.STD_ID topic=key %}"><i class="fa fa-plus"></i></a><br/>
-                        {% endfor %}
-                      {% endif %}
-                      
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-8 order-xl-1 ">
-                <div class="card bg-secondary shadow">
-                    <div class="card-body pt-0 pt-md-4">  
-                        
-                            <div class="post-desc-header">
-                                <div class="one">
-                                    <img src="{{MEDIA_URL}}{{detail.photo_path}}">
+            <div class="row justify-content-left">
+                <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+                    <div class="card card-profile shadow">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-3 order-lg-2">
+                                <div class="card-profile-image">
+                                    <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">
                                 </div>
-                                <div class="two">
-                                    <div class="row1">
+                            </div>
+                        </div>
+                        <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                            <div class="d-flex justify-content-between">
+                                {% if edit %}
+                                <a href="#"></a>
+
+                                <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post"
+                                    enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <p hidden>
+                                        {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                                    </p>
+                                    <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button'
+                                        value='Change Photo' />
+                                </form>
+
+                                {% else %}
+                                <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
+                                <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                        <div class="card-body pt-0 pt-md-4">
+
+
+                            <div class="text-center">
+                                <div class="h5 font-weight-300">
+                                    <br><br>
+                                    <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
+                                    {% if data.FACEBOOK %}
+                                    <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
+                                    {% endif %}
+                                    {% if data.FACEBOOK %}
+                                    <a href={{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                                    {% endif %}
+                                    {% if data.LINKEDIN %}
+                                    <a href={{data.LINKEDIN}}> <i class="fa fa-linkedin"></i></i></a>
+                                    {% endif %}
+                                    {% if data.GOOGLE_SCHOLAR %}
+                                    <a href={{data.GOOGLE_SCHOLAR}}><i class="fa fa-google-plus"></i>/i></a>
+                                    {% endif %}
+                                    {% if data.RESEARCHGATE %}
+                                    <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
+                                    {% endif %}
+                                </div>
+                                <h3>
+                                    {{data.FULL_NAME}}
+                                    {% if data.AGE %}
+                                    <span class="font-weight-light">, {{data.AGE}}</span>
+                                    {% endif %}
+
+                                </h3>
+                                <h4>Batch {{data.STD_ID|make_list|slice:":2"|join:''}}, Department of {{data.DEPT}}</h4>
+                                <h5>{{data.HALL}} Hall</h5>
+                                <br>
+                                {% if data.LVL %}
+                                <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at
+                                        {{data.LVL}}-{{data.TERM}}</b></h6>
+                                {% else %}
+                                <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently
+                                        {{data.DESIGNATION|title }} at<i
+                                            class="ni education_hat mr-2"></i>{{data.COMPANY}}</b></h6>
+                                {% endif %}
+                                <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}},
+                                        {{data.COUNTRY}}<br></b></h6>
+                                <br>
+                                {{data.ABOUT}}<br>
+
+                                <hr class="my-4">
+                                <div class="h5 mt-4">
+
+                                </div>
+                                <div>
+
+                                    <b>Work History</b><br>
+
+                                    {% for row in job %}
+                                    {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
+                                    {% if row.TO_ %}
+                                    {{row.TO_.year}})
+                                    {% else %}
+                                    )
+                                    {% endif %}<br />
+                                    {% endfor %}
+                                    <br>
+                                    <hr class="my-4">
+                                    <b>Interests</b><br>
+                                    {% if edit %}
+                                    {% for key, value in skills.items %}
+                                    {{key}} ({{value}})<br />
+                                    {% endfor %}
+                                    {% else %}
+                                    {% for key, value in skills.items %}
+                                    {{key}} ({{value}}) <a
+                                        href="{% url 'Profile:endorse' std_id=data.STD_ID topic=key %}"><i
+                                            class="fa fa-plus"></i></a><br />
+                                    {% endfor %}
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-8 order-xl-1 ">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-body pt-0 pt-md-4">
+
+                            <div class="topnav-all_post" style="margin-bottom: 20px;">
+                                <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
+                                <a href="#news">Event</a>
+                                <a href="#contact">Community</a>
+                            </div>
+
+                            <div class="post-desc-header" style="padding: 0%; display: flex;">
+                                <div class="one" style="margin-right: 2px;">
+                                    <img src="{{MEDIA_URL}}{{detail.photo_path}}" style="border: 2px solid white;">
+                                </div>
+                                <div class="two" style=" margin-left: 15px;">
+                                    <div class="row1" style=" margin-top: 2px;">
                                         <span class="name"><a href="#">{{detail.full_name}}</a></span>
                                     </div>
-                                    <div class="row2">
+                                    <div class="row2" style="margin-top: 5px;">
                                         <span><b>{{detail.date}}</b></span>
                                         <i class="fa fa-tag">{{detail.class}}</i>
                                     </div>
                                 </div>
                             </div>
+
+
+                            <div class="post-meta">
+
+                                {% if detail.class == 'Help' %}
                     
-                    
-              <br>             
-            <div class="comment-container bootstrap snippets bootdey">
-                <div class="row-comment">
-                    <div class="col-md-12">
-                        <div class="blog-comment">
-                            <ul class="comments">
-                                <li class="clearfix">
-                                    <div class="post-comments">
-                                        <div class="comment-two">
-                                    {% if detail.class == 'Help' %}
-                    
-                                    <div class="text-contrainer">
+                                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
                                         <div class="row-detail">
                                             <div class="col-15">
                                                 <span class="topic">Type of help</span>
@@ -303,7 +317,7 @@
                                 {% endif %}
                     
                                 {% if detail.class == 'Research' %}
-                                    <div class="text-contrainer">
+                                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
                                         <div class="row-detail">
                                             <div class="col-15">
                                                 <span class="topic">Topic Name</span>
@@ -354,7 +368,7 @@
                     
                                 {% if detail.class == 'Job' %}
                                     
-                                    <div class="text-contrainer">
+                                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
                                         <div class="row-detail">
                                             <div class="col-15">
                                                 <span class="topic">Comapny Name</span>
@@ -415,7 +429,7 @@
                                 {% endif %}
                     
                                 {% if detail.class == 'Career'%}
-                                    <div class="clearfix">
+                                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
                                         <div class="row-detail">
                                             <div  class="col-15">
                                                 <span class="topic">Description</span>
@@ -427,61 +441,63 @@
                                     
                                     </div>
                                 {% endif %}
+                    
+                    
+                            </div>
+
+
+
+
+
+                            <!--<div class="comment-container bootstrap snippets bootdey">
+                                <div class="row-comment">
+                                    <div class="col-md-12">
+                                        <div class="blog-comment">
+                                            <ul class="comments">
+                                                <li class="clearfix">
+                                                    <img src="{{MEDIA_URL}}{{detail.commenter_photo}}" class="avatar"
+                                                        alt="">
+                                                    <div class="post-comments">
+                                                        <div class="comment-two">
+                                                            <form
+                                                                action="{% url 'post:upload_comment' post_id=detail.post_id %}">
+
+
+                                                                <div class="col-85">
+                                                                    <textarea rows="3" cols="50"
+                                                                        name="comment_body"></textarea>
+                                                                </div>
+                                                                <br>
+                                                                <div class="row justify-content-end">
+                                                                    <input class="btn btn-info" type="submit"
+                                                                        value="Comment">
+                                                                </div>
+
+
+
+                                                            </form>
+                                                        </div>
+                                                        <br>
+                                                    </div>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                    
-                                
-                    
-                    
-                            
-            <div class="comment-container bootstrap snippets bootdey">
-                <div class="row-comment">
-                    <div class="col-md-12">
-                        <div class="blog-comment">
-                            <ul class="comments">
-                                <li class="clearfix">
-                                    <img src="{{MEDIA_URL}}{{detail.commenter_photo}}" class="avatar" alt="">
-                                    <div class="post-comments">
-                                        <div class="comment-two">
-                                            <form action="{% url 'post:upload_comment' post_id=detail.post_id %}">
-                                            
-                                                
-                                                    <div class="col-85">
-                                                        <textarea rows="3" cols="50" name="comment_body"></textarea>
-                                                    </div>
-                                                <br>
-                                                    <div class="row justify-content-end">
-                                                        <input class="btn btn-info" type="submit" value="Comment">
-                                                    </div>
-                                                
-                                                
-                                    
-                                            </form>
-                                        </div>
-                                        <br>
-                                    </div>
-                                </li>
-                            </ul>
-                            </div></div></div></div>
-                    
-                            <!-- <div class="comment-upload-container">
-                                <div class="commenter-photo">
-                                    <img src="{{MEDIA_URL}}{{detail.commenter_photo}}">
                                 </div>
-                                <div class="comment-two">
-                                    <form action="{% url 'post:upload_comment' post_id=detail.post_id %}" class="upload-comment-form">
+                            </div>-->
+
+                            <div class="comment-upload-container" style="margin-bottom: 50px;">
+                                <div class="commenter-photo" style="margin-left: 0px; margin-right: 15px;">
+                                    <img src="{{MEDIA_URL}}{{detail.commenter_photo}}" style="border: 2px solid white;">
+                                </div>
+                                <div class="comment-two" style="width: 70%; ">
+                                    <form action="{% url 'post:upload_comment' post_id=detail.post_id %}"  class="upload-comment-form">
                                     
                                         <div class="row">
-                                            <div class="col-85">
+                                            <div class="col-85" style="margin-left: 20px; margin-bottom: 10px;">
                                                 <textarea rows="3" cols="50" name="comment_body"></textarea>
                                             </div>
-                                            <div class="col-25">
+                                            <div class="col-25" style="margin-left: 75%;">
                                                 <input type="submit" value="Comment">
                                             </div>
                                         </div>
@@ -489,103 +505,83 @@
                                     </form>
                                 </div>
                                 
-                            </div> -->
-                    
-                            
-                            
-                    
+                            </div>
+
+
+
+
                             {% if not is_begin %}
-                                <a href="{% url 'post:detail_post' post_id=post_id start_from=prev_id %}">
-                                    <button class="previous">Previous</button>
+                            <div style="margin-bottom: 20px;">
+                                <a href="{% url 'post:detail_post' post_id=post_id start_from=prev_id %}" class="comment-scroll" >
+                                    <span class="text-button">View Previous Comments</span>
                                 </a>
+                            </div>
+                            
                             {% endif %}
-                    <br>
+                            <br>
                             <div class="comment-container bootstrap snippets bootdey">
                                 <div class="row-comment">
                                     <div class="col-md-12">
                                         <div class="blog-comment">
-                                            
-                                        
-                    
+
+                                            <ul class="comments">
+
                                                 {% for comment_dict in comment_dicts %}
-                    
-                    
+
+
                                                     <li class="clearfix">
-                                                        <img src="{{MEDIA_URL}}{{comment_dict.photo_path}}" class="avatar" alt="">
+                                                        <img src="{{MEDIA_URL}}{{comment_dict.photo_path}}" class="avatar"
+                                                            alt="">
                                                         <div class="post-comments">
-                                                            <span class="username"><a href="#" class="name">{{comment_dict.full_name}}</a></span>
+                                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=comment_dict.user_id %}"
+                                                                    class="name">{{comment_dict.full_name}}</a></span>
                                                             {% if comment_dict.timestamp == "Just Now" %}
-                                                                <span class="time">{{comment_dict.timestamp}}</span>
+                                                            <span class="time">{{comment_dict.timestamp}}</span>
                                                             {% else %}
-                                                                <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                                            <span class="time">{{comment_dict.timestamp}} Ago</span>
                                                             {% endif %}
                                                             <hr>
-                                                            
-                                                            <p>
+
+                                                            <p style="font-size: 15; font-weight: 400;">
                                                                 {{comment_dict.text}}
                                                             </p>
                                                         </div>
                                                     </li>
-                    
-                                                    
+
+
                                                 {% endfor %}
-                                            
+
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            
-                    
-                            {% if not the_end %}
-                                <a href="{% url 'post:detail_post' post_id=post_id start_from=next_id %}">
-                                    <button class="next">Next</button>
-                                </a>
-                            {% endif %}
-                    
 
-                        </div>      
+
+
+                            {% if not the_end %}
+                            <a href="{% url 'post:detail_post' post_id=post_id start_from=next_id %}" class="comment-scroll">
+                                <!--<button class="next">Next</button>-->
+                                <span class="text-button">View More Comments</span>
+                            </a>
+                            {% endif %}
+
 
                         </div>
+
                     </div>
-                  
                 </div>
+
             </div>
-    
-    
-          </div>
         </div>
 
 
+    </div>
+    </div>
 
-    
+
+
+
 
 
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
