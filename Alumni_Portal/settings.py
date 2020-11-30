@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'post',
     'Timeline',
     'Search',
+    'Events',
 ]
 
 MIDDLEWARE = [
