@@ -9,6 +9,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render
 from .forms import EventForm, CreateEventForm
 from Alumni_Portal.utils import db
+from django.urls import reverse
 # Create your views here.
 
 def index(request):
@@ -47,7 +48,7 @@ def index(request):
             sql3 ="""SELECT EVENT_ID from EVENT WHERE LOWER(LOCATION) LIKE :location
                 INTERSECT """
 
-            sql4 ="""SELECT EVENT_ID from EVENT WHERE :time_period BETWEEN EVENT_START AND EVENT_END
+            sql4 ="""SELECT EVENT_ID from EVENT WHERE to_date(:time_period,'yyyy-mm-dd') BETWEEN EVENT_START AND EVENT_END
                 INTERSECT """
 
            
@@ -73,6 +74,7 @@ def index(request):
                 return render(request,'Events/index.html',{'form':form, 'msg' : message})
             rows =  c.execute(sql,values).fetchall()
             rows = rows
+            print(values)
 
             print("Result Found : " + str(len(rows)))
             if len(rows) ==  0 :
@@ -115,13 +117,17 @@ def visit_event(request,event_id):
             data = dict(zip(columnNames,row))
         except:
             print('cannot Visit Event')
+        sql = """SELECT COUNT(USER_ID) from EVENT_PARTICIPATES WHERE EVENT_ID = :event_id"""
+        row =  c.execute(sql,{'event_id':event_id}).fetchone()
+        joined = row[0]
+        print(row)
             
         sql = """SELECT FULL_NAME from USER_TABLE WHERE STD_ID = (SELECT USER_ID FROM EVENT_ARRANGE WHERE EVENT_ID = :event_id)"""
         row =  c.execute(sql,{'event_id':event_id}).fetchone()
         columnNames = [d[0] for d in c.description]
         print(row)
        
-        return render(request,'Events/Events.html',{'data':data,'Organizer':row[0]})
+        return render(request,'Events/Events.html',{'data':data,'Organizer':row[0],'Joined':joined})
 
 
         
@@ -164,3 +170,21 @@ def make_event(request):
     else:
         form = CreateEventForm()
     return render(request,'Events/create.html',{'form':form, 'msg' : message})
+
+def join_event(request,event_id):
+    if 'std_id' in request.session:
+        conn = db()
+        message = ""
+        c = conn.cursor()
+        try:
+            sql = """ INSERT INTO EVENT_PARTICIPATES (EVENT_ID ,USER_ID)
+                        VALUES(:event_id, :std_id)"""
+            c.execute(sql,{'std_id':request.session['std_id'],'event_id':event_id})
+            conn.commit()
+            conn.close()
+            print('Joined Event')
+        except cx_Oracle.IntegrityError:
+            msg = 'Already Joined'
+        return HttpResponseRedirect(reverse('Events:visit_event', args=(event_id,)))
+
+

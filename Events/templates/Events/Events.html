@@ -133,21 +133,26 @@
                 <div class="col-xl-8 order-xl-1 ">
                     <div class="card bg-secondary shadow">
                         <div class="card-body pt-0 pt-md-4">
-                            <text-center>
+                            <div class="text-center">
                             <div class="picture">
                                 <img class="img-fluid" src="{{MEDIA_URL}}{{data.PHOTO}}" height=130 weight=130>
                             </div> 
+                            <br>
+                            <a href="{% url 'Events:join_event' event_id=data.EVENT_ID %}" class="btn btn-info">Join Event</a>
+                            <br>
                             <h2>{{data.EVENT_NAME}}</h2>
                             <h3>{{data.LOCATION}}</h3>
-                            <h4>{{data.EVENT_START}} - {{data.EVENT_END}}</h2>
-                            <h4>Organizer : </h2>   
+                            <h4>{{data.EVENT_START|date}} - {{data.EVENT_END|date}}</h4>
+                            <h4>{{Joined}} people joined this event.</h4>
+                            <h4>Organizer : </h4>   
+
                                 <ul>
                                     <li> {{Organizer}}</li>
                                 </ul>
                             <br>
                             <br>
                             <p>{{data.DESCRIPTION}}</p>
-                        </text-center>
+                            </div>
                         </div>
 
                     </div>
