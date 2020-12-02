@@ -82,7 +82,7 @@
     font-size: 22;
     font-weight: 500;
     font-family: 'Times New Roman';
-    margin-bottom: 20px;
+    /*margin-bottom: 20px;*/
     white-space: initial;
 }
 .each-item .row-item .group-name a{

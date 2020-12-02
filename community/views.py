@@ -360,7 +360,7 @@ def create_comm_upload(request):
             c.execute(sql, {"comm_id":comm_id, "user_id":user_id})
             c.execute("COMMIT")
 
-            return HttpResponseRedirect(reverse('community:home'))
+            return HttpResponseRedirect(reverse('community:home', args=(1,1,0)))
     else:
         return redirect('SignIn:signin')
 
