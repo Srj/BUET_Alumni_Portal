@@ -253,7 +253,7 @@
                             <div class="topnav-all_post" style="margin-bottom: 20px;">
                                 <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
                                 <a href="#news">Event</a>
-                                <a href="#contact">Community</a>
+                                <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0 %}">Community</a>
                             </div>
 
                             <div class="post-desc-header" style="padding: 0%; display: flex;">
@@ -383,7 +383,7 @@
                                                 <span class="topic">Location</span>
                                             </div>
                                             <div class="col-85">
-                                                <span>{{detail.location}}</span>
+                                                <span>{{detail.designation}}</span>
                                             </div>
                                         </div>
                     
@@ -392,7 +392,7 @@
                                                 <span class="topic">Designation</span>
                                             </div>
                                             <div class="col-85">
-                                                <span>{{detail.designation}}</span>
+                                                <span>{{detail.location}}</span>
                                             </div>
                                         </div>
                     
