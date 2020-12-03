@@ -5,6 +5,8 @@
 <link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/post_detail.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'community/detail_communiity.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'community/home.css' %}">
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
@@ -247,143 +249,203 @@
                   <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0 %}" class="active">Community</a>
                 </div>
 
-                <div class="create-community-container" style="margin-bottom: 20px;">
-                  <a href="{% url 'community:create_community' %}">
-                    <button style="width: 100%;">Create New Community</button>
-                  </a>
+                <div class="post-desc-header" style="padding: 0%; display: flex;">
+                    <div class="one" style="margin-right: 2px;">
+                        <img src="{{MEDIA_URL}}groups.jpg" style="border: 2px solid white;">
+                    </div>
+                    <div class="two" style=" margin-left: 15px;">
+                        <div class="row1" style=" margin-top: 2px;">
+                            <span class="name"><a href="#">{{community_name}}</a></span>
+                        </div>
+                        <div class="row2" style="margin-top: 5px;">
+                            <span><b>Created {{creation_ago}} Ago</b></span>
+                            <!--<i class="fa fa-tag">{{detail.class}}</i>-->
+                        </div>
+                    </div>
                 </div>
 
-                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=2 %}" class="form-container">
-                  <div class="column">
-                    {% if search_comm_name is None %}
-                        <label for="comm_name_search">Community Name</label>
-                        <input type="text" name="comm_name_search" value="">
-                    {% else %}
-                        <label for="comm_name_search">Community Name</label>
-                        <input type="text" name="comm_name_search" value="{{search_comm_name}}">
-                    {% endif %}
-                  </div>
-
-                  <div class="column">
-                    <input type="submit" value="Search">
-                  </div>
-                </form>
-
-                {% if other_community_info_list|length > 0 %}
-                  <h2 style="margin-bottom: 10px;">Join Groups</h2>
-
-                  <div class="whole-groups-container" style="height: 360px; margin-bottom: 20px;">
-
-                    {% if is_other_comm_begin %}
-                      <div class="angle-left" style="background-color: rgb(242, 243, 243);">
-                        <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
-                      </div>
-                    {% else %}
-                      <div class="angle-left" style="cursor: pointer;">
-                        <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt    other_groups_start=prev_other_comm    comm_search_change=1 %}">
-                          <i class="fa fa-angle-left"></i>
-                        </a>
-                      </div>
-                    {% endif %}
-
-                    <div class="scrollmenu-container" style="float: left; width: 90%;">
-                      <div class="scrollmenu">
-                        {% for community_dict in other_community_info_list %}
-                          <div class="each-item">
-                            <div class="row-item">
-                              <img src="{{MEDIA_URL}}groups.jpg">
+                <div class="most-meta">
+                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
+                        
+                        <div class="row-detail">
+                            <div  class="col-15">
+                                <span class="topic">Description</span>
                             </div>
-
-                            <div class="row-item" style="height: 53px;">
-                              <span class="group-name"><a href="{% url 'community:detail_community' community_id=community_dict.community_id    start_member_count=1    start_requ_count=1 %}">{{community_dict.community_name|truncatechars:35}}</a></span>
+                            <div class="col-85">
+                                <pre>{{description}}</pre>
                             </div>
+                        </div>
 
-                            <div class="row-item" style="margin-top: 20px;">
-                              <span class="members">{{community_dict.num_members}} Members</span>
+                        <div class="row-detail">
+                            <div  class="col-15">
+                                <span class="topic">Criteria</span>
                             </div>
-
-                            <div class="row-item">
-                              <span class="created">Created {{community_dict.created}} ago</span>
+                            <div class="col-85">
+                                <pre>{{criteria}}</pre>
                             </div>
-                          </div>
-                        {% endfor %}
-                      </div>
+                        </div>
+                    
                     </div>
+                </div>
 
-                    {% if is_other_comm_end %}
-                      <div class="angle-right" style="background-color: rgb(242, 243, 243);">
-                        <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
-                      </div>
+                {% if not_comm_member %}
+                    {% if already_joined %}
+                        <h3>You already have requested to join this community.</h3>
                     {% else %}
-                      <div class="angle-right" style="cursor: pointer;">
-                        <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt    other_groups_start=next_other_comm    comm_search_change=1 %}">
-                          <i class="fa fa-angle-right"></i>
-                        </a>
-                      </div>
+                        <h3 style="margin-top: 20px;">You Are Not A Member In This Group</h3>
+                        <div class="create-community-container" style="margin-top: 20px;">
+                            <a href="{% url 'community:join_request' community_id=comm_id %}">
+                            <button style="width: 100%;">Join Group</button>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if not_admin %}
+                        <div class="create-community-container" style="margin-top: 20px;">
+                            <a href="#">
+                            <button style="width: 100%;">Leave Group</button>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="create-community-container" style="margin-top: 20px;">
+                            <a href="#">
+                            <button style="width: 100%;">Delete Group</button>
+                            </a>
+                        </div>
+
+                        {% if request_dicts|length > 0 %}
+                            <h2 style="margin-bottom: 10px; ">Join Requests</h2>
+
+                            <div class="whole-groups-container" style="height: 360px;">
+        
+                                {% if is_requ_begin %}
+                                    <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                                        <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="angle-left" style="cursor: pointer;">
+                                        <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=prev_requ %}">
+                                            <i class="fa fa-angle-left"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+            
+                                <div class="scrollmenu-container" style="float: left; width: 90%;">
+                                    <div class="scrollmenu">
+                                    {% for request_dict in request_dicts %}
+                                        <div class="each-item">
+                                            <div class="row-item">
+                                                <img src="{{MEDIA_URL}}{{request_dict.photo}}">
+                                            </div>
+                
+                                            <div class="row-item" style="height: 53px;">
+                                                <span class="group-name"><a href="{% url 'Profile:visit_profile' std_id=request_dict.user_id %}">{{request_dict.full_name|truncatechars:35}}</a></span>
+                                            </div>
+                
+                                            <div class="row-item" style="margin-top: 20px;">
+                                                <span class="members" style="font-size: 18;">Requested {{request_dict.time}} Ago</span>
+                                            </div>
+                
+                                            <div class="row-item" style="height: 40px; padding: 5px;">
+                                                
+                                                <div style="width: 40%; float: left; height: 30px; cursor: pointer;">
+                                                    <a href="{% url 'community:join_community' community_id=comm_id    user_id=request_dict.user_id     start_member_count=orig_member      start_requ_count=1 %}">
+                                                        <i class="fa fa-check" style="font-size: 30;margin-top: 0px; color: green;"></i>
+                                                    </a>
+                                                </div>
+                                            
+                                                <div style="height: 30px; cursor: pointer;">
+                                                    <a href="{% url 'community:remove_request' community_id=comm_id     user_id=request_dict.user_id    start_member_count=orig_member      start_requ_count=1 %}">
+                                                        <i class="fa fa-times" style="font-size: 30; margin-top: 0px; color: red;"></i>
+                                                    </a>
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+            
+                                {% if is_requ_end %}
+                                    <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                                        <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                                    </div>
+                                {% else %}
+                                    <div class="angle-right" style="cursor: pointer;">
+                                        <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=next_requ %}">
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+        
+        
+                            </div>
+                        {% endif %}
                     {% endif %}
 
+                    {% if member_dicts|length > 0 %}
+                        <h2 style="margin-bottom: 10px; ">All Members</h2>
 
-                  </div>
-                {% endif %}
-
-
-                {% if my_communitiy_info_list|length > 0 %}
-                  <h2 style="margin-bottom: 10px; ">My Groups</h2>
-
-                  <div class="whole-groups-container" style="height: 360px;">
-
-                    {% if is_my_comm_begin %}
-                      <div class="angle-left" style="background-color: rgb(242, 243, 243);">
-                        <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
-                      </div>
-                    {% else %}
-                      <div class="angle-left" style="cursor: pointer;">
-                        <a href="{% url 'community:home' my_groups_start=prev_my_comm   other_groups_start=orig_other_grp_strt    comm_search_change=1 %}">
-                          <i class="fa fa-angle-left"></i>
-                        </a>
-                      </div>
+                        <div class="whole-groups-container" style="height: 360px;">
+    
+                            {% if is_member_begin %}
+                                <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                                </div>
+                            {% else %}
+                                <div class="angle-left" style="cursor: pointer;">
+                                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=prev_member    start_requ_count=orig_requ %}">
+                                        <i class="fa fa-angle-left"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+        
+                            <div class="scrollmenu-container" style="float: left; width: 90%;">
+                                <div class="scrollmenu">
+                                {% for member_dict in member_dicts %}
+                                    <div class="each-item">
+                                        <div class="row-item">
+                                            <img src="{{MEDIA_URL}}{{member_dict.photo}}">
+                                        </div>
+            
+                                        <div class="row-item" style="height: 53px;">
+                                            <span class="group-name"><a href="{% url 'Profile:visit_profile' std_id=member_dict.user_id %}">{{member_dict.full_name|truncatechars:35}}</a></span>
+                                        </div>
+            
+                                        <div class="row-item" style="margin-top: 20px;">
+                                            <span class="members">0 posts</span>
+                                        </div>
+            
+                                        <div class="row-item">
+                                            <span class="created">Joined {{member_dict.joined}} ago</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                </div>
+                            </div>
+        
+                            {% if is_member_end %}
+                                <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                                </div>
+                            {% else %}
+                                <div class="angle-right" style="cursor: pointer;">
+                                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=next_member    start_requ_count=orig_requ %}">
+                                        <i class="fa fa-angle-right"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+    
+                        
+    
+    
+                        </div>
                     {% endif %}
 
-                    <div class="scrollmenu-container" style="float: left; width: 90%;">
-                      <div class="scrollmenu">
-                        {% for community_dict in my_communitiy_info_list %}
-                          <div class="each-item">
-                            <div class="row-item">
-                              <img src="{{MEDIA_URL}}groups.jpg">
-                            </div>
-
-                            <div class="row-item" style="height: 53px;">
-                              <span class="group-name"><a href="{% url 'community:detail_community' community_id=community_dict.community_id    start_member_count=1    start_requ_count=1 %}">{{community_dict.community_name|truncatechars:35}}</a></span>
-                            </div>
-
-                            <div class="row-item" style="margin-top: 20px;">
-                              <span class="members">{{community_dict.num_members}} Members</span>
-                            </div>
-
-                            <div class="row-item">
-                              <span class="created">Created {{community_dict.created}} ago</span>
-                            </div>
-                          </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-
-                    {% if is_my_comm_end %}
-                      <div class="angle-right" style="background-color: rgb(242, 243, 243);">
-                        <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
-                      </div>
-                    {% else %}
-                      <div class="angle-right" style="cursor: pointer;">
-                        <a href="{% url 'community:home' my_groups_start=next_my_comm   other_groups_start=orig_other_grp_strt    comm_search_change=1 %}">
-                          <i class="fa fa-angle-right"></i>
-                        </a>
-                      </div>
-                    {% endif %}
 
                     
 
-
-                  </div>
                 {% endif %}
 
 
