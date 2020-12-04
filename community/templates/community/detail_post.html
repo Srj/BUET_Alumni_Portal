@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'post/comment.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/post_detail.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'community/home.css' %}">
 
 
 
@@ -251,10 +252,52 @@
                         <div class="card-body pt-0 pt-md-4">
 
                             <div class="topnav-all_post" style="margin-bottom: 20px;">
-                                <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
+                                <a  href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
                                 <a href="#news">Event</a>
-                                <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0    post_start=1 post_change=0 %}">Community</a>
+                                <a class="active" href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0    post_start=1 post_change=0 %}">Community</a>
                             </div>
+
+                            <div class="post-desc-header" style="padding: 0%; display: flex;">
+                                <div class="one" style="margin-right: 2px;">
+                                  <img src="{{MEDIA_URL}}groups.jpg" style="border: 2px solid white;">
+                                </div>
+
+                                <div class="two" style=" margin-left: 15px;">
+                                    <div class="row1" style=" margin-top: 2px;">
+                                    <span class="name"><a href="#">{{community_name}}</a></span>
+                                </div>
+                                  <div class="row2" style="margin-top: 5px;">
+                                    <span><b>Created {{created}} Ago</b></span>
+                                    <!--<i class="fa fa-tag">{{detail.class}}</i>-->
+                                  </div>
+                                </div>
+                            </div>
+
+                            <div class="most-meta" style="margin-bottom: 40px;">
+                                <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
+              
+                                  <div class="row-detail">
+                                    <div class="col-15">
+                                      <span class="topic">Description</span>
+                                    </div>
+                                    <div class="col-85">
+                                      <pre>{{description}}</pre>
+                                    </div>
+                                  </div>
+              
+                                  <div class="row-detail">
+                                    <div class="col-15">
+                                      <span class="topic">Criteria</span>
+                                    </div>
+                                    <div class="col-85">
+                                      <pre>{{criteria}}</pre>
+                                    </div>
+                                  </div>
+              
+                                </div>
+                            </div>
+
+
 
                             <div class="post-desc-header" style="padding: 0%; display: flex;">
                                 <div class="one" style="margin-right: 2px;">
@@ -431,6 +474,15 @@
                                 {% if detail.class == 'Career'%}
                                     <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
                                         <div class="row-detail">
+                                            <div class="col-15">
+                                                <span class="topic">Topic Name</span>
+                                            </div>
+                                            <div class="col-85">
+                                                <span>{{detail.topic_name}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row-detail">
                                             <div  class="col-15">
                                                 <span class="topic">Description</span>
                                             </div>
@@ -485,13 +537,13 @@
                                     </div>
                                 </div>
                             </div>-->
-
+                                
                             <div class="comment-upload-container" style="margin-bottom: 50px;">
                                 <div class="commenter-photo" style="margin-left: 0px; margin-right: 15px;">
                                     <img src="{{MEDIA_URL}}{{detail.commenter_photo}}" style="border: 2px solid white;">
                                 </div>
                                 <div class="comment-two" style="width: 70%; ">
-                                    <form action="{% url 'post:upload_comment' post_id=detail.post_id %}"  class="upload-comment-form">
+                                    <form action="{% url 'community:upload_comment' community_id=comm_id     post_id=detail.post_id %}"  class="upload-comment-form">
                                     
                                         <div class="row">
                                             <div class="col-85" style="margin-left: 20px; margin-bottom: 10px;">
@@ -512,7 +564,7 @@
 
                             {% if not is_begin %}
                             <div style="margin-bottom: 20px;">
-                                <a href="{% url 'post:detail_post' post_id=post_id start_from=prev_id %}" class="comment-scroll" >
+                                <a href="{% url 'community:detail_post' community_id=comm_id     post_id=post_id    start_from=prev_id %}" class="comment-scroll" >
                                     <span class="text-button">View Previous Comments</span>
                                 </a>
                             </div>
@@ -560,7 +612,7 @@
 
 
                             {% if not the_end %}
-                            <a href="{% url 'post:detail_post' post_id=post_id start_from=next_id %}" class="comment-scroll">
+                            <a href="{% url 'community:detail_post' community_id=comm_id    post_id=post_id      start_from=next_id %}" class="comment-scroll">
                                 <!--<button class="next">Next</button>-->
                                 <span class="text-button">View More Comments</span>
                             </a>

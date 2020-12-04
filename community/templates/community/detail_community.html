@@ -246,205 +246,488 @@
                 <div class="topnav-all_post" style="margin-bottom: 20px;">
                   <a href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
                   <a href="#news">Event</a>
-                  <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0 %}" class="active">Community</a>
+                  <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0    post_start=1     post_change=0 %}"
+                    class="active">Community</a>
                 </div>
 
                 <div class="post-desc-header" style="padding: 0%; display: flex;">
-                    <div class="one" style="margin-right: 2px;">
-                        <img src="{{MEDIA_URL}}groups.jpg" style="border: 2px solid white;">
+                  <div class="one" style="margin-right: 2px;">
+                    <img src="{{MEDIA_URL}}groups.jpg" style="border: 2px solid white;">
+                  </div>
+                  <div class="two" style=" margin-left: 15px;">
+                    <div class="row1" style=" margin-top: 2px;">
+                      <span class="name"><a href="#">{{community_name}}</a></span>
                     </div>
-                    <div class="two" style=" margin-left: 15px;">
-                        <div class="row1" style=" margin-top: 2px;">
-                            <span class="name"><a href="#">{{community_name}}</a></span>
-                        </div>
-                        <div class="row2" style="margin-top: 5px;">
-                            <span><b>Created {{creation_ago}} Ago</b></span>
-                            <!--<i class="fa fa-tag">{{detail.class}}</i>-->
-                        </div>
+                    <div class="row2" style="margin-top: 5px;">
+                      <span><b>Created {{creation_ago}} Ago</b></span>
+                      <!--<i class="fa fa-tag">{{detail.class}}</i>-->
                     </div>
+                  </div>
                 </div>
 
                 <div class="most-meta">
-                    <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
-                        
-                        <div class="row-detail">
-                            <div  class="col-15">
-                                <span class="topic">Description</span>
-                            </div>
-                            <div class="col-85">
-                                <pre>{{description}}</pre>
-                            </div>
-                        </div>
+                  <div class="text-contrainer" style="padding: 10px; padding-left: 15px; margin-left: 9%; width: 90%;">
 
-                        <div class="row-detail">
-                            <div  class="col-15">
-                                <span class="topic">Criteria</span>
-                            </div>
-                            <div class="col-85">
-                                <pre>{{criteria}}</pre>
-                            </div>
-                        </div>
-                    
+                    <div class="row-detail">
+                      <div class="col-15">
+                        <span class="topic">Description</span>
+                      </div>
+                      <div class="col-85">
+                        <pre>{{description}}</pre>
+                      </div>
                     </div>
+
+                    <div class="row-detail">
+                      <div class="col-15">
+                        <span class="topic">Criteria</span>
+                      </div>
+                      <div class="col-85">
+                        <pre>{{criteria}}</pre>
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
 
                 {% if not_comm_member %}
-                    {% if already_joined %}
-                        <h3>You already have requested to join this community.</h3>
-                    {% else %}
-                        <h3 style="margin-top: 20px;">You Are Not A Member In This Group</h3>
-                        <div class="create-community-container" style="margin-top: 20px;">
-                            <a href="{% url 'community:join_request' community_id=comm_id %}">
-                            <button style="width: 100%;">Join Group</button>
-                            </a>
-                        </div>
-                    {% endif %}
+                {% if already_joined %}
+                <h3>You already have requested to join this community.</h3>
                 {% else %}
-                    {% if not_admin %}
-                        <div class="create-community-container" style="margin-top: 20px;">
-                            <a href="#">
-                            <button style="width: 100%;">Leave Group</button>
-                            </a>
+                <h3 style="margin-top: 20px;">You Are Not A Member In This Group</h3>
+                <div class="create-community-container" style="margin-top: 20px;">
+                  <a href="{% url 'community:join_request' community_id=comm_id %}">
+                    <button style="width: 100%;">Join Group</button>
+                  </a>
+                </div>
+                {% endif %}
+                {% else %}
+                {% if not_admin %}
+                <div class="create-community-container" style="margin-top: 20px;">
+                  <a href="#">
+                    <button style="width: 100%;">Leave Group</button>
+                  </a>
+                </div>
+                {% else %}
+                <div class="create-community-container" style="margin-top: 20px;">
+                  <a href="#">
+                    <button style="width: 100%;">Delete Group</button>
+                  </a>
+                </div>
+
+                {% if request_dicts|length > 0 %}
+                <h2 style="margin-bottom: 10px; ">Join Requests</h2>
+
+                <div class="whole-groups-container" style="height: 360px;">
+
+                  {% if is_requ_begin %}
+                  <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-left" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=prev_requ   post_start=orig_post   post_change=1 %}">
+                      <i class="fa fa-angle-left"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  <div class="scrollmenu-container" style="float: left; width: 90%;">
+                    <div class="scrollmenu">
+                      {% for request_dict in request_dicts %}
+                      <div class="each-item">
+                        <div class="row-item">
+                          <img src="{{MEDIA_URL}}{{request_dict.photo}}">
                         </div>
+
+                        <div class="row-item" style="height: 53px;">
+                          <span class="group-name"><a
+                              href="{% url 'Profile:visit_profile' std_id=request_dict.user_id %}">{{request_dict.full_name|truncatechars:35}}</a></span>
+                        </div>
+
+                        <div class="row-item" style="margin-top: 20px;">
+                          <span class="members" style="font-size: 18;">Requested {{request_dict.time}} Ago</span>
+                        </div>
+
+                        <div class="row-item" style="height: 40px; padding: 5px;">
+
+                          <div style="width: 40%; float: left; height: 30px; cursor: pointer;">
+                            <a
+                              href="{% url 'community:join_community' community_id=comm_id    user_id=request_dict.user_id     start_member_count=orig_member      start_requ_count=1 %}">
+                              <i class="fa fa-check" style="font-size: 30;margin-top: 0px; color: green;"></i>
+                            </a>
+                          </div>
+
+                          <div style="height: 30px; cursor: pointer;">
+                            <a
+                              href="{% url 'community:remove_request' community_id=comm_id     user_id=request_dict.user_id    start_member_count=orig_member      start_requ_count=1 %}">
+                              <i class="fa fa-times" style="font-size: 30; margin-top: 0px; color: red;"></i>
+                            </a>
+                          </div>
+
+
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% if is_requ_end %}
+                  <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-right" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=next_requ    post_start=orig_post    post_change=1 %}">
+                      <i class="fa fa-angle-right"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+
+                </div>
+                {% endif %}
+                {% endif %}
+
+                {% if member_dicts|length > 0 %}
+                <h2 style="margin-bottom: 10px; ">All Members</h2>
+
+                <div class="whole-groups-container" style="height: 360px;">
+
+                  {% if is_member_begin %}
+                  <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-left" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:detail_community' community_id=comm_id    start_member_count=prev_member    start_requ_count=orig_requ    post_start=orig_post   post_change=1 %}">
+                      <i class="fa fa-angle-left"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  <div class="scrollmenu-container" style="float: left; width: 90%;">
+                    <div class="scrollmenu">
+                      {% for member_dict in member_dicts %}
+                      <div class="each-item">
+                        <div class="row-item">
+                          <img src="{{MEDIA_URL}}{{member_dict.photo}}">
+                        </div>
+
+                        <div class="row-item" style="height: 53px;">
+                          <span class="group-name"><a
+                              href="{% url 'Profile:visit_profile' std_id=member_dict.user_id %}">{{member_dict.full_name|truncatechars:35}}</a></span>
+                        </div>
+
+                        <div class="row-item" style="margin-top: 20px;">
+                          <span class="members">0 posts</span>
+                        </div>
+
+                        <div class="row-item">
+                          <span class="created">Joined {{member_dict.joined}} ago</span>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% if is_member_end %}
+                  <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-right" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:detail_community' community_id=comm_id    start_member_count=next_member    start_requ_count=orig_requ    post_start=orig_post    post_change=1 %}">
+                      <i class="fa fa-angle-right"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+
+
+
+                </div>
+                {% endif %}
+
+                <h2 style="margin-top: 20px; margin-bottom: 10px;">Share With The Group</h2>
+                <div class="write-post-container" style="margin-bottom: 20px;">
+                  <a href="{% url 'community:make_post' community_id=comm_id %}">
+                    <button>Write Post</button>
+                  </a>
+                </div>
+
+                {% if search_post_typ is None %}
+                <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2  %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="">
                     {% else %}
-                        <div class="create-community-container" style="margin-top: 20px;">
-                            <a href="#">
-                            <button style="width: 100%;">Delete Group</button>
-                            </a>
-                        </div>
-
-                        {% if request_dicts|length > 0 %}
-                            <h2 style="margin-bottom: 10px; ">Join Requests</h2>
-
-                            <div class="whole-groups-container" style="height: 360px;">
-        
-                                {% if is_requ_begin %}
-                                    <div class="angle-left" style="background-color: rgb(242, 243, 243);">
-                                        <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
-                                    </div>
-                                {% else %}
-                                    <div class="angle-left" style="cursor: pointer;">
-                                        <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=prev_requ %}">
-                                            <i class="fa fa-angle-left"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-            
-                                <div class="scrollmenu-container" style="float: left; width: 90%;">
-                                    <div class="scrollmenu">
-                                    {% for request_dict in request_dicts %}
-                                        <div class="each-item">
-                                            <div class="row-item">
-                                                <img src="{{MEDIA_URL}}{{request_dict.photo}}">
-                                            </div>
-                
-                                            <div class="row-item" style="height: 53px;">
-                                                <span class="group-name"><a href="{% url 'Profile:visit_profile' std_id=request_dict.user_id %}">{{request_dict.full_name|truncatechars:35}}</a></span>
-                                            </div>
-                
-                                            <div class="row-item" style="margin-top: 20px;">
-                                                <span class="members" style="font-size: 18;">Requested {{request_dict.time}} Ago</span>
-                                            </div>
-                
-                                            <div class="row-item" style="height: 40px; padding: 5px;">
-                                                
-                                                <div style="width: 40%; float: left; height: 30px; cursor: pointer;">
-                                                    <a href="{% url 'community:join_community' community_id=comm_id    user_id=request_dict.user_id     start_member_count=orig_member      start_requ_count=1 %}">
-                                                        <i class="fa fa-check" style="font-size: 30;margin-top: 0px; color: green;"></i>
-                                                    </a>
-                                                </div>
-                                            
-                                                <div style="height: 30px; cursor: pointer;">
-                                                    <a href="{% url 'community:remove_request' community_id=comm_id     user_id=request_dict.user_id    start_member_count=orig_member      start_requ_count=1 %}">
-                                                        <i class="fa fa-times" style="font-size: 30; margin-top: 0px; color: red;"></i>
-                                                    </a>
-                                                </div>
-                                                
-                                                
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                    </div>
-                                </div>
-            
-                                {% if is_requ_end %}
-                                    <div class="angle-right" style="background-color: rgb(242, 243, 243);">
-                                        <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
-                                    </div>
-                                {% else %}
-                                    <div class="angle-right" style="cursor: pointer;">
-                                        <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=next_requ %}">
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
-        
-        
-                            </div>
-                        {% endif %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="{{search_std_id}}">
                     {% endif %}
+                  </div>
 
-                    {% if member_dicts|length > 0 %}
-                        <h2 style="margin-bottom: 10px; ">All Members</h2>
+                  <div class="column">
+                    <label for="detail_search_post_typ">Post Type</label>
+                    <select name="detail_search_post_typ">
+                      <option value="" selected disabled>Select an Item</option>
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
 
-                        <div class="whole-groups-container" style="height: 360px;">
-    
-                            {% if is_member_begin %}
-                                <div class="angle-left" style="background-color: rgb(242, 243, 243);">
-                                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
-                                </div>
-                            {% else %}
-                                <div class="angle-left" style="cursor: pointer;">
-                                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=prev_member    start_requ_count=orig_requ %}">
-                                        <i class="fa fa-angle-left"></i>
-                                    </a>
-                                </div>
-                            {% endif %}
-        
-                            <div class="scrollmenu-container" style="float: left; width: 90%;">
-                                <div class="scrollmenu">
-                                {% for member_dict in member_dicts %}
-                                    <div class="each-item">
-                                        <div class="row-item">
-                                            <img src="{{MEDIA_URL}}{{member_dict.photo}}">
-                                        </div>
-            
-                                        <div class="row-item" style="height: 53px;">
-                                            <span class="group-name"><a href="{% url 'Profile:visit_profile' std_id=member_dict.user_id %}">{{member_dict.full_name|truncatechars:35}}</a></span>
-                                        </div>
-            
-                                        <div class="row-item" style="margin-top: 20px;">
-                                            <span class="members">0 posts</span>
-                                        </div>
-            
-                                        <div class="row-item">
-                                            <span class="created">Joined {{member_dict.joined}} ago</span>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                                </div>
-                            </div>
-        
-                            {% if is_member_end %}
-                                <div class="angle-right" style="background-color: rgb(242, 243, 243);">
-                                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
-                                </div>
-                            {% else %}
-                                <div class="angle-right" style="cursor: pointer;">
-                                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=next_member    start_requ_count=orig_requ %}">
-                                        <i class="fa fa-angle-right"></i>
-                                    </a>
-                                </div>
-                            {% endif %}
-    
-                        
-    
-    
-                        </div>
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+                {% if search_post_typ == 'Help' %}
+                <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="">
+                    {% else %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="{{search_std_id}}">
                     {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="detail_search_post_typ">Post Type</label>
+                    <select name="detail_search_post_typ">
+                      <option value="Help" selected> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+                {% if search_post_typ == 'Career' %}
+                <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="">
+                    {% else %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="detail_search_post_typ">Post Type</label>
+                    <select name="detail_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career" selected> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
 
 
-                    
+                {% if search_post_typ == 'Research' %}
+                <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="">
+                    {% else %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="detail_search_post_typ">Post Type</label>
+                    <select name="detail_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research" selected> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+
+                {% if search_post_typ == 'Job Post' %}
+                <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="">
+                    {% else %}
+                    <label for="detail_search_std_id">Text</label>
+                    <input type="text" name="detail_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="detail_search_post_typ">Post Type</label>
+                    <select name="detail_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post" selected> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+
+                {% if post_dicts|length > 0 %}
+
+                {% if not is_post_begin %}
+                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=prev_post    post_change=1 %}">
+                        <button class="previous" style="margin-top: 10px;">Previous</button>
+                    </a>
+                {% endif %}
+
+                <div class="all-post">
+
+                  <div class="profile-content">
+                    <!-- begin tab-content -->
+                    <div class="tab-content p-0">
+                      <!-- begin #profile-post tab -->
+                      <div class="tab-pane fade active show" id="profile-post">
+                        <!-- begin timeline -->
+                        <ul class="timeline">
+                          {% for post_dict in post_dicts %}
+
+
+                          <li>
+
+                            <!-- begin timeline-time -->
+                            <div class="timeline-time" style="margin-left: -20px;">
+                              {% if post_dict.date == 'Just Now' %}
+                              <span class="date">{{post_dict.date}}</span>
+                              {% else %}
+                              <span class="date">{{post_dict.date}}</span>
+                              <span class="date">Ago</span>
+                              {% endif %}
+                            </div>
+                            <!-- end timeline-time -->
+                            <!-- begin timeline-icon -->
+                            <div class="timeline-icon">
+                              <a href="javascript:;">&nbsp;</a>
+                            </div>
+                            <!-- end timeline-icon -->
+                            <!-- begin timeline-body -->
+                            <div class="timeline-body" style=" padding: 15px; padding-left: 20px; height: 255px;">
+                              <div class="timeline-header" style=" margin: 5px; ">
+                                <span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>
+                                <span class="username"><a
+                                    href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a>
+                                  <small></small></span>
+                                <!-- <span class="pull-right text-muted">18 Views</span> -->
+                              </div>
+                              <div class="timeline-content">
+
+                                {% if doing_text_search %}
+                                <p>
+                                  {{post_dict.desc_selected}} &emsp; <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"><b>See More</b></a>
+                                </p>
+                                <!--<p id="p1">Some text</p>
+                                                  <script>
+                                                    
+                                                    document.getElementById("p1").innerHTML = "abcd";
+                                                  </script>-->
+                                {% else %}
+                                <p>
+                                  {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"><b>See More</b></a>
+                                </p>
+                                {% endif %}
+                              </div>
+                              <div class="timeline-likes">
+                                <div class="stats">
+                                  {% if post_dict.num_comments == 0 %}
+                                  <span class="stats-text">0 Comments</span>
+                                  {% else %}
+                                  <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"><span
+                                      class="stats-text">{{post_dict.num_comments}} Comments</span></a>
+                                  {% endif %}
+                                </div>
+                              </div>
+
+                              <div class="timeline-footer">
+                                <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"
+                                  class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i>
+                                  Comment</a>
+                                <div class="tags">
+                                  <i class="fa fa-tag"> {{post_dict.class}}</i>
+                                  {% if not not_admin %}
+                                    <a href="#" style="color: red;"><span>Delete</span></a>
+                                  {% endif %}
+                                </div>
+
+                              </div>
+                            </div>
+                            <!-- end timeline-body -->
+                          </li>
+
+
+
+                          {% endfor %}
+
+
+                        </ul>
+                        <!-- end timeline -->
+
+                      </div>
+                      <!-- end #profile-post tab -->
+                    </div>
+                    <!-- end tab-content -->
+                  </div>
+
+
+                </div>
+
+                {% if not is_post_end %}
+                    <a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=next_post    post_change=1 %}">
+                        <button class="next">Next</button>
+                    </a>
+                {% endif %}
+
+                {% endif %}
+
+
+
+
+
+
 
                 {% endif %}
 
