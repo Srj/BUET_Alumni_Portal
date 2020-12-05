@@ -231,17 +231,17 @@
                           <div class="topnav-all_post" style="margin-bottom: 20px;">
                               <a class="active" href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
                               <a href="#news">Event</a>
-                              <a href="#contact">Community</a>
+                              <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0  post_start=1   post_change=0 %}">Community</a>
                           </div>
               
                           {% if search_post_typ is None %}
                               <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
                                   <div class="column">
                                       {% if search_std_id is None %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="">
                                       {% else %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="{{search_std_id}}">
                                       {% endif %}
                                   </div>
@@ -268,10 +268,10 @@
                               <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
                                   <div class="column">
                                       {% if search_std_id is None %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="">
                                       {% else %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="{{search_std_id}}">
                                       {% endif %}
                                   </div>
@@ -297,10 +297,10 @@
                               <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
                                   <div class="column">
                                       {% if search_std_id is None %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="">
                                       {% else %}
-                                          <label for="search_std_id">Student ID</label>
+                                          <label for="search_std_id">Text</label>
                                           <input type="text" name="search_std_id" value="{{search_std_id}}">
                                       {% endif %}
                                   </div>
@@ -327,10 +327,10 @@
                             <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
                                 <div class="column">
                                     {% if search_std_id is None %}
-                                        <label for="search_std_id">Student ID</label>
+                                        <label for="search_std_id">Text</label>
                                         <input type="text" name="search_std_id" value="">
                                     {% else %}
-                                        <label for="search_std_id">Student ID</label>
+                                        <label for="search_std_id">Text</label>
                                         <input type="text" name="search_std_id" value="{{search_std_id}}">
                                     {% endif %}
                                 </div>
@@ -357,10 +357,10 @@
                             <form action="{% url 'post:all_post' start_from=1 change=2 %}" class="form-container">
                                 <div class="column">
                                     {% if search_std_id is None %}
-                                        <label for="search_std_id">Student ID</label>
+                                        <label for="search_std_id">Text</label>
                                         <input type="text" name="search_std_id" value="">
                                     {% else %}
-                                        <label for="search_std_id">Student ID</label>
+                                        <label for="search_std_id">Text</label>
                                         <input type="text" name="search_std_id" value="{{search_std_id}}">
                                     {% endif %}
                                 </div>
@@ -416,7 +416,7 @@
                                                   <li>
                                                       
                                                       <!-- begin timeline-time -->
-                                                      <div class="timeline-time">
+                                                      <div class="timeline-time" style="margin-left: -20px;">
                                                           {% if post_dict.date == 'Just Now' %}
                                                               <span class="date">{{post_dict.date}}</span>
                                                           {% else %}
@@ -438,9 +438,21 @@
                                                             <!-- <span class="pull-right text-muted">18 Views</span> -->
                                                         </div>
                                                         <div class="timeline-content" >
-                                                            <p >
-                                                                {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
-                                                            </p>
+                                                          
+                                                            {% if doing_text_search %}
+                                                              <p>
+                                                                {{post_dict.desc_selected}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
+                                                              </p>
+                                                              <!--<p id="p1">Some text</p>
+                                                              <script>
+                                                                
+                                                                document.getElementById("p1").innerHTML = "abcd";
+                                                              </script>-->
+                                                            {% else %}
+                                                              <p>
+                                                                  {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}"><b>See More</b></a>
+                                                              </p>
+                                                            {% endif %}
                                                         </div>
                                                         <div class="timeline-likes" >
                                                                 <div class="stats">

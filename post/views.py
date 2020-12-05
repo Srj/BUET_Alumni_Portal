@@ -22,6 +22,85 @@ def modify_c(c):
         data.append(row)
     return data
 
+def description_after_text_search(desc, text):
+    len_search = len(text)
+    search_pos = desc.find(text)
+    #updated_desc = desc.replace(text, f'<mark>{text}</mark>')
+    updated_desc = desc
+
+    if search_pos + len_search < 100 :
+        #selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
+        selected = (updated_desc[:100] + "...").replace("\n", "  ")
+        #selected = selected.replace('/^"(.*)"$/', '$1')
+        return selected
+    else:
+        remaining = 100 - (len_search + 12)
+        start = search_pos - remaining//2
+        end = search_pos + len_search + 13 + remaining//2
+
+        if end > len(desc):
+            starting = start - remaining//2
+        else:
+            starting = start
+
+        if start <= 0:
+            ending = end + remaining//2
+        else:
+            ending = end
+
+        if starting <= 0:
+            if ending > len(desc):
+                selected = updated_desc
+            else:
+                selected = updated_desc[:ending] + "..."
+        else:
+            if ending > len(desc):
+                selected = "..." + updated_desc[starting:]
+            else:
+                selected = "..." + updated_desc[starting:ending] + "..."
+        selected = selected.replace("\n", "  ")
+        #selected = selected.replace('/^"(.*)"$/', '$1')
+        return selected
+
+def description_after_text_search2(desc, text):
+    len_search = len(text)
+    search_pos = desc.find(text)
+    updated_desc = desc.replace(text, f'<h2>{text}</h2>')
+
+    if search_pos + len_search < 100 :
+        selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
+        #selected = selected.replace('/^"(.*)"$/', '$1')
+        return selected
+    else:
+        remaining = 100 - (len_search + 12)
+        start = search_pos - remaining//2
+        end = search_pos + len_search + 13 + remaining//2
+
+        if end > len(desc):
+            starting = start - remaining//2
+        else:
+            starting = start
+
+        if start <= 0:
+            ending = end + remaining//2
+        else:
+            ending = end
+
+        if starting <= 0:
+            if ending > len(desc):
+                selected = updated_desc
+            else:
+                selected = updated_desc[:ending] + "..."
+        else:
+            if ending > len(desc):
+                selected = "..." + updated_desc[starting:]
+            else:
+                selected = "..." + updated_desc[starting:ending] + "..."
+        selected = selected.replace("\n", "  ")
+        #selected = selected.replace('/^"(.*)"$/', '$1')
+        return selected
+
+
 
 def all_post(request, start_from, change):
 
@@ -50,15 +129,14 @@ def all_post(request, start_from, change):
             request.session['search_post_typ'] = search_post_typ
 
 
-        #search_std_id = request.GET.get('search_std_id')
-        #search_post_typ = request.GET.get('search_post_typ')
+        
         
         
         if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
             c.execute('Select count(*) from post')
 
         if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
-            sql = '''SELECT COUNT(*) FROM USER_POSTS WHERE USER_ID = :search_std_id'''
+            sql = '''SELECT COUNT(*) FROM POST WHERE INSTR(DESCRIPTION, :search_std_id) > 0'''
             c.execute(sql, {'search_std_id':search_std_id})
 
         if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -73,16 +151,16 @@ def all_post(request, start_from, change):
 
         if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
             if search_post_typ == 'Help':
-                sql = '''SELECT COUNT(*) FROM USER_POSTS U, HELP H WHERE (H.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)'''
+                sql = '''SELECT COUNT(*) FROM POST P, HELP H WHERE (H.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Career':
-                sql = '''SELECT COUNT(*) FROM USER_POSTS U, CAREER C WHERE (C.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)'''
+                sql = '''SELECT COUNT(*) FROM POST P, CAREER C WHERE (C.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Research':
-                sql = '''SELECT COUNT(*) FROM USER_POSTS U, RESEARCH R WHERE (R.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)'''
+                sql = '''SELECT COUNT(*) FROM POST P, RESEARCH R WHERE (R.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Job Post':
-                sql = '''SELECT COUNT(*) FROM USER_POSTS U, JOB_POST J WHERE (j.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)'''
+                sql = '''SELECT COUNT(*) FROM POST P, JOB_POST J WHERE (J.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
         
         num_post = modify_c(c)[0]
@@ -120,10 +198,10 @@ def all_post(request, start_from, change):
                         FROM(
                                 SELECT A.*, ROWNUM RNUM
                                 FROM(
-                                        SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
-                                        FROM POST P, USER_POSTS U
-                                        WHERE (P.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)
-                                        ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
+                                        SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION
+                                        FROM POST
+                                        WHERE ( INSTR(DESCRIPTION, :search_std_id) > 0 )
+                                        ORDER BY DATE_OF_POST DESC, POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < :end_post
                             )
@@ -211,8 +289,8 @@ def all_post(request, start_from, change):
                                     SELECT A.*, ROWNUM RNUM
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
-                                            FROM POST P, HELP H, USER_POSTS U
-                                            WHERE (P.POST_ID = H.POST_ID) AND (P.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)
+                                            FROM POST P, HELP H
+                                            WHERE (P.POST_ID = H.POST_ID)  AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < :end_post
@@ -228,8 +306,8 @@ def all_post(request, start_from, change):
                                     SELECT A.*, ROWNUM RNUM
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
-                                            FROM POST P, CAREER C, USER_POSTS U
-                                            WHERE (P.POST_ID = C.POST_ID) AND (P.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)
+                                            FROM POST P, CAREER C
+                                            WHERE (P.POST_ID = C.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < :end_post
@@ -245,8 +323,8 @@ def all_post(request, start_from, change):
                                     SELECT A.*, ROWNUM RNUM
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
-                                            FROM POST P, RESEARCH R, USER_POSTS U
-                                            WHERE (P.POST_ID = R.POST_ID) AND (P.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)
+                                            FROM POST P, RESEARCH R
+                                            WHERE (P.POST_ID = R.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < :end_post
@@ -262,8 +340,8 @@ def all_post(request, start_from, change):
                                     SELECT A.*, ROWNUM RNUM
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
-                                            FROM POST P, JOB_POST J, USER_POSTS U
-                                            WHERE (P.POST_ID = J.POST_ID) AND (P.POST_ID = U.POST_ID) AND (U.USER_ID = :search_std_id)
+                                            FROM POST P, JOB_POST J
+                                            WHERE (P.POST_ID = J.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < :end_post
@@ -315,6 +393,11 @@ def all_post(request, start_from, change):
                 for row in c:
                     post_dict['class'] = 'job'
 
+                if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
+                    post_dict['desc_selected'] = description_after_text_search(post_dict['desc'], search_std_id) 
+                    #post_dict["desc_selected_json"] = json.dumps({"text": post_dict['desc_selected'] })
+                    post_dict['query'] = search_std_id
+
                 all_post_dicts.append(post_dict)
 
             
@@ -365,6 +448,7 @@ def all_post(request, start_from, change):
                 'edit':True,
                 'dp':dp_form,
                 'job':job_list,
+                'doing_text_search':True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
             }        
             return render(request, 'post/all_post.html', show)
     else:
@@ -673,7 +757,51 @@ def upload_post(request):
 
 
         if (len(unfilled_data) != 0) or (cell_wrong_type) or (salary_wrong_type):
-            return render(request, 'post/make_post.html', {'type':post_class, 'unfilled':True, 'unfilled_list':unfilled_data, 'filled_data':filled_data, 'cell_wrong':cell_wrong_type, 'salary_wrong':salary_wrong_type})
+            #-------------------------------------Profile Card---------------------------------
+            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+            row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
+            columnNames = [d[0] for d in c.description]
+            
+            try:
+                data = dict(zip(columnNames,row))
+            except:
+                print('Cannot Parse Profile')
+
+            #-----------------------------------Skills------------------------------------
+            sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
+                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+            skills = {}
+            for row in rows:
+                skills[row[0]] = row[1]
+            dp_form = DPForm()
+
+            #--------------------------------------Job History--------------------------------
+            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+            jobs = rows.fetchall()
+            columnNames = [d[0] for d in c.description]
+            job_list = []
+            for job in jobs:
+                try:
+                    job_list.append(dict(zip(columnNames,job)))
+                except:
+                    print('NULL')
+
+            show = {
+                'type':post_class,
+                'unfilled':True,
+                'unfilled_list':unfilled_data,
+                'filled_data':filled_data, 
+                'cell_wrong':cell_wrong_type, 
+                'salary_wrong':salary_wrong_type,
+                'data':data,
+                'skills':skills,
+                'edit':True,
+                'dp':dp_form,
+                'job':job_list,
+            }
+            return render(request, 'post/make_post.html', show)
 
         
 

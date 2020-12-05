@@ -1,0 +1,677 @@
+{% load static %}
+{% load widget_tweaks %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'post/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/post.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'post/form.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'community/home.css' %}">
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+<script>
+  function setup() {
+    document.getElementById('buttonid').addEventListener('click', openDialog);
+    function openDialog() {
+      document.getElementById('fileid').click();
+    }
+    document.getElementById('fileid').addEventListener('change', submitForm);
+    function submitForm() {
+      document.getElementById('formid').submit();
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<body onload="setup()">
+
+  <div class="main-content">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET Alumni
+          Portal</a>
+        <!-- Form -->
+        <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+          <div class="form-group mb-0">
+
+          </div>
+        </form>
+        <!-- User -->
+
+        <ul class="navbar-nav align-items-center d-none d-md-flex">
+          <!-- <li class="nav-item dropdown">
+              <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="media align-items-center">
+                  <span class="avatar avatar-sm rounded-circle">
+                    {% static "Profile/DP/" as baseUrl %}
+                    <img  src="{{MEDIA_URL}}{{data.PHOTO}}">
+                  </span>
+                  <div class="media-body ml-2 d-none d-lg-block">
+                    <span class="mb-0 text-sm  font-weight-bold">{{data.FULL_NAME}}</span>
+                  </div>
+                </div>
+              </a>-->
+
+          <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+            <div class=" dropdown-header noti-title">
+
+              <h1 class="text-overflow m-0">Welcome!</h1>
+            </div>
+
+            <a href="../examples/profile.html" class="dropdown-item">
+              <i class="ni ni-single-02"></i>
+              <span>My profile</span>
+            </a>
+            <a href="../examples/profile.html" class="dropdown-item">
+              <i class="ni ni-settings-gear-65"></i>
+              <span>Settings</span>
+            </a>
+            <a href="../examples/profile.html" class="dropdown-item">
+              <i class="ni ni-calendar-grid-58"></i>
+              <span>Activity</span>
+            </a>
+            <a href="../examples/profile.html" class="dropdown-item">
+              <i class="ni ni-support-16"></i>
+              <span>Support</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#!" class="dropdown-item">
+              <i class="ni ni-user-run"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Header -->
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+      style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
+      <!-- Mask -->
+      <span class="mask bg-gradient-default opacity-8"></span>
+      <!-- Header container -->
+      <div class="container-fluid d-flex align-items-center ">
+        <div class="row">
+          <div class="col-lg-7 col-md-10">
+            <h1 class="display-2 text-white">
+              <!--Hello {{data.NICK_NAME}}-->
+            </h1>
+            <p class="text-white mt-0 mb-5"> This is the profile page. You can see the progress this profile has made
+              with your work and manage your projects or assigned tasks</p>
+            {% if edit %}
+            <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
+            <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
+            <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
+            {% else %}
+            <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
+            {% endif %}
+            <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--7 justify-content-center">
+      <div class="row justify-content-left">
+        <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+          <div class="card card-profile shadow">
+            <div class="row justify-content-center">
+              <div class="col-lg-3 order-lg-2">
+                <div class="card-profile-image">
+                  <img src="{{MEDIA_URL}}{{data.PHOTO}}" class="rounded-circle">
+                </div>
+              </div>
+            </div>
+            <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+              <div class="d-flex justify-content-between">
+                {% if edit %}
+                <a href="#"></a>
+
+                <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <p hidden>
+                    {% render_field dp.file class="hidden" id="fileid" accept="image/x-png,image/gif,image/jpeg" %}
+                  </p>
+                  <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' />
+                </form>
+
+                {% else %}
+                <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
+                <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
+                {% endif %}
+
+              </div>
+            </div>
+            <div class="card-body pt-0 pt-md-4">
+
+
+              <div class="text-center">
+                <div class="h5 font-weight-300">
+                  <br><br>
+                  <a href="mailto:{{data.EMAIL}}"><i class="fa fa-at"></i></a>
+                  {% if data.FACEBOOK %}
+                  <a href="{{data.FACEBOOK}}"><i class="fa fa-facebook"></i></a>
+                  {% endif %}
+                  {% if data.FACEBOOK %}
+                  <a href={{data.TWITTER}}><i class="fa fa-twitter"></i></a>
+                  {% endif %}
+                  {% if data.LINKEDIN %}
+                  <a href={{data.LINKEDIN}}> <i class="fa fa-linkedin"></i></i></a>
+                  {% endif %}
+                  {% if data.GOOGLE_SCHOLAR %}
+                  <a href={{data.GOOGLE_SCHOLAR}}><i class="fa fa-google-plus"></i>/i></a>
+                  {% endif %}
+                  {% if data.RESEARCHGATE %}
+                  <a href={{data.RESEARCHGATE}}>R<i class="fa fa-researchgate"></i></i></a>
+                  {% endif %}
+                </div>
+                <h3>
+                  {{data.FULL_NAME}}
+                  {% if data.AGE %}
+                  <span class="font-weight-light">, {{data.AGE}}</span>
+                  {% endif %}
+
+                </h3>
+                <h4>Batch {{data.STD_ID|make_list|slice:":2"|join:''}}, Department of {{data.DEPT}}</h4>
+                <h5>{{data.HALL}} Hall</h5>
+                <br>
+                {% if data.LVL %}
+                <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently at {{data.LVL}}-{{data.TERM}}</b></h6>
+                {% else %}
+                <h6><b><i class="ni business_briefcase-24 mr-2"></i>Currently {{data.DESIGNATION|title }} at<i
+                      class="ni education_hat mr-2"></i>{{data.COMPANY}}</b></h6>
+                {% endif %}
+                <h6><b><i class="ni location_pin mr-2"></i>Currently live at {{data.CITY}}, {{data.COUNTRY}}<br></b>
+                </h6>
+                <br>
+                {{data.ABOUT}}<br>
+
+                <hr class="my-4">
+                <div class="h5 mt-4">
+
+                </div>
+                <div>
+
+                  <b>Work History</b><br>
+
+                  {% for row in job %}
+                  {{row.DESIGNATION}}, {{row.NAME}} ({{row.FROM_.year}}-
+                  {% if row.TO_ %}
+                  {{row.TO_.year}})
+                  {% else %}
+                  )
+                  {% endif %}<br />
+                  {% endfor %}
+                  <br>
+                  <hr class="my-4">
+                  <b>Interests</b><br>
+                  {% if edit %}
+                  {% for key, value in skills.items %}
+                  {{key}} ({{value}})<br />
+                  {% endfor %}
+                  {% else %}
+                  {% for key, value in skills.items %}
+                  {{key}} ({{value}}) <a href="{% url 'Profile:endorse' std_id=data.STD_ID topic=key %}"><i
+                      class="fa fa-plus"></i></a><br />
+                  {% endfor %}
+                  {% endif %}
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-8 order-xl-1 ">
+          <div class="card2 bg-secondary shadow">
+            <div class="card-body ">
+              <!--<div class="text-center">-->
+              <div>
+                <div class="topnav-all_post" style="margin-bottom: 20px;">
+                  <a href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
+                  <a href="#news">Event</a>
+                  <a href="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=0    post_start=1     post_change=0 %}"
+                    class="active">Community</a>
+                </div>
+
+                <div class="create-community-container" style="margin-bottom: 20px;">
+                  <a href="{% url 'community:create_community' %}">
+                    <button style="width: 100%;">Create New Community</button>
+                  </a>
+                </div>
+
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=2    post_start=1     post_change=1 %}"
+                  class="form-container">
+                  <div class="column">
+                    {% if search_comm_name is None %}
+                    <label for="comm_name_search">Community Name</label>
+                    <input type="text" name="comm_name_search" value="">
+                    {% else %}
+                    <label for="comm_name_search">Community Name</label>
+                    <input type="text" name="comm_name_search" value="{{search_comm_name}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+                </form>
+
+                {% if other_community_info_list|length > 0 %}
+                <h2 style="margin-bottom: 10px;">Join Groups</h2>
+
+                <div class="whole-groups-container" style="height: 360px; margin-bottom: 20px;">
+
+                  {% if is_other_comm_begin %}
+                  <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-left" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:home' my_groups_start=orig_my_grp_strt    other_groups_start=prev_other_comm    comm_search_change=1    post_start=orig_post     post_change=1 %}">
+                      <i class="fa fa-angle-left"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  <div class="scrollmenu-container" style="float: left; width: 90%;">
+                    <div class="scrollmenu">
+                      {% for community_dict in other_community_info_list %}
+                      <div class="each-item">
+                        <div class="row-item">
+                          <img src="{{MEDIA_URL}}groups.jpg">
+                        </div>
+
+                        <div class="row-item" style="height: 53px;">
+                          <span class="group-name"><a
+                              href="{% url 'community:detail_community' community_id=community_dict.community_id    start_member_count=1    start_requ_count=1   post_start=1   post_change=0 %}">{{community_dict.community_name|truncatechars:35}}</a></span>
+                        </div>
+
+                        <div class="row-item" style="margin-top: 20px;">
+                          <span class="members">{{community_dict.num_members}} Members</span>
+                        </div>
+
+                        <div class="row-item">
+                          <span class="created">Created {{community_dict.created}} ago</span>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% if is_other_comm_end %}
+                  <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-right" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:home' my_groups_start=orig_my_grp_strt    other_groups_start=next_other_comm    comm_search_change=1   post_start=orig_post     post_change=1  %}">
+                      <i class="fa fa-angle-right"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+
+                </div>
+                {% endif %}
+
+
+                {% if my_communitiy_info_list|length > 0 %}
+                <h2 style="margin-bottom: 10px; ">My Groups</h2>
+
+                <div class="whole-groups-container" style="height: 360px;">
+
+                  {% if is_my_comm_begin %}
+                  <div class="angle-left" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-left" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-left" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:home' my_groups_start=prev_my_comm   other_groups_start=orig_other_grp_strt    comm_search_change=1   post_start=orig_post     post_change=1  %}">
+                      <i class="fa fa-angle-left"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+                  <div class="scrollmenu-container" style="float: left; width: 90%;">
+                    <div class="scrollmenu">
+                      {% for community_dict in my_communitiy_info_list %}
+                      <div class="each-item">
+                        <div class="row-item">
+                          <img src="{{MEDIA_URL}}groups.jpg">
+                        </div>
+
+                        <div class="row-item" style="height: 53px;">
+                          <span class="group-name"><a
+                              href="{% url 'community:detail_community' community_id=community_dict.community_id    start_member_count=1    start_requ_count=1    post_start=1  post_change=0 %}">{{community_dict.community_name|truncatechars:35}}</a></span>
+                        </div>
+
+                        <div class="row-item" style="margin-top: 20px;">
+                          <span class="members">{{community_dict.num_members}} Members</span>
+                        </div>
+
+                        <div class="row-item">
+                          <span class="created">Created {{community_dict.created}} ago</span>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+
+                  {% if is_my_comm_end %}
+                  <div class="angle-right" style="background-color: rgb(242, 243, 243);">
+                    <i class="fa fa-angle-right" style="color: rgb(156, 156, 156);"></i>
+                  </div>
+                  {% else %}
+                  <div class="angle-right" style="cursor: pointer;">
+                    <a
+                      href="{% url 'community:home' my_groups_start=next_my_comm   other_groups_start=orig_other_grp_strt    comm_search_change=1    post_start=orig_post     post_change=1 %}">
+                      <i class="fa fa-angle-right"></i>
+                    </a>
+                  </div>
+                  {% endif %}
+
+
+
+
+                </div>
+                {% endif %}
+
+                <h2>Search Post</h2>
+                {% if search_post_typ is None %}
+                
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=1 post_start=1 post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="">
+                    {% else %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="comm_search_post_typ">Post Type</label>
+                    <select name="comm_search_post_typ">
+                      <option value="" selected disabled>Select an Item</option>
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+                {% if search_post_typ == 'Help' %}
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=1 post_start=1 post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="">
+                    {% else %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="comm_search_post_typ">Post Type</label>
+                    <select name="comm_search_post_typ">
+                      <option value="Help" selected> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+                {% if search_post_typ == 'Career' %}
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=1 post_start=1 post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="">
+                    {% else %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="comm_search_post_typ">Post Type</label>
+                    <select name="comm_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career" selected> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+
+                {% if search_post_typ == 'Research' %}
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=1 post_start=1 post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="">
+                    {% else %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="comm_search_post_typ">Post Type</label>
+                    <select name="comm_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research" selected> Research </option>
+                      <option value="Job Post"> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+
+                {% if search_post_typ == 'Job Post' %}
+                <form action="{% url 'community:home' my_groups_start=1 other_groups_start=1 comm_search_change=1 post_start=1 post_change=2 %}" class="form-container">
+                  <div class="column">
+                    {% if search_std_id is None %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="">
+                    {% else %}
+                    <label for="comm_search_std_id">Text</label>
+                    <input type="text" name="comm_search_std_id" value="{{search_std_id}}">
+                    {% endif %}
+                  </div>
+
+                  <div class="column">
+                    <label for="comm_search_post_typ">Post Type</label>
+                    <select name="comm_search_post_typ">
+                      <option value="Help"> Help </option>
+                      <option value="Career"> Career </option>
+                      <option value="Research"> Research </option>
+                      <option value="Job Post" selected> Job Post </option>
+                    </select>
+                  </div>
+
+                  <div class="column">
+                    <input type="submit" value="Search">
+                  </div>
+
+                </form>
+                {% endif %}
+
+                {% if not post_is_begin %}
+                    <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt   other_groups_start=orig_other_grp_strt    comm_search_change=1    post_start=prev_post     post_change=1 %}">
+                        <button class="previous" style="margin-top: 10px;">Previous</button>
+                    </a>
+                {% endif %}
+
+                {% if post_dicts|length > 0 %}
+                <div class="all-post">
+
+                  <div class="profile-content">
+                    <!-- begin tab-content -->
+                    <div class="tab-content p-0">
+                      <!-- begin #profile-post tab -->
+                      <div class="tab-pane fade active show" id="profile-post">
+                        <!-- begin timeline -->
+                        <ul class="timeline">
+                          {% for post_dict in post_dicts %}
+
+
+                          <li>
+
+                            <!-- begin timeline-time -->
+                            <div class="timeline-time" style="margin-left: -20px;">
+                              {% if post_dict.date == 'Just Now' %}
+                              <span class="date">{{post_dict.date}}</span>
+                              {% else %}
+                              <span class="date">{{post_dict.date}}</span>
+                              <span class="date">Ago</span>
+                              {% endif %}
+                            </div>
+                            <!-- end timeline-time -->
+                            <!-- begin timeline-icon -->
+                            <div class="timeline-icon">
+                              <a href="javascript:;">&nbsp;</a>
+                            </div>
+                            <!-- end timeline-icon -->
+                            <!-- begin timeline-body -->
+                            <div class="timeline-body" style=" padding: 15px; padding-left: 20px; height: 255px;">
+                              <div class="timeline-header" style=" margin: 5px; ">
+                                <!--<span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>-->
+                                <span class="username" style="margin-right: 5px;"><a href="javascript:;">{{post_dict.community_name}}</a> <small></small></span>
+                                <span class="username" style="margin-right: 10px;"><i class="fa fa-angle-right"></i> <small></small></span>
+                                <span class="username"><a href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a><small></small></span>
+                                
+                              </div>
+                              <div class="timeline-content">
+
+                                {% if doing_text_search %}
+                                <p>
+                                  {{post_dict.desc_selected}} &emsp; <a
+                                    href="#"><b>See
+                                      More</b></a>
+                                </p>
+                                <!--<p id="p1">Some text</p>
+                                              <script>
+                                                
+                                                document.getElementById("p1").innerHTML = "abcd";
+                                              </script>-->
+                                {% else %}
+                                <p>
+                                  {{post_dict.desc|truncatechars:100}} &emsp; <a
+                                    href="#"><b>See
+                                      More</b></a>
+                                </p>
+                                {% endif %}
+                              </div>
+                              <div class="timeline-likes">
+                                <div class="stats">
+                                  {% if post_dict.num_comments == 0 %}
+                                  <span class="stats-text">0 Comments</span>
+                                  {% else %}
+                                  <a href="#"><span
+                                      class="stats-text">{{post_dict.num_comments}} Comments</span></a>
+                                  {% endif %}
+                                </div>
+                              </div>
+
+                              <div class="timeline-footer">
+                                <a href="#"
+                                  class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i>
+                                  Comment</a>
+                                <div class="tags">
+                                  <i class="fa fa-tag"> {{post_dict.class}}</i>
+                                </div>
+
+                              </div>
+                            </div>
+                            <!-- end timeline-body -->
+                          </li>
+
+
+
+                          {% endfor %}
+
+
+                        </ul>
+                        <!-- end timeline -->
+
+                      </div>
+                      <!-- end #profile-post tab -->
+                    </div>
+                    <!-- end tab-content -->
+                  </div>
+
+
+                </div>
+                {% endif %}
+
+                {% if not post_the_end %}
+                    <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt   other_groups_start=orig_other_grp_strt    comm_search_change=1    post_start=next_post     post_change=1 %}">
+                        <button class="next">Next</button>
+                    </a>
+                {% endif %}
+
+
+
+              </div>
+
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+
+</body>

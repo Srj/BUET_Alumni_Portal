@@ -1,0 +1,101 @@
+/* FOR GROUPS SCROLLBAR */
+.whole-groups-container .angle-left, .whole-groups-container .angle-right{
+    width: 4%;
+    float: left;
+    background-color: rgb(190, 184, 184);
+    height: 357px;
+    text-align: center;
+    border: 1px solid rgb(136, 135, 135);
+    border-radius: 3px;
+    
+}
+.whole-groups-container .angle-left{
+    margin-right: 5px;
+}
+.whole-groups-container .angle-right{
+    margin-left: 5px;
+}
+.whole-groups-container i{
+    font-size: 55px;
+    margin-top: 150px;
+}
+
+
+
+
+
+.scrollmenu {
+    background-color: rgb(199, 194, 194);
+    overflow: auto;
+    padding: 10px;
+    white-space: nowrap;
+    
+}
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
+
+.each-item{
+    height: 320px;
+    width: 220px;
+    background-color: rgb(240, 239, 236);
+    border: 2px solid #706f6f;
+    border-radius: 4px;
+    padding: 10px;
+    display: inline-block;
+}
+
+.each-item:hover{
+    background-color: rgb(211, 210, 208);
+}
+
+
+.each-item .row-item:after{
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.each-item .row-item{
+    width: 100%;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
+.each-item .row-item > *{
+    display: inline-block;
+}
+
+.each-item .row-item img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgb(51, 50, 50);
+    
+}
+
+.each-item .row-item .group-name{
+    font-size: 22;
+    font-weight: 500;
+    font-family: 'Times New Roman';
+    /*margin-bottom: 20px;*/
+    white-space: initial;
+}
+.each-item .row-item .group-name a{
+    text-decoration: none;
+    color: inherit;
+}
+.each-item .row-item .group-name a:hover{
+    text-decoration: underline;
+    color: rgb(88, 172, 202);
+}
+
+.each-item .row-item .members, .each-item .row-item .created{
+    font-size: 20;
+    font-weight: 500;
+    font-family:'Times New Roman';
+}

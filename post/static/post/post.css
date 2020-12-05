@@ -356,7 +356,7 @@ select.form-control:not([size]):not([multiple]) {
     left: 0;
     width: 18%;
     text-align: left;
-    top: 30px
+    top: 30px;
 }
 
 .timeline .timeline-time .date,
@@ -373,7 +373,7 @@ select.form-control:not([size]):not([multiple]) {
 .timeline .timeline-time .time {
     line-height: 24px;
     font-size: 20px;
-    color: #242a30
+    color: #242a30 
 }
 
 .timeline .timeline-icon {
