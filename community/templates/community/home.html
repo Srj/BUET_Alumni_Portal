@@ -551,6 +551,11 @@
 
                 </form>
                 {% endif %}
+                <style>
+                  mark{
+                    background-color: yellow;
+                  }
+                </style>
 
                 {% if not post_is_begin %}
                     <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt   other_groups_start=orig_other_grp_strt    comm_search_change=1    post_start=prev_post     post_change=1 %}">

@@ -5,6 +5,7 @@ from django.urls import reverse
 import cx_Oracle
 import datetime
 from django.core.files.storage import FileSystemStorage
+from django.utils.safestring import mark_safe
 from datetime import date
 import json
 from django import forms
@@ -16,14 +17,12 @@ class DPForm(forms.Form):
 def description_after_text_search(desc, text):
     len_search = len(text)
     search_pos = desc.find(text)
-    #updated_desc = desc.replace(text, f'<mark>{text}</mark>')
-    updated_desc = desc
+    updated_desc = desc.replace(text, f'<mark>{text}</mark>')
 
     if search_pos + len_search < 100 :
-        #selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
-        selected = (updated_desc[:100] + "...").replace("\n", "  ")
+        selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
         #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
     else:
         remaining = 100 - (len_search + 12)
         start = search_pos - remaining//2
@@ -50,8 +49,7 @@ def description_after_text_search(desc, text):
             else:
                 selected = "..." + updated_desc[starting:ending] + "..."
         selected = selected.replace("\n", "  ")
-        #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
 
 def home(request, my_groups_start, other_groups_start, comm_search_change, post_start, post_change):
     if "std_id" in request.session:
@@ -1066,6 +1064,8 @@ def detail_community(request, community_id, start_member_count, start_requ_count
             request.session['detail_search_std_id'] = search_std_id
             request.session['detail_search_post_typ'] = search_post_typ
 
+        print(search_std_id)
+
 
 
         #-------------------------------------Profile Card---------------------------------
@@ -1459,6 +1459,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     post_dict['class'] = 'job'
 
                 if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
+                    print("aschi")
                     post_dict['desc_selected'] = description_after_text_search(post_dict['desc'], search_std_id)
                     post_dict['query'] = search_std_id
 
@@ -1561,6 +1562,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     "orig_post":post_start,
                     "doing_text_search":True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
 
+                    "search_post_typ":search_post_typ,
+                    "search_std_id":search_std_id
+
                 }
                 return render(request, "community/detail_community.html", context)
             else:
@@ -1650,7 +1654,11 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     "is_post_end":post_the_end,
                     "next_post":end_post,
                     "prev_post":(begin_post - 5) if (begin_post > 5) else 0,
-                    "orig_post":post_start
+                    "orig_post":post_start,
+
+                    "search_post_typ":search_post_typ,
+                    "search_std_id":search_std_id,
+                    "doing_text_search":True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
                 }
                 return render(request, "community/detail_community.html", context)
 
