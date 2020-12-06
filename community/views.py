@@ -856,6 +856,8 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
             all_post_dicts.append(post_dict)
 
+        
+
 
 
 
@@ -1676,6 +1678,109 @@ def join_request(request, community_id):
     else:
         return redirect('SignIn:signin')
 
+def cancel_join_request(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {'community_id':community_id, "user_id":user_id})
+        c.execute("COMMIT")
+
+        return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+    else:
+        return redirect('SignIn:signin')
+
+def delete_comment(request, community_id, post_id, comment_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+        
+        if request_from_admin:
+            c.execute("DELETE FROM COMMUNITY_USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:detail_post', args=(community_id, post_id, 1)))
+
+
+    else:
+        return redirect('SignIn:signin')
+
+def delete_post(request, community_id, post_id, member_start, requ_start):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+        if request_from_admin:
+            c.execute("DELETE FROM COMMUNITY_POST WHERE POST_ID = :post_id", {"post_id":post_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, member_start, requ_start, 1, 0)))
+
+        
+    else:
+        return redirect('SignIn:signin')
+
+
+
+def delete_group(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+        if request_from_admin :
+            c.execute("DELETE FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+
+    else:
+        return redirect('SignIn:signin')
+
+
+
+def leave_group(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        c.execute("DELETE FROM COMM_MEMBERS WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("COMMIT")
+
+        return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+    else:
+        return redirect('SignIn:signin')
+
+
+
+
+
 
 def join_community(request, community_id, user_id, start_member_count, start_requ_count):
     if "std_id" in request.session:
@@ -1959,15 +2064,17 @@ def upload_post(request, community_id):
             description = description.replace("'", "''")
             journal = request.GET.get('journal')
             doi = request.GET.get('doi')
-            date_of_publication = request.GET.get('date_of_publication')
+            print(date_of_publication)
             topic_name = topic_name.replace("'", "''")
             journal = journal.replace("'", "''")
             doi = doi.replace("'", "''")
 
-            if date_of_publication is None:
+            if (date_of_publication is None) or (len(date_of_publication) == 0):
                 date_of_publication = date_today
+                date_of_publication = str(date_of_publication)
             else :
                 date_of_publication = date_of_publication[8:10] + '-' + date_of_publication[5:7] + '-' + date_of_publication[:4]
+            
 
 
 
@@ -2055,6 +2162,7 @@ def detail_post(request, community_id, post_id, start_from):
         comment_dicts = []
         for row in c:
             comment_dict = {}
+            comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
             comment_dict['post_id'] = row[2]
             comment_dict['community_id'] = row[3]
@@ -2166,6 +2274,12 @@ def detail_post(request, community_id, post_id, start_from):
             description = row[1]
             criteria = row[2]
             created = row[3]
+
+        user_is_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+        for row in c:
+            if user_id == row[0]:
+                user_is_admin = True
         
         context = {
             'detail':post_detail, 
@@ -2184,7 +2298,8 @@ def detail_post(request, community_id, post_id, start_from):
             "community_name":community_name,
             "description":description,
             "criteria":criteria,
-            "created":created
+            "created":created,
+            "is_admin":user_is_admin,
         }
 
         return render(request, 'community/detail_post.html', context)
