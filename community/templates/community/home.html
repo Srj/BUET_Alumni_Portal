@@ -307,7 +307,11 @@
                         </div>
 
                         <div class="row-item">
+                          {% if community_dict.created == 'Just Now' %}
+                          <span class="created">Created {{community_dict.created}}</span>
+                          {% else %}
                           <span class="created">Created {{community_dict.created}} ago</span>
+                          {% endif %}
                         </div>
                       </div>
                       {% endfor %}
@@ -368,7 +372,11 @@
                         </div>
 
                         <div class="row-item">
+                          {% if community_dict.created == 'Just Now' %}
+                          <span class="created">Created {{community_dict.created}}</span>
+                          {% else %}
                           <span class="created">Created {{community_dict.created}} ago</span>
+                          {% endif %}
                         </div>
                       </div>
                       {% endfor %}
@@ -543,6 +551,11 @@
 
                 </form>
                 {% endif %}
+                <style>
+                  mark{
+                    background-color: yellow;
+                  }
+                </style>
 
                 {% if not post_is_begin %}
                     <a href="{% url 'community:home' my_groups_start=orig_my_grp_strt   other_groups_start=orig_other_grp_strt    comm_search_change=1    post_start=prev_post     post_change=1 %}">
@@ -584,7 +597,7 @@
                             <div class="timeline-body" style=" padding: 15px; padding-left: 20px; height: 255px;">
                               <div class="timeline-header" style=" margin: 5px; ">
                                 <!--<span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>-->
-                                <span class="username" style="margin-right: 5px;"><a href="javascript:;">{{post_dict.community_name}}</a> <small></small></span>
+                                <span class="username" style="margin-right: 5px;"><a href="{% url 'community:detail_community' community_id=post_dict.community_id    start_member_count=1    start_requ_count=1    post_start=1    post_change=0  %}">{{post_dict.community_name}}</a> <small></small></span>
                                 <span class="username" style="margin-right: 10px;"><i class="fa fa-angle-right"></i> <small></small></span>
                                 <span class="username"><a href="{% url 'Profile:visit_profile' std_id=post_dict.user_id %}">{{post_dict.full_name}}</a><small></small></span>
                                 

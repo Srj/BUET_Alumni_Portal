@@ -5,6 +5,7 @@ from django.urls import reverse
 import cx_Oracle
 import datetime
 from django.core.files.storage import FileSystemStorage
+from django.utils.safestring import mark_safe
 from datetime import date
 import json
 from django import forms
@@ -16,14 +17,12 @@ class DPForm(forms.Form):
 def description_after_text_search(desc, text):
     len_search = len(text)
     search_pos = desc.find(text)
-    #updated_desc = desc.replace(text, f'<mark>{text}</mark>')
-    updated_desc = desc
+    updated_desc = desc.replace(text, f'<mark>{text}</mark>')
 
     if search_pos + len_search < 100 :
-        #selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
-        selected = (updated_desc[:100] + "...").replace("\n", "  ")
+        selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
         #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
     else:
         remaining = 100 - (len_search + 12)
         start = search_pos - remaining//2
@@ -50,8 +49,7 @@ def description_after_text_search(desc, text):
             else:
                 selected = "..." + updated_desc[starting:ending] + "..."
         selected = selected.replace("\n", "  ")
-        #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
 
 def home(request, my_groups_start, other_groups_start, comm_search_change, post_start, post_change):
     if "std_id" in request.session:
@@ -856,6 +854,8 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
             all_post_dicts.append(post_dict)
 
+        
+
 
 
 
@@ -1063,6 +1063,8 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
             request.session['detail_search_std_id'] = search_std_id
             request.session['detail_search_post_typ'] = search_post_typ
+
+        print(search_std_id)
 
 
 
@@ -1457,6 +1459,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     post_dict['class'] = 'job'
 
                 if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
+                    print("aschi")
                     post_dict['desc_selected'] = description_after_text_search(post_dict['desc'], search_std_id)
                     post_dict['query'] = search_std_id
 
@@ -1559,6 +1562,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     "orig_post":post_start,
                     "doing_text_search":True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
 
+                    "search_post_typ":search_post_typ,
+                    "search_std_id":search_std_id
+
                 }
                 return render(request, "community/detail_community.html", context)
             else:
@@ -1648,7 +1654,11 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     "is_post_end":post_the_end,
                     "next_post":end_post,
                     "prev_post":(begin_post - 5) if (begin_post > 5) else 0,
-                    "orig_post":post_start
+                    "orig_post":post_start,
+
+                    "search_post_typ":search_post_typ,
+                    "search_std_id":search_std_id,
+                    "doing_text_search":True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
                 }
                 return render(request, "community/detail_community.html", context)
 
@@ -1675,6 +1685,109 @@ def join_request(request, community_id):
         return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
     else:
         return redirect('SignIn:signin')
+
+def cancel_join_request(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {'community_id':community_id, "user_id":user_id})
+        c.execute("COMMIT")
+
+        return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+    else:
+        return redirect('SignIn:signin')
+
+def delete_comment(request, community_id, post_id, comment_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+        
+        if request_from_admin:
+            c.execute("DELETE FROM COMMUNITY_USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:detail_post', args=(community_id, post_id, 1)))
+
+
+    else:
+        return redirect('SignIn:signin')
+
+def delete_post(request, community_id, post_id, member_start, requ_start):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+        if request_from_admin:
+            c.execute("DELETE FROM COMMUNITY_POST WHERE POST_ID = :post_id", {"post_id":post_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, member_start, requ_start, 1, 0)))
+
+        
+    else:
+        return redirect('SignIn:signin')
+
+
+
+def delete_group(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        for row in c:
+            if user_id == row[0]:
+                request_from_admin = True
+            else:
+                return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+        if request_from_admin :
+            c.execute("DELETE FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+
+
+    else:
+        return redirect('SignIn:signin')
+
+
+
+def leave_group(request, community_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session.get('std_id')
+
+        c.execute("DELETE FROM COMM_MEMBERS WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("COMMIT")
+
+        return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+    else:
+        return redirect('SignIn:signin')
+
+
+
+
 
 
 def join_community(request, community_id, user_id, start_member_count, start_requ_count):
@@ -1959,15 +2072,17 @@ def upload_post(request, community_id):
             description = description.replace("'", "''")
             journal = request.GET.get('journal')
             doi = request.GET.get('doi')
-            date_of_publication = request.GET.get('date_of_publication')
+            print(date_of_publication)
             topic_name = topic_name.replace("'", "''")
             journal = journal.replace("'", "''")
             doi = doi.replace("'", "''")
 
-            if date_of_publication is None:
+            if (date_of_publication is None) or (len(date_of_publication) == 0):
                 date_of_publication = date_today
+                date_of_publication = str(date_of_publication)
             else :
                 date_of_publication = date_of_publication[8:10] + '-' + date_of_publication[5:7] + '-' + date_of_publication[:4]
+            
 
 
 
@@ -2055,6 +2170,7 @@ def detail_post(request, community_id, post_id, start_from):
         comment_dicts = []
         for row in c:
             comment_dict = {}
+            comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
             comment_dict['post_id'] = row[2]
             comment_dict['community_id'] = row[3]
@@ -2166,6 +2282,12 @@ def detail_post(request, community_id, post_id, start_from):
             description = row[1]
             criteria = row[2]
             created = row[3]
+
+        user_is_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+        for row in c:
+            if user_id == row[0]:
+                user_is_admin = True
         
         context = {
             'detail':post_detail, 
@@ -2184,7 +2306,8 @@ def detail_post(request, community_id, post_id, start_from):
             "community_name":community_name,
             "description":description,
             "criteria":criteria,
-            "created":created
+            "created":created,
+            "is_admin":user_is_admin,
         }
 
         return render(request, 'community/detail_post.html', context)

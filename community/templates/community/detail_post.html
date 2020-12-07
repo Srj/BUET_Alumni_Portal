@@ -264,10 +264,14 @@
 
                                 <div class="two" style=" margin-left: 15px;">
                                     <div class="row1" style=" margin-top: 2px;">
-                                    <span class="name"><a href="#">{{community_name}}</a></span>
+                                    <span class="name"><a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=1    start_requ_count=1    post_start=1    post_change=0  %}">{{community_name}}</a></span>
                                 </div>
                                   <div class="row2" style="margin-top: 5px;">
+                                    {% if created == 'Just Now' %}
+                                    <span><b>Created {{created}}</b></span>
+                                    {% else %}
                                     <span><b>Created {{created}} Ago</b></span>
+                                    {% endif %}
                                     <!--<i class="fa fa-tag">{{detail.class}}</i>-->
                                   </div>
                                 </div>
@@ -588,9 +592,17 @@
                                                             <span class="username"><a href="{% url 'Profile:visit_profile' std_id=comment_dict.user_id %}"
                                                                     class="name">{{comment_dict.full_name}}</a></span>
                                                             {% if comment_dict.timestamp == "Just Now" %}
-                                                            <span class="time">{{comment_dict.timestamp}}</span>
+                                                                {% if is_admin %}
+                                                                    <span class="time">{{comment_dict.timestamp}} &emsp; <a href="{% url 'community:delete_comment'  community_id=comm_id  post_id=detail.post_id   comment_id=comment_dict.comment_id    %}" style="color: red; font-weight: 500;">Delete</a></span>
+                                                                {% else %}
+                                                                    <span class="time">{{comment_dict.timestamp}}</span>
+                                                                {% endif %}
                                                             {% else %}
-                                                            <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                                                {% if is_admin %}
+                                                                    <span class="time">{{comment_dict.timestamp}} Ago  &emsp; <a href="{% url 'community:delete_comment'   community_id=comm_id  post_id=detail.post_id  comment_id=comment_dict.comment_id %}" style="color: red; font-weight: 500;">Delete</a></span>
+                                                                {% else %}
+                                                                    <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                                                {% endif %}
                                                             {% endif %}
                                                             <hr>
 

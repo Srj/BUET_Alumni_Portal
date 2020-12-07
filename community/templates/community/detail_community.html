@@ -256,10 +256,14 @@
                   </div>
                   <div class="two" style=" margin-left: 15px;">
                     <div class="row1" style=" margin-top: 2px;">
-                      <span class="name"><a href="#">{{community_name}}</a></span>
+                      <span class="name"><a href="{% url 'community:detail_community' community_id=comm_id    start_member_count=1    start_requ_count=1    post_start=1    post_change=0  %}">{{community_name}}</a></span>
                     </div>
                     <div class="row2" style="margin-top: 5px;">
+                      {% if creation_ago == 'Just Now' %}
+                      <span><b>Created {{creation_ago}}</b></span>
+                      {% else %}
                       <span><b>Created {{creation_ago}} Ago</b></span>
+                      {% endif %}
                       <!--<i class="fa fa-tag">{{detail.class}}</i>-->
                     </div>
                   </div>
@@ -290,26 +294,31 @@
                 </div>
 
                 {% if not_comm_member %}
-                {% if already_joined %}
-                <h3>You already have requested to join this community.</h3>
-                {% else %}
-                <h3 style="margin-top: 20px;">You Are Not A Member In This Group</h3>
-                <div class="create-community-container" style="margin-top: 20px;">
-                  <a href="{% url 'community:join_request' community_id=comm_id %}">
-                    <button style="width: 100%;">Join Group</button>
-                  </a>
-                </div>
-                {% endif %}
+                  {% if already_joined %}
+                    <h3>You already have requested to join this community.</h3>
+                    <div class="create-community-container" style="margin-top: 20px;">
+                      <a href="{% url 'community:cancel_join_request' community_id=comm_id %}">
+                        <button style="width: 100%;">Cancel Join Request</button>
+                      </a>
+                    </div>
+                  {% else %}
+                  <h3 style="margin-top: 20px;">You Are Not A Member In This Group</h3>
+                  <div class="create-community-container" style="margin-top: 20px;">
+                    <a href="{% url 'community:join_request' community_id=comm_id %}">
+                      <button style="width: 100%;">Join Group</button>
+                    </a>
+                  </div>
+                  {% endif %}
                 {% else %}
                 {% if not_admin %}
                 <div class="create-community-container" style="margin-top: 20px;">
-                  <a href="#">
+                  <a href="{% url 'community:leave_group' community_id=comm_id %}">
                     <button style="width: 100%;">Leave Group</button>
                   </a>
                 </div>
                 {% else %}
                 <div class="create-community-container" style="margin-top: 20px;">
-                  <a href="#">
+                  <a href="{% url 'community:delete_group' community_id=comm_id %}">
                     <button style="width: 100%;">Delete Group</button>
                   </a>
                 </div>
@@ -346,7 +355,11 @@
                         </div>
 
                         <div class="row-item" style="margin-top: 20px;">
+                          {% if request_dict.time == 'Just Now' %}
+                          <span class="members" style="font-size: 18;">Requested {{request_dict.time}}</span>
+                          {% else %}
                           <span class="members" style="font-size: 18;">Requested {{request_dict.time}} Ago</span>
+                          {% endif %}
                         </div>
 
                         <div class="row-item" style="height: 40px; padding: 5px;">
@@ -426,7 +439,11 @@
                         </div>
 
                         <div class="row-item">
+                          {% if member_dict.joined == 'Just Now' %}
+                          <span class="created">Joined {{member_dict.joined}}</span>
+                          {% else %}
                           <span class="created">Joined {{member_dict.joined}} ago</span>
+                          {% endif %}
                         </div>
                       </div>
                       {% endfor %}
@@ -458,6 +475,7 @@
                     <button>Write Post</button>
                   </a>
                 </div>
+                
 
                 {% if search_post_typ is None %}
                 <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2  %}" class="form-container">
@@ -607,6 +625,11 @@
                 </form>
                 {% endif %}
 
+                <style>
+                  mark{
+                    background-color: yellow;
+                  }
+                </style>
 
                 {% if post_dicts|length > 0 %}
 
@@ -689,7 +712,7 @@
                                 <div class="tags">
                                   <i class="fa fa-tag"> {{post_dict.class}}</i>
                                   {% if not not_admin %}
-                                    <a href="#" style="color: red;"><span>Delete</span></a>
+                                    <a href="{% url 'community:delete_post' community_id=comm_id   post_id=post_dict.post_id  member_start=orig_member   requ_start=orig_requ %}" style="color: red;"><span>Delete</span></a>
                                   {% endif %}
                                 </div>
 
