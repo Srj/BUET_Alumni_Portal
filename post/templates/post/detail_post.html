@@ -533,12 +533,19 @@
                                                         <img src="{{MEDIA_URL}}{{comment_dict.photo_path}}" class="avatar"
                                                             alt="">
                                                         <div class="post-comments">
-                                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=comment_dict.user_id %}"
-                                                                    class="name">{{comment_dict.full_name}}</a></span>
+                                                            <span class="username"><a href="{% url 'Profile:visit_profile' std_id=comment_dict.user_id %}" class="name">{{comment_dict.full_name}}</a></span>
                                                             {% if comment_dict.timestamp == "Just Now" %}
-                                                            <span class="time">{{comment_dict.timestamp}}</span>
+                                                                {% if comment_dict.logged_in %}
+                                                                    <span class="time">{{comment_dict.timestamp}} &emsp; <a href="{% url 'post:delete_comment' post_id=detail.post_id   comment_id=comment_dict.comment_id  %}" style="color: red; font-weight: 500;">Delete</a></span>
+                                                                {% else %}
+                                                                    <span class="time">{{comment_dict.timestamp}}</span>
+                                                                {% endif %}
                                                             {% else %}
-                                                            <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                                                {% if comment_dict.logged_in %}
+                                                                    <span class="time">{{comment_dict.timestamp}} Ago  &emsp; <a href="{% url 'post:delete_comment'    post_id=detail.post_id  comment_id=comment_dict.comment_id %}" style="color: red; font-weight: 500;">Delete</a></span>
+                                                                {% else %}
+                                                                    <span class="time">{{comment_dict.timestamp}} Ago</span>
+                                                                {% endif %}
                                                             {% endif %}
                                                             <hr>
 

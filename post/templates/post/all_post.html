@@ -473,6 +473,9 @@
                                                             <a  href="{% url 'post:detail_post' post_id=post_dict.post_id start_from=1 %}" class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i> Comment</a> 
                                                             <div class="tags">
                                                                 <i class="fa fa-tag">   {{post_dict.class}}</i> 
+                                                                {% if post_dict.logged_in %}
+                                                                  <a href="{% url 'post:delete_post' post_id=post_dict.post_id %}" style="color: red;"><span>Delete</span></a>
+                                                                {% endif %}
                                                             </div>
                                                             
                                                         </div>

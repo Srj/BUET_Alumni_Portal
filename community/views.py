@@ -1728,6 +1728,8 @@ def delete_post(request, community_id, post_id, member_start, requ_start):
         c = conn.cursor()
         user_id = request.session.get('std_id')
 
+        
+
         request_from_admin = False
         c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
         for row in c:
@@ -1752,8 +1754,9 @@ def delete_group(request, community_id):
         conn = db()
         c = conn.cursor()
         user_id = request.session.get('std_id')
+        print("Good Luck !!!")
 
-        request_from_admin = False
+        '''request_from_admin = False
         c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
         for row in c:
             if user_id == row[0]:
@@ -1764,7 +1767,7 @@ def delete_group(request, community_id):
         if request_from_admin :
             c.execute("DELETE FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
             c.execute("COMMIT")
-            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
+            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))'''
 
 
     else:

@@ -8,6 +8,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'post/post_detail.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'community/detail_communiity.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'community/home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'community/modal.css' %}">
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
 <script>
@@ -20,8 +21,32 @@
     function submitForm() {
       document.getElementById('formid').submit();
     }
+
+    
+
+    
+
+
+
+    document.getElementById('delete-grp').addEventListener('click',
+    function(){
+      document.getElementById('delete-grp-modal').style.display = "flex";
+    })
+
+    document.getElementById('close-grp-modal-del').addEventListener('click',
+    function(){
+      document.getElementById('delete-grp-modal').style.display = "none";
+    })
+
+    document.getElementById('back-grp-modal-del').addEventListener('click',
+    function(){
+      document.getElementById('delete-grp-modal').style.display = "none";
+    })
+
+
   }
 </script>
+
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
@@ -39,9 +64,13 @@
 
 <body onload="setup()">
 
+  
+
   <div class="main-content">
+    
     <!-- Top navbar -->
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      
       <div class="container-fluid">
         <!-- Brand -->
         <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET Alumni
@@ -242,6 +271,7 @@
           <div class="card2 bg-secondary shadow">
             <div class="card-body ">
               <!--<div class="text-center">-->
+                
               <div>
                 <div class="topnav-all_post" style="margin-bottom: 20px;">
                   <a href="{% url 'post:all_post' start_from=1 change=0 %}">Post</a>
@@ -293,6 +323,30 @@
                   </div>
                 </div>
 
+                
+
+                <div class="post-delete-modal" id="delete-grp-modal">
+                  <div class="post-delete-modal-content">
+                    <div class="close-modal" id="close-grp-modal-del">+</div>
+                    <h5 style="margin-top: -2%;">This action can't be undone</h3>
+                    <div class="confirmation-block">
+
+                      <div class="confirm-delete" >
+                        <a href="{% url 'community:delete_group' community_id=comm_id %}" style="height: 100%; width: 100%; ">
+                          <span>Confirm</span>
+                        </a>
+                      </div>
+
+                      <div class="back" id="back-grp-modal-del">
+                        <span>Back</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                
+
                 {% if not_comm_member %}
                   {% if already_joined %}
                     <h3>You already have requested to join this community.</h3>
@@ -312,14 +366,14 @@
                 {% else %}
                 {% if not_admin %}
                 <div class="create-community-container" style="margin-top: 20px;">
-                  <a href="{% url 'community:leave_group' community_id=comm_id %}">
-                    <button style="width: 100%;">Leave Group</button>
+                  <a href="#">
+                    <button style="width: 100%;" >Leave Group</button>
                   </a>
                 </div>
                 {% else %}
                 <div class="create-community-container" style="margin-top: 20px;">
-                  <a href="{% url 'community:delete_group' community_id=comm_id %}">
-                    <button style="width: 100%;">Delete Group</button>
+                  <a href="#">
+                    <button style="width: 100%;" id="delete-grp">Delete Group</button>
                   </a>
                 </div>
 
@@ -650,8 +704,8 @@
                         <ul class="timeline">
                           {% for post_dict in post_dicts %}
 
-
                           <li>
+                            
 
                             <!-- begin timeline-time -->
                             <div class="timeline-time" style="margin-left: -20px;">
@@ -669,7 +723,29 @@
                             </div>
                             <!-- end timeline-icon -->
                             <!-- begin timeline-body -->
+                            
                             <div class="timeline-body" style=" padding: 15px; padding-left: 20px; height: 255px;">
+
+                              <!--<div class="post-delete-modal">
+                                <div class="post-delete-modal-content">
+                                  <div class="close-modal">+</div>
+                                  <h5 style="margin-top: -2%;">Are you sure you want to delete ?</h3>
+                                  <div class="confirmation-block">
+
+                                    <div class="confirm-delete" >
+                                      <a href="{% url 'community:delete_post' community_id=comm_id   post_id=post_dict.post_id  member_start=orig_member   requ_start=orig_requ %}" style="height: 100%; width: 100%; ">
+                                        <span>Confirm</span>
+                                      </a>
+                                    </div>
+
+                                    <div class="back">
+                                      <span>Back</span>
+                                    </div>
+                                  </div>
+
+                                </div>
+                              </div>-->
+
                               <div class="timeline-header" style=" margin: 5px; ">
                                 <span class="userimage"><img src="{{MEDIA_URL}}{{post_dict.photo_path}}" alt=""></span>
                                 <span class="username"><a
@@ -683,11 +759,7 @@
                                 <p>
                                   {{post_dict.desc_selected}} &emsp; <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"><b>See More</b></a>
                                 </p>
-                                <!--<p id="p1">Some text</p>
-                                                  <script>
-                                                    
-                                                    document.getElementById("p1").innerHTML = "abcd";
-                                                  </script>-->
+                                
                                 {% else %}
                                 <p>
                                   {{post_dict.desc|truncatechars:100}} &emsp; <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"><b>See More</b></a>
@@ -706,13 +778,14 @@
                               </div>
 
                               <div class="timeline-footer">
-                                <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}"
-                                  class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i>
-                                  Comment</a>
+                                <a href="{% url 'community:detail_post' community_id=comm_id  post_id=post_dict.post_id  start_from=1 %}" class="m-r-15 text-inverse-lighter"><i class="fa fa-comments fa-fw fa-lg m-r-3"></i>Comment</a>
+                                
                                 <div class="tags">
                                   <i class="fa fa-tag"> {{post_dict.class}}</i>
                                   {% if not not_admin %}
                                     <a href="{% url 'community:delete_post' community_id=comm_id   post_id=post_dict.post_id  member_start=orig_member   requ_start=orig_requ %}" style="color: red;"><span>Delete</span></a>
+                                    <!--<a href="" style="color: red;" id="delete-post"><span >Delete</span></a>-->
+                                    <!--<span  style="cursor: pointer;" class="del-button">Delete</span>-->
                                   {% endif %}
                                 </div>
 
@@ -758,16 +831,20 @@
 
               </div>
 
-
             </div>
           </div>
-
         </div>
+        <!--<div class="post-delete-modal">
+          <div class="post-delete-modal-content">
+      
+          </div>
+        </div>-->
       </div>
 
 
     </div>
   </div>
+
 
 
 </body>

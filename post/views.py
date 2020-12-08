@@ -363,6 +363,7 @@ def all_post(request, start_from, change):
                 for row in c:
                     user_id = row[0]
                     post_dict['user_id'] = user_id
+                    post_dict['logged_in'] = user_id == request.session['std_id']
 
                 c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(user_id)+"' ")
                 for row in c:
@@ -448,12 +449,52 @@ def all_post(request, start_from, change):
                 'dp':dp_form,
                 'job':job_list,
                 'doing_text_search':True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
+                'orig_start':start_from
             }        
             return render(request, 'post/all_post.html', show)
     else:
         return redirect('SignIn:signin')
 
 
+def delete_post(request, post_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session['std_id']
+
+        
+        c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = :post_id", {"post_id":post_id})
+        for row in c:
+            posted_by = row[0]
+
+        if posted_by == user_id:
+            c.execute("DELETE FROM POST WHERE POST_ID = :post_id", {"post_id":post_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
+        else:
+            return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
+    else:
+        return redirect('SignIn:signin')
+
+def delete_comment(request, post_id, comment_id):
+    if "std_id" in request.session:
+        conn = db()
+        c = conn.cursor()
+        user_id = request.session['std_id']
+
+        proper_request = False
+        c.execute("SELECT USER_ID FROM USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+        for row in c:
+            commented_by = row[0]
+        
+        if commented_by == user_id:
+            c.execute("DELETE FROM USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+            c.execute("COMMIT")
+            return HttpResponseRedirect(reverse('post:detail_post', args=(post_id, 1)))
+        else:
+            return HttpResponseRedirect(reverse('post:detail_post', args=(post_id, 1)))
+    else:
+        return redirect('SignIn:signin')
 
 
 
@@ -510,10 +551,12 @@ def detail_post(request, post_id, start_from):
         comment_dicts = []
         for row in c:
             comment_dict = {}
+            comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
             comment_dict['post_id'] = row[2]
             comment_dict['text'] = row[3]
             comment_dict['timestamp'] = row[4]
+            comment_dict['logged_in'] = comment_dict['user_id'] == user_id
     
             comment_dicts.append(comment_dict)
         
@@ -538,7 +581,7 @@ def detail_post(request, post_id, start_from):
         c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = '"+str(post_id)+"' ")
         for row in c:
             post_detail['user_id'] = row[0]
-        
+            
         
         
         c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
