@@ -1,0 +1,173 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+
+
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+<script>
+    function setup() {
+        document.getElementById('buttonid').addEventListener('click', openDialog);
+        function openDialog() {
+            document.getElementById('fileid').click();
+        }
+        document.getElementById('fileid').addEventListener('change', submitForm);
+        function submitForm() {
+            document.getElementById('formid').submit();
+        }
+    }
+</script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'Profile/edit.css' %}">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+<body onload="setup()">
+
+    <div class="main-content">
+        <!-- Top navbar -->
+        <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+            <div class="container-fluid">
+                <!-- Brand -->
+                <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="" target="_blank">BUET
+                    Alumni Portal</a>
+                <!-- Form -->
+                <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+                    <div class="form-group mb-0">
+
+                    </div>
+                </form>
+                <!-- User -->
+
+                <ul class="navbar-nav align-items-center d-none d-md-flex">
+                    <!-- <li class="nav-item dropdown">
+                <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 <div class="media align-items-center">
+                    <span class="avatar avatar-sm rounded-circle">
+                      {% static "Profile/DP/" as baseUrl %}
+                      <img  src="{{MEDIA_URL}}{{data.PHOTO}}">
+                    </span>
+                    <div class="media-body ml-2 d-none d-lg-block">
+                      <span class="mb-0 text-sm  font-weight-bold">{{data.FULL_NAME}}</span>
+                    </div>
+                  </div>
+                </a>-->
+
+                    <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+                        <div class=" dropdown-header noti-title">
+
+                            <h1 class="text-overflow m-0">Welcome!</h1>
+                        </div>
+
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-single-02"></i>
+                            <span>My profile</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-settings-gear-65"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-calendar-grid-58"></i>
+                            <span>Activity</span>
+                        </a>
+                        <a href="../examples/profile.html" class="dropdown-item">
+                            <i class="ni ni-support-16"></i>
+                            <span>Support</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#!" class="dropdown-item">
+                            <i class="ni ni-user-run"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!-- Header -->
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+            style="min-height: 600px; background-image: url('{% static 'SignUp/images/bg-01.jpg' %}'); background-size: cover; background-position: center top;">
+            <!-- Mask -->
+            <span class="mask bg-gradient-default opacity-8"></span>
+            <!-- Header container -->
+            <div class="container-fluid d-flex align-items-center ">
+                <div class="row">
+                    <div class="col-lg-7 col-md-10">
+                        <h1 class="display-2 text-white">
+                            <!--Hello {{data.NICK_NAME}}-->
+                        </h1>
+                        
+                        {% if edit %}
+                        <a href="{% url 'Profile:edit_profile' %}" class="btn btn-info">Edit profile</a>
+                        <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
+                        <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
+                        {% else %}
+                        <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
+                        {% endif %}
+                        <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Page content -->
+        <div class="container-fluid mt--7 justify-content-center">
+            <div class="row justify-content-center">
+
+                <div class="col-xl-8 order-xl-1 ">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-body pt-0 pt-md-4">
+                            <div class="text-center">
+                            <div class="picture">
+                                <img class="img-fluid" src="{{MEDIA_URL}}{{data.PHOTO}}" height=130 weight=130>
+                            </div> 
+                            <br>
+                            <a href="{% url 'Events:join_event' event_id=data.EVENT_ID %}" class="btn btn-info">Join Event</a>
+                            <br>
+                            <h2>{{data.EVENT_NAME}}</h2>
+                            <h3>{{data.LOCATION}}</h3>
+                            <h4>{{data.EVENT_START|date}} - {{data.EVENT_END|date}}</h4>
+                            <h4>{{Joined}} people joined this event.</h4>
+                            <h4>Organizer : </h4>   
+
+                                <ul>
+                                    <li> {{Organizer}}</li>
+                                </ul>
+                            <br>
+                            <br>
+                            <p>{{data.DESCRIPTION}}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    </div>
+
+
+
+
+
+
+</body>
