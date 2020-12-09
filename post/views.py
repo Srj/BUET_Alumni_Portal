@@ -5,6 +5,7 @@ from django.urls import reverse
 import cx_Oracle
 import datetime
 from django.core.files.storage import FileSystemStorage
+from django.utils.safestring import mark_safe
 from datetime import date
 import json
 from django import forms
@@ -22,7 +23,7 @@ def modify_c(c):
         data.append(row)
     return data
 
-def description_after_text_search(desc, text):
+'''def description_after_text_search(desc, text):
     len_search = len(text)
     search_pos = desc.find(text)
     #updated_desc = desc.replace(text, f'<mark>{text}</mark>')
@@ -60,17 +61,17 @@ def description_after_text_search(desc, text):
                 selected = "..." + updated_desc[starting:ending] + "..."
         selected = selected.replace("\n", "  ")
         #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return selected'''
 
 def description_after_text_search2(desc, text):
     len_search = len(text)
     search_pos = desc.find(text)
-    updated_desc = desc.replace(text, f'<h2>{text}</h2>')
+    updated_desc = desc.replace(text, f'<mark>{text}</mark>')
 
     if search_pos + len_search < 100 :
         selected = (updated_desc[:100 + 13] + "...").replace("\n", "  ")
         #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
     else:
         remaining = 100 - (len_search + 12)
         start = search_pos - remaining//2
@@ -97,8 +98,7 @@ def description_after_text_search2(desc, text):
             else:
                 selected = "..." + updated_desc[starting:ending] + "..."
         selected = selected.replace("\n", "  ")
-        #selected = selected.replace('/^"(.*)"$/', '$1')
-        return selected
+        return mark_safe(selected)
 
 
 
@@ -394,8 +394,7 @@ def all_post(request, start_from, change):
                     post_dict['class'] = 'job'
 
                 if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
-                    post_dict['desc_selected'] = description_after_text_search(post_dict['desc'], search_std_id) 
-                    #post_dict["desc_selected_json"] = json.dumps({"text": post_dict['desc_selected'] })
+                    post_dict['desc_selected'] = description_after_text_search2(post_dict['desc'], search_std_id) 
                     post_dict['query'] = search_std_id
 
                 all_post_dicts.append(post_dict)

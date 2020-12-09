@@ -475,6 +475,7 @@
                     <button>Write Post</button>
                   </a>
                 </div>
+                
 
                 {% if search_post_typ is None %}
                 <form action="{% url 'community:detail_community' community_id=comm_id    start_member_count=orig_member    start_requ_count=orig_requ    post_start=1    post_change=2  %}" class="form-container">
@@ -624,6 +625,11 @@
                 </form>
                 {% endif %}
 
+                <style>
+                  mark{
+                    background-color: yellow;
+                  }
+                </style>
 
                 {% if post_dicts|length > 0 %}
 
