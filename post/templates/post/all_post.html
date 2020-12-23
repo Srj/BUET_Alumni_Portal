@@ -106,7 +106,7 @@
                 <a href="{% url 'SignIn:logout'%}" class="btn btn-info">Log Out</a>
                 <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
               {% else %}
-                <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a>
+                <!-- <a href="{% url 'Profile:profile' %}" class="btn btn-info">Back to Profile</a> -->
               {% endif %}
                 <a href="{% url 'Search:search' %}" class="btn btn-info">Search</a>
                 <a href="{% url 'Events:events' %}" class="btn btn-info">Events</a>
@@ -128,7 +128,7 @@
               </div>
               <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                 <div class="d-flex justify-content-between">
-                  {% if edit %}
+                  
                     <a href="#"></a>
   
                   <form id="formid" action="{% url 'Profile:edit_photo'  %}" method="post" enctype="multipart/form-data"> 
@@ -139,10 +139,6 @@
                     <input id='buttonid' class="btn btn-sm btn-info mr-4" type='button' value='Change Photo' /> 
                   </form> 
   
-                  {% else %}
-                    <a href="#" class="btn btn-sm btn-info mr-4">Connect</a>
-                    <a href="#" class="btn btn-sm btn-info mr-4">Message</a>
-                  {% endif %}
                   
                 </div>
               </div>

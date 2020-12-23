@@ -27,8 +27,9 @@ class SignUpForm(forms.Form):
         print(password)
         conn = db()
         c = conn.cursor()
-        sql = """ SELECT STD_ID from USER_TABLE WHERE STD_ID = :std_id"""
-        row =  c.execute(sql,{'std_id':std_id}).fetchone()
+        sql = """ SELECT STD_ID from USER_TABLE WHERE STD_ID = %(std_id)s"""
+        c.execute(sql,{'std_id':std_id})
+        row = c.fetchone()
         print(row)
         if row is not None:
             print('I am here')

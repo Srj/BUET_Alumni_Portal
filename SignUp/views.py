@@ -3,10 +3,10 @@ from django.core.exceptions import ValidationError
 from django import forms
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
-import cx_Oracle
 from Alumni_Portal.utils import password_validator,encrypt_password,db
 from .forms import SignUpForm
-
+from psycopg2 import IntegrityError
+import psycopg2
 def index(request):
     conn = db()
     message = ""
@@ -20,20 +20,21 @@ def index(request):
             'password' : encrypt_password(form_signup.cleaned_data['password']),
             'email' : form_signup.cleaned_data['email'],
             'mobile' : form_signup.cleaned_data['mobile'],
-            'birthdate': form_signup.cleaned_data['birthdate'],
+            'birthdate': str(form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d')),
+
             }
             print(info)
 
             c = conn.cursor()
             sql = """ INSERT INTO USER_TABLE (STD_ID,FULL_NAME,NICK_NAME,EMAIL,MOBILE,DATE_OF_BIRTH,PASSWORD)
-                        VALUES(:std_id,:fullname,:nickname,:email,:mobile,to_date(:birthdate,'yyyy-mm-dd'),:password)"""
+                        VALUES(%(std_id)s,%(fullname)s,%(nickname)s,%(email)s,%(mobile)s,to_date(%(birthdate)s,'yyyy-mm-dd'),%(password)s)"""
             try:
                 c.execute(sql,info)
                 conn.commit()
                 conn.close()
                 print('Registered User' + str(info['std_id']))
                 return redirect('SignIn:signin')
-            except cx_Oracle.IntegrityError:
+            except  IntegrityError:
                 message = "User already exists ..."
                 print('"User already exists ...')
     else:

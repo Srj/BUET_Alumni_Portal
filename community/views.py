@@ -2,7 +2,6 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from Alumni_Portal.utils import db,encrypt_password
 from django.urls import reverse
-import cx_Oracle
 import datetime
 from django.core.files.storage import FileSystemStorage
 from django.utils.safestring import mark_safe

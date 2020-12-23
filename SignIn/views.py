@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect
 from passlib.context import CryptContext
 from Alumni_Portal.utils import check_encrypted_password,db
-import cx_Oracle
 from .forms import SignInForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -29,8 +28,9 @@ def index(request):
             std_id = form.cleaned_data['std_id']
             password = form.cleaned_data['password']
             c = conn.cursor()
-            sql = """ SELECT password from USER_TABLE WHERE STD_ID = :std_id"""
-            row =  c.execute(sql,{'std_id':std_id}).fetchone()
+            sql = """ SELECT password from USER_TABLE WHERE STD_ID = %(std_id)s;"""
+            c.execute(sql,{'std_id':std_id})
+            row = c.fetchone()
             if row is None:
                 message = "User Doesn\'t exists ..."
                 return render(request,'SignIn/index.html',{'form':form, 'msg' : message,'std_id': None})

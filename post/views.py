@@ -2,7 +2,6 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from Alumni_Portal.utils import db,encrypt_password
 from django.urls import reverse
-import cx_Oracle
 import datetime
 from django.core.files.storage import FileSystemStorage
 from django.utils.safestring import mark_safe
@@ -133,7 +132,7 @@ def all_post(request, start_from, change):
         
         
         if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
-            c.execute('Select count(*) from post')
+            c.execute('Select count(*) from post;')
 
         if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
             sql = '''SELECT COUNT(*) FROM POST WHERE INSTR(DESCRIPTION, :search_std_id) > 0'''
@@ -403,9 +402,9 @@ def all_post(request, start_from, change):
             
             
             #-------------------------------------Profile Card---------------------------------
-            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
             row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-            columnNames = [d[0] for d in c.description]
+            columnNames = [d[0].upper() for d in c.description]
             
             try:
                 data = dict(zip(columnNames,row))
@@ -414,7 +413,7 @@ def all_post(request, start_from, change):
 
             #-----------------------------------Skills------------------------------------
             sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             skills = {}
             for row in rows:
@@ -422,10 +421,10 @@ def all_post(request, start_from, change):
             dp_form = DPForm()
 
             #--------------------------------------Job History--------------------------------
-            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             jobs = rows.fetchall()
-            columnNames = [d[0] for d in c.description]
+            columnNames = [d[0].upper() for d in c.description]
             job_list = []
             for job in jobs:
                 try:
@@ -433,7 +432,7 @@ def all_post(request, start_from, change):
                 except:
                     print('NULL')
             
-
+            
             show = {
                 'no_post':False,
                 'post_dicts':all_post_dicts,
@@ -450,7 +449,8 @@ def all_post(request, start_from, change):
                 'job':job_list,
                 'doing_text_search':True if ( (search_std_id is not None) and (len(search_std_id) > 0) ) else False,
                 'orig_start':start_from
-            }        
+            }
+            print(data,skills)        
             return render(request, 'post/all_post.html', show)
     else:
         return redirect('SignIn:signin')

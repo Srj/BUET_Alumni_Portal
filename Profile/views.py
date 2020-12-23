@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse,HttpResponseRedirect
 from Alumni_Portal.utils import db,encrypt_password
 from django.urls import reverse
-import cx_Oracle
+from psycopg2 import IntegrityError
 import datetime
 from .forms import EditForm,DPForm,ExpertForm,JobForm
 from django.core.files.storage import FileSystemStorage
@@ -17,9 +17,10 @@ def index(request):
         conn = db()
         c = conn.cursor()
         #------------------------Fetch Profile Information-----------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
-        row =  c.execute(sql,{'std_id':std_id}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
+        c.execute(sql,{'std_id':std_id})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -28,25 +29,26 @@ def index(request):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':std_id})
+    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        c.execute(sql,{'std_id':std_id})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':std_id})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
                 job_list.append(dict(zip(columnNames,job)))
             except:
                 print('NULL')
-        
+        print(data)
         return render(request,'Profile/profile.html',{'data':data,'skills':skills,'edit':True,'dp':dp_form,'job':job_list})
     else:
         return redirect('SignIn:signin')
@@ -62,10 +64,12 @@ def edit(request):
     conn = db()
     c = conn.cursor()
     message = ""
-    sql = """SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
-    row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-    columnNames = [d[0] for d in c.description]
+    sql = """SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
+    c.execute(sql,{'std_id':request.session.get('std_id')})
+    row = c.fetchone()
+    columnNames = [d[0].upper() for d in c.description]
     data = dict(zip(columnNames,row))
+    print(data)
     dp_form = DPForm()
     
     form_signup = EditForm(initial={'fullname':data['FULL_NAME'],'nickname':data['NICK_NAME'],'email':data['EMAIL'],
@@ -85,7 +89,7 @@ def edit(request):
             'nickname' : form_signup.cleaned_data['nickname'],
             'email' : form_signup.cleaned_data['email'],
             'mobile' : form_signup.cleaned_data['mobile'],
-            'birthdate': form_signup.cleaned_data['birthdate'],
+            'birthdate': form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d'),
             }
             undergrad = {
                 'std_id' : request.session.get('std_id'),
@@ -117,85 +121,88 @@ def edit(request):
             }
             print('HEERE')
             print(undergrad)
-            sql = """ UPDATE USER_TABLE SET FULL_NAME = :fullname, NICK_NAME = :nickname,EMAIL=:email,MOBILE=:mobile,DATE_OF_BIRTH=:birthdate WHERE STD_ID=:std_id"""
+            sql = """ UPDATE USER_TABLE SET FULL_NAME = %(fullname)s, NICK_NAME = %(nickname)s,EMAIL=%(email)s,MOBILE=%(mobile)s,DATE_OF_BIRTH=to_date(%(birthdate)s,'yyyy-mm-dd') WHERE STD_ID=%(std_id)s"""
             try:
                 c.execute(sql,user)
                 conn.commit()
                 print('Updated User')
-            except cx_Oracle.IntegrityError:
+            except IntegrityError:
                 message = "User already exists ..."
                 print('Error Updating User')
             #-----------------Update Profile---------------------
-            sql = """ SELECT * from PROFILE WHERE STD_ID = :std_id"""
+            sql = """ SELECT * from PROFILE WHERE STD_ID = %(std_id)s"""
             print(profile)
-            row =  c.execute(sql,{'std_id':user['std_id']}).fetchone()
+            c.execute(sql,{'std_id':user['std_id']})
+            row = c.fetchone()
             if row is None:
                 sql = """ INSERT INTO PROFILE (STD_ID,HOUSE_NO,ROAD_NO,ZIP_CODE,CITY,COUNTRY,HOME_TOWN,ABOUT,FACEBOOK,TWITTER, LINKEDIN ,RESEARCHGATE, GOOGLE_SCHOLAR)
-                        VALUES(:std_id,:house,:road,:zip,:city,:country,:hometown,:about,:fb,:twitter,:linkedin,:rg,:google)"""
+                        VALUES(%(std_id)s,%(house)s,%(road)s,%(zip)s,%(city)s,%(country)s,%(hometown)s,%(about)s,%(fb)s,%(twitter)s,%(linkedin)s,%(rg)s,%(google)s)"""
                 try:
                     c.execute(sql,profile)
                     conn.commit()
                     print('Inserted Profile')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating Profile 1')
             else:
-                sql = """ UPDATE PROFILE SET HOUSE_NO = :house,ROAD_NO = :road, ZIP_CODE = :zip,CITY = :city,COUNTRY = :country,HOME_TOWN = :hometown,ABOUT=:about,
-                        FACEBOOK=:fb,TWITTER=:twitter, LINKEDIN=:linkedin, RESEARCHGATE=:rg,GOOGLE_SCHOLAR=:google
-                        WHERE STD_ID = :std_id"""
+                sql = """ UPDATE PROFILE SET HOUSE_NO = %(house)s,ROAD_NO = %(road)s, ZIP_CODE = %(zip)s,CITY = %(city)s,COUNTRY = %(country)s,HOME_TOWN = %(hometown)s,ABOUT=%(about)s,
+                        FACEBOOK=%(fb)s,TWITTER=%(twitter)s, LINKEDIN=%(linkedin)s, RESEARCHGATE=%(rg)s,GOOGLE_SCHOLAR=%(google)s
+                        WHERE STD_ID = %(std_id)s"""
                 try:
                     c.execute(sql,profile)
                     conn.commit()
                     print('Updated User')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating Profile 2')
 
             #------------------------Update Undergrad----------------------
-            sql = """ SELECT * from UNDERGRAD WHERE STD_ID = :std_id"""
-            row =  c.execute(sql,{'std_id':user['std_id']}).fetchone()
+            sql = """ SELECT * from UNDERGRAD WHERE STD_ID = %(std_id)s"""
+            c.execute(sql,{'std_id':user['std_id']})
+            row = c.fetchone()
             if row is None:
                 sql = """ INSERT INTO UNDERGRAD (STD_ID,HALL,DEPT,LVL,TERM)
-                        VALUES(:std_id,:hall,:dept,:lvl,:term)"""
+                        VALUES(%(std_id)s,%(hall)s,%(dept)s,%(lvl)s,%(term)s)"""
                 try:
                     c.execute(sql,undergrad)
                     conn.commit()
                     print('Inserted UnderGrad')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating Undergrad 1')
             else:
-                sql = """ UPDATE UNDERGRAD SET HALL =:hall,DEPT=:dept,LVL=:lvl,TERM=:term
-                        WHERE STD_ID =:std_id"""
+                sql = """ UPDATE UNDERGRAD SET HALL =%(hall)s,DEPT=%(dept)s,LVL=%(lvl)s,TERM=%(term)s
+                        WHERE STD_ID =%(std_id)s"""
                 try:
                     c.execute(sql,undergrad)
                     conn.commit()
                     print('Updated Undergrad')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating Undergrad 2')
 
             #-----------------Update Postgrad ----------------------------
-            sql = """ SELECT * from POSTGRAD WHERE STD_ID = :std_id"""
-            row =  c.execute(sql,{'std_id':user['std_id']}).fetchone()
+            sql = """ SELECT * from POSTGRAD WHERE STD_ID = %(std_id)s"""
+            c.execute(sql,{'std_id':user['std_id']})
+            row = c.fetchone()
             if row is None:
                 sql = """ INSERT INTO POSTGRAD (STD_ID,MSC,PHD)
-                        VALUES(:std_id,:msc,:phd)"""
+                        VALUES(%(std_id)s,%(msc)s,%(phd)s)"""
                 try:
                     c.execute(sql,postgrad)
                     conn.commit()
                     print('Inserted PostGrad')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating PostGrad 1')
             else:
-                sql = """ UPDATE POSTGRAD SET MSC=:msc,PHD=:phd
-                        WHERE STD_ID = :std_id"""
+                sql = """ UPDATE POSTGRAD SET MSC=%(msc)s,PHD=%(phd)s
+                        WHERE STD_ID = %(std_id)s"""
                 try:
                     c.execute(sql,postgrad)
                     conn.commit()
                     print('Updated PostGrad')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating PostGrad 2')
                 return redirect('Profile:profile')
@@ -203,17 +210,18 @@ def edit(request):
             print('Error While Editing Profile')
     expertise = ExpertForm()
     sql = """SELECT  EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+    c.execute(sql,{'std_id':request.session.get('std_id')})
+    rows = c.fetchall()
     skills = {}
     for row in rows:
         skills[row[0]] = row[1]
     job_form = JobForm()
 #------------------------------------Job History---------------------------------
-    sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
-    rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-    jobs = rows.fetchall()
-    columnNames = [d[0] for d in c.description]
+    sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
+    c.execute(sql,{'std_id':request.session.get('std_id')})
+    jobs = c.fetchall()
+    columnNames = [d[0].upper() for d in c.description]
     job_list = []
     for job in jobs:
         try:
@@ -236,8 +244,9 @@ def visit_profile(request,std_id):
         conn = db()
         c = conn.cursor()
         sql = """SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
-        row =  c.execute(sql,{'std_id':std_id}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':std_id})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         print(row)
         try:
             data = dict(zip(columnNames,row))
@@ -246,7 +255,8 @@ def visit_profile(request,std_id):
         #---------------------------------Expertise with Endorse Count----------------------------------
         sql = """ SELECT  EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
         EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':std_id})
+        c.execute(sql,{'std_id':std_id})
+        row = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -254,9 +264,9 @@ def visit_profile(request,std_id):
 
         #Job----------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':std_id})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':std_id})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
        
         for job in jobs:
@@ -279,25 +289,26 @@ def edit_photo(request):
             filename = fs.save(myfile.name, myfile)
             conn = db()
             c = conn.cursor()
-            sql = """ SELECT * from PROFILE WHERE STD_ID = :std_id"""
-            row =  c.execute(sql,{'std_id':user}).fetchone()
+            sql = """ SELECT * from PROFILE WHERE STD_ID = %(std_id)s"""
+            c.execute(sql,{'std_id':user})
+            row = c.fetchone()
             if row is None:
                 sql = """ INSERT INTO PROFILE (STD_ID,PHOTO)
-                        VALUES(:std_id,:photo)"""
+                        VALUES(%(std_id)s,%(photo)s)"""
                 try:
                     c.execute(sql,{'std_id':user,"photo":filename})
                     conn.commit()
                     print('Inserted DP')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     print('Error')
             else:
-                sql = """ UPDATE PROFILE SET PHOTO=:photo
-                            WHERE STD_ID = :std_id"""
+                sql = """ UPDATE PROFILE SET PHOTO=%(photo)s
+                            WHERE STD_ID = %(std_id)s"""
                 try:
                     c.execute(sql,{'photo':filename,'std_id':user})
                     conn.commit()
                     print('Updated DP')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     message = "User already exists ..."
                     print('Error Updating DP')
     return redirect('Profile:profile')
@@ -314,16 +325,17 @@ def edit_expertise(request):
                 topic = form.cleaned_data['topic']
                 conn = db()
                 c = conn.cursor()
-                sql = """ SELECT TOPIC from EXPERTISE WHERE STD_ID = :std_id AND TOPIC =:topic"""
-                row =  c.execute(sql,{'std_id':user,'topic':topic}).fetchone()
+                sql = """ SELECT TOPIC from EXPERTISE WHERE STD_ID = %(std_id)s AND TOPIC =%(topic)s"""
+                c.execute(sql,{'std_id':user,'topic':topic})
+                row = c.fetchone()
                 if row is None:
                     sql = """ INSERT INTO EXPERTISE (STD_ID,TOPIC)
-                            VALUES(:std_id,:topic)"""
+                            VALUES(%(std_id)s,%(topic)s)"""
                     try:
                         c.execute(sql,{'std_id':user,"topic":topic})
                         conn.commit()
                         print('Inserted Skill')
-                    except cx_Oracle.IntegrityError:
+                    except  IntegrityError:
                         print('Error')
                 else:
                     print('Exists')
@@ -345,23 +357,24 @@ def delete_expertise(request):
                 topic = form.cleaned_data['topic']
                 conn = db()
                 c = conn.cursor()
-                sql = """ SELECT TOPIC from EXPERTISE WHERE STD_ID = :std_id AND TOPIC =:topic"""
-                row =  c.execute(sql,{'std_id':user,'topic':topic}).fetchone()
+                sql = """ SELECT TOPIC from EXPERTISE WHERE STD_ID = %(std_id)s AND TOPIC =%(topic)s"""
+                c.execute(sql,{'std_id':user,'topic':topic})
+                row = c.fetchone()
                 print(row)
                 if not row is None:
-                    sql = """ DELETE FROM EXPERTISE WHERE STD_ID =:std_id AND TOPIC=:topic"""
+                    sql = """ DELETE FROM EXPERTISE WHERE STD_ID =%(std_id)s AND TOPIC=%(topic)s"""
                     try:
                         c.execute(sql,{'std_id':user,"topic":topic})
                         conn.commit()
                         print('Deleted Skill')
-                    except cx_Oracle.IntegrityError:
+                    except  IntegrityError:
                         print('Error Deleting Skill')
-                    sql = """ DELETE FROM ENDORSE WHERE TAKER_ID =:std_id AND TOPIC=:topic"""
+                    sql = """ DELETE FROM ENDORSE WHERE TAKER_ID =%(std_id)s AND TOPIC=%(topic)s"""
                     try:
                         c.execute(sql,{'std_id':user,"topic":topic})
                         conn.commit()
                         print('Inserted Skill')
-                    except cx_Oracle.IntegrityError:
+                    except  IntegrityError:
                         print('Error')
                 else:
                     print('Exists')
@@ -387,26 +400,28 @@ def edit_job(request):
                 designation = form.cleaned_data['designation']
                 conn = db()
                 c = conn.cursor()
-                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME=:name"""
-                ins_id =  c.execute(sql,{'name':name}).fetchone()
+                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME=%(name)s"""
+                c.execute(sql,{'name':name})
+                ins_id = c.fetchone()
                 print(ins_id)
                 if ins_id is None:
                     print('No Institute')
                     return redirect('Profile:edit_profile')
                 else:
 
-                    sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_ from WORKS WHERE STD_ID = :std_id AND INSTITUTE_ID = : ins_id AND FROM_ = :from_"""
+                    sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_ from WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s"""
 
-                    row =  c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_}).fetchone()
+                    c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_})
+                    row = c.fetchone()
                     if row is None:
                         sql = """ INSERT INTO WORKS (STD_ID,INSTITUTE_ID,FROM_,TO_,DESIGNATION)
-                                VALUES(:std_id,:ins_id,:from_,:to_,UPPER(:designation))"""
+                                VALUES(%(std_id)s,%(ins_id)s,%(from_)s,%(to_)s,UPPER(%(designation)s))"""
                         try:
                             print({'std_id':user,'ins_id':ins_id[0],'from_':from_,'to_':to_,'designation':designation})
                             c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'to_':to_,'designation':designation})
                             conn.commit()
                             print('Inserted Job')
-                        except cx_Oracle.IntegrityError:
+                        except  IntegrityError:
                             print('Error')
                     else:
                         print('Exists')
@@ -429,24 +444,26 @@ def delete_job(request):
                 print('Accquired Delete Req')
                 conn = db()
                 c = conn.cursor()
-                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME=:name"""
-                ins_id =  c.execute(sql,{'name':name}).fetchone()
+                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME%(name)s"""
+                c.execute(sql,{'name':name})
+                ins_id = c.fetchone()
                 if ins_id is None:
                     print('No Institute')
                     return redirect('Profile:edit_profile')
                 else:
 
-                    sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_,DESIGNATION from WORKS WHERE STD_ID = :std_id 
-                    AND INSTITUTE_ID = : ins_id AND FROM_ = :from_ AND DESIGNATION=UPPER(:designation)"""
-                    row =  c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'designation':designation}).fetchone()
+                    sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_,DESIGNATION from WORKS WHERE STD_ID =%(std_id)s 
+                    AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s AND DESIGNATION=UPPER%(designation)s)"""
+                    c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'designation':designation})
+                    row = c.fetchone()
                     print(row)
                     if row is not None:
-                        sql = """ DELETE FROM WORKS WHERE STD_ID =:std_id AND INSTITUTE_ID = : ins_id AND FROM_ = :from_ AND DESIGNATION=UPPER(:designation)"""
+                        sql = """ DELETE FROM WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = :%(ins_id)s AND FROM_ = %(from_)s AND DESIGNATION=UPPER(%(designation)s)"""
                         try:
                             c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'designation':designation})
                             conn.commit()
                             print('Deleted Job')
-                        except cx_Oracle.IntegrityError:
+                        except  IntegrityError:
                             print('Error')
                     else:
                         print('Don\'t Exists')
@@ -461,16 +478,17 @@ def endorse(request,std_id,topic):
         conn = db()
         c = conn.cursor()
         print({'user':user,'std_id':std_id,'topic':topic})
-        sql = """ SELECT * from ENDORSE WHERE GIVER_ID = :user_id AND TAKER_ID =:std_id AND TOPIC =:topic"""
-        row =  c.execute(sql,{'user_id':user,'std_id':std_id,'topic':topic}).fetchone()
+        sql = """ SELECT * from ENDORSE WHERE GIVER_ID = %(user_id)s AND TAKER_ID =%(std_id)s AND TOPIC =%(topic)s"""
+        c.execute(sql,{'user_id':user,'std_id':std_id,'topic':topic})
+        row = c.fetchone()
         if row is None:
                 sql = """ INSERT INTO ENDORSE (GIVER_ID,TAKER_ID,TOPIC)
-                        VALUES(:user_id,:std_id,:topic)"""
+                        VALUES(%(user_id)s,%(std_id)s,%(topic)s)"""
                 try:
                     c.execute(sql,{'user_id':user,'std_id':std_id,'topic':topic})
                     conn.commit()
                     print('Endorsed')
-                except cx_Oracle.IntegrityError:
+                except  IntegrityError:
                     print('Error in Endorsing')
         else:
             print('Endorse Exists')

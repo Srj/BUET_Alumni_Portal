@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import Http404
-import cx_Oracle
 from django.shortcuts import render,redirect
 from django.core.exceptions import ValidationError
 from django import forms
@@ -10,6 +9,7 @@ from django.shortcuts import render
 from .forms import EventForm, CreateEventForm
 from Alumni_Portal.utils import db
 from django.urls import reverse
+from psycopg2 import IntegrityError
 # Create your views here.
 
 def index(request):
@@ -154,7 +154,7 @@ def make_event(request):
                 c.execute(sql,info)
                 conn.commit()
                 print('Registered Event')
-            except cx_Oracle.IntegrityError:
+            except IntegrityError:
                 message = "Event already exists ..."
                 print('"Event already exists ...')
 
@@ -183,7 +183,7 @@ def join_event(request,event_id):
             conn.commit()
             conn.close()
             print('Joined Event')
-        except cx_Oracle.IntegrityError:
+        except IntegrityError:
             msg = 'Already Joined'
         return HttpResponseRedirect(reverse('Events:visit_event', args=(event_id,)))
 

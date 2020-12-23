@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from  django.contrib.auth.password_validation import CommonPasswordValidator
-import cx_Oracle
+import psycopg2 
+from psycopg2 import Error
 
 
 #------------------------Encryption Metadata-----------------------------
@@ -12,9 +13,14 @@ pwd_context = CryptContext(
 
 #--------------------------Connect Database----------------------------- 
 def db():
-    dsn_tns = cx_Oracle.makedsn('localhost','1521',service_name='ORCL')
-    return cx_Oracle.connect(user='DJANGO_DB',password='007007',dsn=dsn_tns)
-
+        conn = psycopg2.connect(
+                    user="postgres",
+                    password="007007",
+                    host="127.0.0.1",
+                    port="5432",
+                    database="django_db"
+        )
+        return conn
 
 #----------------Logged In----------------
 logged_in = False
