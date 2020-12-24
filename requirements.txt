@@ -1,0 +1,13 @@
+asgiref==3.3.1
+construct==2.5.3
+Django==3.1.4
+django-widget-tweaks==1.4.8
+future==0.18.2
+haystack==0.42
+passlib==1.7.4
+pefile==2019.4.18
+psycopg2==2.8.6
+python-ptrace==0.9.7
+pytz==2020.4
+six==1.15.0
+sqlparse==0.4.1

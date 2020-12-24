@@ -49,7 +49,8 @@ def index(request):
             except:
                 print('NULL')
         print(data)
-        return render(request,'Profile/profile.html',{'data':data,'skills':skills,'edit':True,'dp':dp_form,'job':job_list})
+        # return render(request,'Profile/profile.html',{'data':data,'skills':skills,'edit':True,'dp':dp_form,'job':job_list})
+        return redirect('SignIn:signin')
     else:
         return redirect('SignIn:signin')
 

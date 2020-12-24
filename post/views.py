@@ -102,13 +102,45 @@ def description_after_text_search2(desc, text):
 
 
 def all_post(request, start_from, change):
-
+    print("IN ALL POST")
     if "std_id" in request.session:
         conn = db()
         c = conn.cursor()
-
+        print("IN ALL POST")
         user_id = request.session.get('std_id')
+        #-------------------------------------Profile Card---------------------------------
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
+        
+        try:
+            data = dict(zip(columnNames,row))
+        except:
+            print('Cannot Parse Profile')
+        print("IN ALL POST")
+        #-----------------------------------Skills------------------------------------
+        sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
+        skills = {}
+        for row in rows:
+            skills[row[0]] = row[1]
+        dp_form = DPForm()
 
+        #--------------------------------------Job History--------------------------------
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
+        job_list = []
+        for job in jobs:
+            try:
+                job_list.append(dict(zip(columnNames,job)))
+            except:
+                print('NULL')
+        
         if change == 0:
             # set to default
             request.session['search_std_id'] = ''
@@ -167,7 +199,13 @@ def all_post(request, start_from, change):
             show = {
                 #'user':user,
                 'no_post':True,
+                'data':data,
+                'skills':skills,
+                'edit':True,
+                'dp':dp_form,
+                'job':job_list,
             }
+            print(data,skills,job_list)
             return render(request, 'post/all_post.html', show)
 
         else:
@@ -399,38 +437,9 @@ def all_post(request, start_from, change):
 
                 all_post_dicts.append(post_dict)
 
+            print("IN ALL POST")
             
-            
-            #-------------------------------------Profile Card---------------------------------
-            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-            row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-            columnNames = [d[0].upper() for d in c.description]
-            
-            try:
-                data = dict(zip(columnNames,row))
-            except:
-                print('Cannot Parse Profile')
 
-            #-----------------------------------Skills------------------------------------
-            sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-            skills = {}
-            for row in rows:
-                skills[row[0]] = row[1]
-            dp_form = DPForm()
-
-            #--------------------------------------Job History--------------------------------
-            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-            jobs = rows.fetchall()
-            columnNames = [d[0].upper() for d in c.description]
-            job_list = []
-            for job in jobs:
-                try:
-                    job_list.append(dict(zip(columnNames,job)))
-                except:
-                    print('NULL')
             
             
             show = {

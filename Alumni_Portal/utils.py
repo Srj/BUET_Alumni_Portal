@@ -15,8 +15,8 @@ pwd_context = CryptContext(
 def db():
         conn = psycopg2.connect(
                     user="postgres",
-                    password="007007",
-                    host="127.0.0.1",
+                    password= '007007',                 #"postgres",
+                    host= "127.0.0.1",          #"database",
                     port="5432",
                     database="django_db"
         )

@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  database:
+    image: "postgres"
+    env_file:
+      - database.env
+    volumes:
+      #      - database-data:/var/lib/postgrest/data
+      - ./DDL.sql:/docker-entrypoint-initdb.d/DDL.sql
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/Alumni_Portal
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
