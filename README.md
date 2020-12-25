@@ -5,7 +5,7 @@ BUET Alumni Portal is implemented by [Saifur Rahman Jony](https://github.com/Srj
 __N.B.__ : This is a modified version of the original project where [Oracle DBMS](https://www.oracle.com/database/) has been replaced by [PostgreSQL](https://www.postgresql.org/) for ease of reproducibility. All user data have been erased due to privacy issue. 
 
 ### Table of Content
-* [Installation]()
+* [Installation](https://github.com/Srj/BUET_Alumni_Portal/blob/master/README.md#installation)
 * [Documentation](https://github.com/Srj/BUET_Alumni_Portal#documentation)
 
 ## Installation
