@@ -93,7 +93,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             
 
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -104,15 +104,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -126,15 +126,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
         #=================================MY GROUPS INFO===================================
         if (comm_search_name is None) or (len(comm_search_name) == 0):
-            sql = "SELECT COUNT(*) FROM COMM_MEMBERS WHERE USER_ID = :user_id"
+            sql = "SELECT COUNT(*) FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s"
             c.execute(sql, {"user_id":user_id})
         else:
             sql = '''SELECT COUNT(*) 
                     FROM COMM_MEMBERS CM, COMMUNITY C 
-                    WHERE (CM.USER_ID = :user_id) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )'''
+                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )'''
             c.execute(sql, {"comm_search_name":comm_search_name, "user_id":user_id})
-
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             num_my_comms = row[0]
 
         
@@ -152,12 +152,12 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
                                     FROM COMMUNITY C, COMM_MEMBERS CM 
-                                    WHERE (CM.USER_ID = :user_id) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID)
+                                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID)
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < :end_community
+                            WHERE ROWNUM < %(end_community)s
                         )
-                    WHERE RNUM >= :begin_community'''
+                    WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_my_comm, "begin_community":begin_my_comm, "user_id":user_id})
         else:
@@ -168,17 +168,18 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
                                     FROM COMMUNITY C, COMM_MEMBERS CM 
-                                    WHERE (CM.USER_ID = :user_id) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < :end_community
+                            WHERE ROWNUM < %(end_community)s
                         )
-                    WHERE RNUM >= :begin_community'''
+                    WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_my_comm, "begin_community":begin_my_comm, "user_id":user_id, "comm_search_name":comm_search_name})
         
         my_communities_infos = []
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             community_dict = {}
             community_dict['community_id'] = row[0]
             community_dict['community_name'] = row[1]
@@ -189,30 +190,25 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
 
         #================================Groups I am not in (joinable groups) =======================================
-        '''SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
-        FROM COMMUNITY
-        WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) )
-
-        SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
-        FROM COMMUNITY
-        WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) ) AND ( INSTR(COMMUNITY_NAME, :comm_search_name) > 0 )'''
+        
 
         if (comm_search_name is None) or (len(comm_search_name) == 0):
             sql = '''
                     SELECT COUNT(*)
                     FROM COMMUNITY
-                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) )
+                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) )
                 '''
             c.execute(sql, {"user_id":user_id})
         else:
             sql = '''
                     SELECT COUNT(*)
                     FROM COMMUNITY
-                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) ) AND ( INSTR(COMMUNITY_NAME, :comm_search_name) > 0 )
+                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( INSTR(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                 '''
             c.execute(sql, {"comm_search_name":comm_search_name, "user_id":user_id})
 
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             num_other_comms = row[0]
         
         
@@ -231,12 +227,12 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
                                     FROM COMMUNITY
-                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) )
+                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) )
                                     ORDER BY COUNT_COMM_MEMBER(COMMUNITY_ID) DESC, DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < :end_community
+                            WHERE ROWNUM < %(end_community)s
                         )
-                    WHERE RNUM >= :begin_community'''
+                    WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_other_comm, "begin_community":begin_other_comm, "user_id":user_id})
         else:
@@ -247,19 +243,20 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
                                     FROM COMMUNITY
-                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) ) AND ( INSTR(COMMUNITY_NAME, :comm_search_name) > 0 )
+                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( INSTR(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(COMMUNITY_ID) DESC, DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < :end_community
+                            WHERE ROWNUM < %(end_community)s
                         )
-                    WHERE RNUM >= :begin_community'''
+                    WHERE RNUM >= %(begin_community)s'''
 
             
 
             c.execute(sql, {"end_community":end_other_comm, "begin_community":begin_other_comm, "user_id":user_id, "comm_search_name":comm_search_name})
 
         other_communities_infos = []
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             #print(row)
             community_dict = {}
             community_dict['community_id'] = row[0]
@@ -274,13 +271,13 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         if (comm_search_name is None) or (len(comm_search_name) == 0):
 
             if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
-                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS WHERE COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ", {"user_id":user_id})
+                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS WHERE COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ", {"user_id":user_id})
 
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP
-                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
@@ -290,7 +287,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = H.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID)
                             '''
                     c.execute(sql, {"user_id":user_id})
 
@@ -298,7 +295,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = C.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID)
                             '''
                     c.execute(sql, {"user_id":user_id})
 
@@ -306,7 +303,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = R.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID)
                             '''
                     c.execute(sql, {"user_id":user_id})
 
@@ -314,7 +311,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = J.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID)
                             '''
                     c.execute(sql, {"user_id":user_id})
 
@@ -323,7 +320,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -331,7 +328,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -339,7 +336,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -347,11 +344,12 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
-            
-            for row in c:
+
+            rows = c.fetchall()
+            for row in rows:
                 num_post = row[0]
 
 
@@ -368,15 +366,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM (
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -386,15 +385,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "user_id":user_id})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -406,15 +406,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -423,15 +424,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -440,15 +442,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -457,15 +460,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
@@ -476,15 +480,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -493,15 +498,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -510,15 +516,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -527,26 +534,27 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
         else:
 
             if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
-                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS CUP, COMMUNITY C WHERE CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 ) ", {"user_id":user_id, "comm_search_name":comm_search_name})
+                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS CUP, COMMUNITY C WHERE CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 ) ", {"user_id":user_id, "comm_search_name":comm_search_name})
 
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -556,7 +564,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -564,7 +572,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -572,7 +580,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -580,7 +588,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -589,7 +597,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -597,7 +605,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -605,7 +613,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -613,11 +621,12 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
             
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 num_post = row[0]
 
 
@@ -634,15 +643,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM (
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rpws]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -652,15 +662,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -672,15 +683,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -689,15 +701,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -706,15 +719,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -723,15 +737,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
@@ -742,15 +757,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -759,15 +775,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -776,15 +793,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -793,15 +811,16 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = :user_id) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, :comm_search_name) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
         
         all_post_dicts = []
         for post in all_post:
@@ -813,38 +832,46 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             post_dict['community_name'] = post[4]
 
             #c.execute("SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE POST_ID = '"+str(post_dict['post_id'])+"' ")
-            sql = "SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE (POST_ID = :post_id) AND (COMMUNITY_ID = :community_id) "
+            sql = "SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE (POST_ID = %(post_id)s) AND (COMMUNITY_ID = %(community_id)s) "
             c.execute(sql, {'post_id':post_dict['post_id'], "community_id":post_dict['community_id']})
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['user_id'] = row[0]
 
             c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_dict['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['photo_path'] = row[0]
             
             c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(post_dict['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['full_name'] = row[0]
 
-            c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE (POST_ID = :post_id) AND (COMMUNITY_ID = :community_id) ", {'post_id':post_dict['post_id'], "community_id":post_dict['community_id']})
-            for row in c:
+            c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE (POST_ID = %(post_id)s) AND (COMMUNITY_ID = %(community_id)s) ", {'post_id':post_dict['post_id'], "community_id":post_dict['community_id']})
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['num_comments'] = row[0]
             
 
             c.execute("SELECT * FROM COMMUNITY_HELP WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['class'] = 'help'
 
             c.execute("SELECT * FROM COMMUNITY_CAREER WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['class'] = 'career'
 
             c.execute("SELECT * FROM COMMUNITY_RESEARCH WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['class'] = 'research'
 
             c.execute("SELECT * FROM COMMUNITY_JOB_POST WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 post_dict['class'] = 'job'
 
             if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
@@ -906,7 +933,7 @@ def create_community(request):
         user_id = request.session.get('std_id')
 
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -917,15 +944,15 @@ def create_community(request):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -979,7 +1006,7 @@ def create_comm_upload(request):
 
         if len(unfilled_data) > 0:
             #-------------------------------------Profile Card---------------------------------
-            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
             row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
             columnNames = [d[0] for d in c.description]
             
@@ -990,15 +1017,15 @@ def create_comm_upload(request):
 
             #-----------------------------------Skills------------------------------------
             sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+            rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
             skills = {}
             for row in rows:
                 skills[row[0]] = row[1]
             dp_form = DPForm()
 
             #--------------------------------------Job History--------------------------------
-            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             jobs = rows.fetchall()
             columnNames = [d[0] for d in c.description]
@@ -1021,14 +1048,15 @@ def create_comm_upload(request):
             }
             return render(request, "community/create_community.html", show)
         else:
-            sql = '''INSERT INTO COMMUNITY (COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION) VALUES (:community_name, :description, :criteria, SYSDATE)  '''
+            sql = '''INSERT INTO COMMUNITY (COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION) VALUES (%(community_name)s, %(description)s, %(criteria)s, SYSDATE)  '''
             c.execute(sql, {"community_name":community_name, "description":description, "criteria":criteria})
             c.execute("SELECT COMMUNITY_ID FROM (SELECT COMMUNITY_ID FROM COMMUNITY ORDER BY COMMUNITY_ID DESC) WHERE ROWNUM=1")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 comm_id = row[0]
-            sql = '''INSERT INTO MODERATOR VALUES (:comm_id, :user_id) '''
+            sql = '''INSERT INTO MODERATOR VALUES (%(comm_id)s, %(user_id)s) '''
             c.execute(sql, {"comm_id":comm_id, "user_id":user_id})
-            sql = '''INSERT INTO COMM_MEMBERS VALUES (:comm_id, :user_id, SYSDATE) '''
+            sql = '''INSERT INTO COMM_MEMBERS VALUES (%(comm_id)s, %(user_id)s, SYSDATE) '''
             c.execute(sql, {"comm_id":comm_id, "user_id":user_id})
             c.execute("COMMIT")
 
@@ -1068,7 +1096,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
 
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -1079,15 +1107,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -1101,17 +1129,19 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
 
 
-        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-        for row in c:
+        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+        rows = c.fetchall()
+        for row in rows:
             community_name = row[0]
             description = row[1]
             criteria = row[2]
             creation = row[3]
             creation_ago = row[4]
 
-        c.execute("SELECT USER_ID FROM COMM_MEMBERS WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        c.execute("SELECT USER_ID FROM COMM_MEMBERS WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
         members_list = []
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             idx = row[0]
             members_list.append(idx)
         
@@ -1119,8 +1149,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
         
         if not user_is_comm_member:
             already_joined = False
-            c.execute("SELECT * FROM JOIN_REQUEST WHERE (USER_ID = :user_id) AND (COMMUNITY_ID = :community_id) ", {"user_id":user_id, "community_id":community_id})
-            for row in c:
+            c.execute("SELECT * FROM JOIN_REQUEST WHERE (USER_ID = %(user_id)s) AND (COMMUNITY_ID = %(community_id)s) ", {"user_id":user_id, "community_id":community_id})
+            rows = c.fetchall()
+            for row in rows:
                 already_joined = True
             context = {
                 'data':data,
@@ -1142,20 +1173,21 @@ def detail_community(request, community_id, start_member_count, start_requ_count
         else:
 
             #=======================Gather Data For Post=========================
-            c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-            for row in c:
+            c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+            rows = c.fetchall()
+            for row in rows:
                 created_by = row[0]
 
             user_is_admin = True if created_by == user_id else False
 
             if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
-                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS WHERE COMMUNITY_ID = :community_id ", {"community_id":community_id})
+                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS WHERE COMMUNITY_ID = %(community_id)s ", {"community_id":community_id})
 
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP
-                            WHERE ( CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
@@ -1165,7 +1197,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = H.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = H.POST_ID)
                             '''
                     c.execute(sql, {"community_id":community_id})
 
@@ -1173,7 +1205,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = C.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = C.POST_ID)
                             '''
                     c.execute(sql, {"community_id":community_id})
 
@@ -1181,7 +1213,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = R.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = R.POST_ID)
                             '''
                     c.execute(sql, {"community_id":community_id})
 
@@ -1189,7 +1221,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = J.POST_ID)
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = J.POST_ID)
                             '''
                     c.execute(sql, {"community_id":community_id})
 
@@ -1198,7 +1230,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -1206,7 +1238,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -1214,7 +1246,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
 
@@ -1222,11 +1254,11 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
-            
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 num_post = row[0]
 
 
@@ -1243,15 +1275,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                 FROM (
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
+                                        WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -1261,15 +1294,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "community_id":community_id})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -1281,15 +1315,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -1298,15 +1333,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -1315,15 +1351,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -1332,15 +1369,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
@@ -1351,15 +1389,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -1368,15 +1407,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -1385,15 +1425,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -1402,15 +1443,16 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID = :community_id ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
 
             all_post_dicts = []
@@ -1423,42 +1465,50 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 post_dict['community_name'] = post[4]
 
                 #c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = '"+str(post_dict['post_id'])+"' ")
-                sql = "SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE (POST_ID = :post_id) AND (COMMUNITY_ID = :community_id) "
+                sql = "SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE (POST_ID = %(post_id)s) AND (COMMUNITY_ID = %(community_id)s) "
                 c.execute(sql, {"post_id":post_dict['post_id'], "community_id":community_id})
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['user_id'] = row[0]
 
                 c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_dict['user_id'])+"' ")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['photo_path'] = row[0]
                 
                 c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(post_dict['user_id'])+"' ")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['full_name'] = row[0]
 
-                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE (POST_ID = :post_id) AND (COMMUNITY_ID = :community_id) ", {'post_id':post_dict['post_id'], "community_id":community_id})
-                for row in c:
+                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE (POST_ID = %(post_id)s) AND (COMMUNITY_ID = %(community_id)s) ", {'post_id':post_dict['post_id'], "community_id":community_id})
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['num_comments'] = row[0]
                 
 
                 c.execute("SELECT * FROM COMMUNITY_HELP WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'help'
 
                 c.execute("SELECT * FROM COMMUNITY_CAREER WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'career'
 
                 c.execute("SELECT * FROM COMMUNITY_RESEARCH WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'research'
 
                 c.execute("SELECT * FROM COMMUNITY_JOB_POST WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'job'
 
                 if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
-                    print("aschi")
+                    
                     post_dict['desc_selected'] = description_after_text_search(post_dict['desc'], search_std_id)
                     post_dict['query'] = search_std_id
 
@@ -1466,15 +1516,17 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
             #==========================Gather Data For Member List==================================
 
-            c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-            for row in c:
+            c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+            rows = c.fetchall()
+            for row in rows:
                 created_by = row[0]
 
             user_is_admin = True if created_by == user_id else False
 
-            sql = "SELECT COUNT(*) FROM COMM_MEMBERS WHERE (COMMUNITY_ID = :community_id) AND (USER_ID <> :user_id)"
+            sql = "SELECT COUNT(*) FROM COMM_MEMBERS WHERE (COMMUNITY_ID = %(community_id)s) AND (USER_ID <> %(user_id)s)"
             c.execute(sql, {"community_id":community_id, "user_id":user_id})
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 num_members = row[0]
 
             begin_member = start_member_count
@@ -1490,17 +1542,18 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                             FROM (
                                     SELECT U.STD_ID, U.FULL_NAME, TIME_DIFF(CM.JOIN_DATE)
                                     FROM USER_TABLE U, COMM_MEMBERS CM
-                                    WHERE (CM.USER_ID = U.STD_ID) AND (CM.USER_ID <> :user_id) AND (CM.COMMUNITY_ID = :community_id)
+                                    WHERE (CM.USER_ID = U.STD_ID) AND (CM.USER_ID <> %(user_id)s) AND (CM.COMMUNITY_ID = %(community_id)s)
                                     ORDER BY CM.JOIN_DATE ASC, U.std_id ASC
                                 ) A
-                            WHERE ROWNUM < :end_member
+                            WHERE ROWNUM < %(end_member)s
                         )
-                    WHERE RNUM >= :begin_member'''
+                    WHERE RNUM >= %(begin_member)s'''
             
             c.execute(sql, {"end_member":end_member, "begin_member":begin_member, "user_id":user_id, "community_id":community_id})
 
             members_info = []
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 member_dict = {}
                 member_dict['user_id'] = row[0]
                 member_dict['full_name'] = row[1]
@@ -1510,8 +1563,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
             
             for idx, member_dict in enumerate(members_info):
                 member_dict['photo'] = "dummy_user.png"
-                c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = :user_id", {"user_id":member_dict['user_id']})
-                for row in c:
+                c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = %(user_id)s", {"user_id":member_dict['user_id']})
+                rows = c.fetchall()
+                for row in rows:
                     member_dict['photo'] = row[0]
                 members_info[idx] = member_dict
 
@@ -1567,8 +1621,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 }
                 return render(request, "community/detail_community.html", context)
             else:
-                c.execute("SELECT COUNT(*) FROM JOIN_REQUEST WHERE COMMUNITY_ID = :community_id ", {"community_id":community_id})
-                for row in c:
+                c.execute("SELECT COUNT(*) FROM JOIN_REQUEST WHERE COMMUNITY_ID = %(community_id)s ", {"community_id":community_id})
+                rows = c.fetchall()
+                for row in rows:
                     num_requ = row[0]
 
                 begin_requ = start_requ_count
@@ -1585,17 +1640,18 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                             FROM (
                                     SELECT U.STD_ID, U.FULL_NAME, TIME_DIFF(J.REQUEST_TIME)
                                     FROM USER_TABLE U, JOIN_REQUEST J
-                                    WHERE (J.USER_ID = U.STD_ID) AND (J.COMMUNITY_ID = :community_id)
+                                    WHERE (J.USER_ID = U.STD_ID) AND (J.COMMUNITY_ID = %(community_id)s)
                                     ORDER BY J.REQUEST_TIME ASC, U.std_id ASC
                                 ) A
-                            WHERE ROWNUM < :end_requ
+                            WHERE ROWNUM < %(end_requ)s
                         )
-                    WHERE RNUM >= :begin_requ'''
+                    WHERE RNUM >= %(begin_requ)s'''
                 
                 c.execute(sql, {"end_requ":end_requ, "begin_requ":begin_requ, "community_id":community_id})
 
                 request_infos = []
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     request_dict = {}
                     request_dict['user_id'] = row[0]
                     request_dict['full_name'] = row[1]
@@ -1610,8 +1666,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 for idx, request_dict in enumerate(request_infos):
                     request_dict['photo'] = "dummy_user.png"
 
-                    c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = :user_id", {"user_id":request_dict['user_id']})
-                    for row in c:
+                    c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = %(user_id)s", {"user_id":request_dict['user_id']})
+                    rows = c.fetchall()
+                    for row in rows:
                         request_dict['photo'] = row[0]
                     request_infos[idx] = request_dict
 
@@ -1678,7 +1735,7 @@ def join_request(request, community_id):
         c = conn.cursor()
         user_id = request.session.get('std_id')
 
-        c.execute("INSERT INTO JOIN_REQUEST VALUES (:community_id, :user_id, SYSDATE)", {"community_id":community_id, "user_id":user_id})
+        c.execute("INSERT INTO JOIN_REQUEST VALUES (%(community_id)s, %(user_id)s, SYSDATE)", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
 
         return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
@@ -1691,7 +1748,7 @@ def cancel_join_request(request, community_id):
         c = conn.cursor()
         user_id = request.session.get('std_id')
 
-        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {'community_id':community_id, "user_id":user_id})
+        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = %(community_id)s) AND (USER_ID = %(user_id)s) ", {'community_id':community_id, "user_id":user_id})
         c.execute("COMMIT")
 
         return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
@@ -1705,15 +1762,16 @@ def delete_comment(request, community_id, post_id, comment_id):
         user_id = request.session.get('std_id')
 
         request_from_admin = False
-        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-        for row in c:
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+        rows = c.fetchall()
+        for row in rows:
             if user_id == row[0]:
                 request_from_admin = True
             else:
                 return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
         
         if request_from_admin:
-            c.execute("DELETE FROM COMMUNITY_USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+            c.execute("DELETE FROM COMMUNITY_USER_REPLIES WHERE USR_REPLS_ROW = %(comment_id)s", {"comment_id":comment_id})
             c.execute("COMMIT")
             return HttpResponseRedirect(reverse('community:detail_post', args=(community_id, post_id, 1)))
 
@@ -1730,15 +1788,16 @@ def delete_post(request, community_id, post_id, member_start, requ_start):
         
 
         request_from_admin = False
-        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-        for row in c:
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+        rows = c.fetchall()
+        for row in rows:
             if user_id == row[0]:
                 request_from_admin = True
             else:
                 return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
 
         if request_from_admin:
-            c.execute("DELETE FROM COMMUNITY_POST WHERE POST_ID = :post_id", {"post_id":post_id})
+            c.execute("DELETE FROM COMMUNITY_POST WHERE POST_ID = %(post_id)s", {"post_id":post_id})
             c.execute("COMMIT")
             return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, member_start, requ_start, 1, 0)))
 
@@ -1753,20 +1812,20 @@ def delete_group(request, community_id):
         conn = db()
         c = conn.cursor()
         user_id = request.session.get('std_id')
-        print("Good Luck !!!")
 
-        '''request_from_admin = False
-        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-        for row in c:
+        request_from_admin = False
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+        rows = c.fetchall()
+        for row in rows:
             if user_id == row[0]:
                 request_from_admin = True
             else:
                 return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
 
         if request_from_admin :
-            c.execute("DELETE FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+            c.execute("DELETE FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {'community_id':community_id})
             c.execute("COMMIT")
-            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))'''
+            return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
 
 
     else:
@@ -1780,7 +1839,7 @@ def leave_group(request, community_id):
         c = conn.cursor()
         user_id = request.session.get('std_id')
 
-        c.execute("DELETE FROM COMM_MEMBERS WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("DELETE FROM COMM_MEMBERS WHERE (COMMUNITY_ID = %(community_id)s) AND (USER_ID = %(user_id)s) ", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
 
         return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
@@ -1797,7 +1856,7 @@ def join_community(request, community_id, user_id, start_member_count, start_req
         conn = db()
         c = conn.cursor()
 
-        c.execute("INSERT INTO COMM_MEMBERS VALUES (:community_id, :user_id, SYSDATE) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("INSERT INTO COMM_MEMBERS VALUES (%(community_id)s, %(user_id)s, SYSDATE) ", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
         return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, start_member_count, start_requ_count, 1, 0)))
     else:
@@ -1808,7 +1867,7 @@ def remove_request(request, community_id, user_id, start_member_count, start_req
         conn = db()
         c = conn.cursor()
 
-        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = :community_id) AND (USER_ID = :user_id) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("DELETE FROM JOIN_REQUEST WHERE (COMMUNITY_ID = %(community_id)s) AND (USER_ID = %(user_id)s) ", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
         return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, start_member_count, start_requ_count, 1, 0)))
     else:
@@ -1820,7 +1879,7 @@ def make_post(request, community_id):
         conn = db()
         c = conn.cursor()
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -1831,15 +1890,15 @@ def make_post(request, community_id):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -1850,8 +1909,9 @@ def make_post(request, community_id):
             except:
                 print('NULL')
 
-        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-        for row in c:
+        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+        rows = c.fetchall()
+        for row in rows:
             community_name = row[0]
             description = row[1]
             criteria = row[2]
@@ -1913,8 +1973,9 @@ def form_unfilled_message(unfilled_data):
     return txt
 
 def modify_c(c):
+    rows = c.fetchall()
     data = []
-    for row in c:
+    for row in rows:
         row = str(row)
         for char in "()',":
             row = row.replace(char, "")
@@ -1963,7 +2024,7 @@ def upload_post(request, community_id):
 
         if (len(unfilled_data) != 0) or (cell_wrong_type) or (salary_wrong_type):
             #-------------------------------------Profile Card---------------------------------
-            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
             row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
             columnNames = [d[0] for d in c.description]
             
@@ -1974,15 +2035,15 @@ def upload_post(request, community_id):
 
             #-----------------------------------Skills------------------------------------
             sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+            rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
             skills = {}
             for row in rows:
                 skills[row[0]] = row[1]
             dp_form = DPForm()
 
             #--------------------------------------Job History--------------------------------
-            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             jobs = rows.fetchall()
             columnNames = [d[0] for d in c.description]
@@ -1993,8 +2054,9 @@ def upload_post(request, community_id):
                 except:
                     print('NULL')
 
-            c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
-            for row in c:
+            c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
+            rows = c.fetchall()
+            for row in rows:
                 community_name = row[0]
                 description = row[1]
                 criteria = row[2]
@@ -2146,8 +2208,9 @@ def detail_post(request, community_id, post_id, start_from):
 
         user_id = request.session.get('std_id')
 
-        c.execute('SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE POST_ID = :post_id', {'post_id':post_id})
-        for row in c:
+        c.execute('SELECT COUNT(*) FROM COMMUNITY_USER_REPLIES WHERE POST_ID = %(post_id)s', {'post_id':post_id})
+        rows = c.fetchall()
+        for row in rows:
             num_comments = row[0]
 
         begin_comment = start_from
@@ -2162,15 +2225,16 @@ def detail_post(request, community_id, post_id, start_from):
         sql= '''SELECT * 
                 FROM(
                         SELECT A.*, ROWNUM RNUM
-                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM COMMUNITY_USER_REPLIES  WHERE POST_ID = :post_id ORDER BY TIMESTAMP DESC, POST_ID DESC) A
-                        WHERE ROWNUM < :end_comment
+                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM COMMUNITY_USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
+                        WHERE ROWNUM < %(end_comment)s
                     )
-                WHERE RNUM >= :begin_comment'''
+                WHERE RNUM >= %(begin_comment)s'''
 
         c.execute(sql, {'post_id':post_id, 'end_comment':end_comment, 'begin_comment':begin_comment})
 
         comment_dicts = []
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             comment_dict = {}
             comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
@@ -2184,49 +2248,58 @@ def detail_post(request, community_id, post_id, start_from):
         for i in range(len(comment_dicts)):
 
             c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(comment_dicts[i]['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 comment_dicts[i]['photo_path'] = row[0]
             
             c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(comment_dicts[i]['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 comment_dicts[i]['full_name'] = row[0]
 
         c.execute("SELECT * FROM COMMUNITY_POST WHERE POST_ID = '"+str(post_id)+"' ")
 
         post_detail = {}
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['date'] = row[1]
             post_detail['desc'] = row[2]
             post_detail['post_id'] = post_id
 
         c.execute("SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE POST_ID = '"+str(post_id)+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['user_id'] = row[0]
         
         
         
         c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rpws:
             post_detail['photo_path'] = row[0]
 
         c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['full_name'] = row[0]
 
         c.execute("SELECT * FROM COMMUNITY_HELP WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['type_of_help'] = row[1]
             post_detail['reason'] = row[2]
             post_detail['cell'] = row[3]
             post_detail['class'] = 'Help'
 
         c.execute("SELECT * FROM COMMUNITY_CAREER WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['topic_name'] = row[1]
             post_detail['class'] = 'Career'
 
         c.execute("SELECT * FROM COMMUNITY_RESEARCH WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['topic_name'] = row[1]
             post_detail['date_of_publication'] = row[2]
             post_detail['journal'] = row[3]
@@ -2234,7 +2307,8 @@ def detail_post(request, community_id, post_id, start_from):
             post_detail['class'] = 'Research'
 
         c.execute("SELECT * FROM COMMUNITY_JOB_POST WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['company_name'] = row[1]
             post_detail['location'] = row[2]
             post_detail['requirements'] = row[3]
@@ -2242,11 +2316,12 @@ def detail_post(request, community_id, post_id, start_from):
             post_detail['salary'] = row[5]
             post_detail['class'] = 'Job'
 
-        c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = :std_id", {'std_id': user_id})
-        for row in c:
+        c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = %(std_id)s", {'std_id': user_id})
+        rows = c.fetchall()
+        for row in rows:
             post_detail['commenter_photo'] = row[0]
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -2257,15 +2332,15 @@ def detail_post(request, community_id, post_id, start_from):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -2278,7 +2353,7 @@ def detail_post(request, community_id, post_id, start_from):
 
 
         #======================COMMUNITY INFO=================
-        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = :community_id", {"community_id":community_id})
+        c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
         for row in c:
             community_name = row[0]
             description = row[1]
@@ -2286,7 +2361,7 @@ def detail_post(request, community_id, post_id, start_from):
             created = row[3]
 
         user_is_admin = False
-        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = :community_id", {'community_id':community_id})
+        c.execute("SELECT USER_ID FROM MODERATOR WHERE COMMUNITY_ID = %(community_id)s", {'community_id':community_id})
         for row in c:
             if user_id == row[0]:
                 user_is_admin = True
