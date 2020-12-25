@@ -97,7 +97,7 @@ This Portal consists of 4 core modules:
 ### Users
 * If you are a BUET Alumni or current Student, you can register your account with your Student ID and some basic information. 
 
-![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/Register.gif | width=100 "Register")
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/Register.gif "Register")
 
 * After registering you can update your profile information to make it easy for others to find you.
 
