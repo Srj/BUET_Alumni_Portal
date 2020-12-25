@@ -90,7 +90,7 @@ def edit(request):
             'nickname' : form_signup.cleaned_data['nickname'],
             'email' : form_signup.cleaned_data['email'],
             'mobile' : form_signup.cleaned_data['mobile'],
-            'birthdate': form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d'),
+            'birthdate': str(form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d')) if form_signup.cleaned_data['birthdate'] is not None else None,
             }
             undergrad = {
                 'std_id' : request.session.get('std_id'),

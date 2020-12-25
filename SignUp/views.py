@@ -20,7 +20,7 @@ def index(request):
             'password' : encrypt_password(form_signup.cleaned_data['password']),
             'email' : form_signup.cleaned_data['email'],
             'mobile' : form_signup.cleaned_data['mobile'],
-            'birthdate': str(form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d')),
+            'birthdate': str(form_signup.cleaned_data['birthdate'].strftime('%Y-%m-%d')) if form_signup.cleaned_data['birthdate'] is not None else None ,
 
             }
             print(info)
