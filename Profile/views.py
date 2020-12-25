@@ -407,26 +407,31 @@ def edit_job(request):
                 print(ins_id)
                 if ins_id is None:
                     print('No Institute')
-                    return redirect('Profile:edit_profile')
+                    sql = "INSERT INTO INSTITUTE (NAME) VALUES( %(name)s);"
+                    c.execute(sql,{'name':name})
+                    conn.commit()
+
+                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME=%(name)s"""
+                c.execute(sql,{'name':name})
+                ins_id = c.fetchone()
+
+                sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_ from WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s"""
+
+                c.execute(sql,{'std_id':user,'ins_id':ins_id,'from_':from_})
+                row = c.fetchone()
+                if row is None:
+                    sql = """ INSERT INTO WORKS (STD_ID,INSTITUTE_ID,FROM_,TO_,DESIGNATION)
+                            VALUES(%(std_id)s,%(ins_id)s,%(from_)s,%(to_)s,UPPER(%(designation)s))"""
+                    # try:
+                    print({'std_id':user,'ins_id':ins_id,'from_':from_,'to_':to_,'designation':designation})
+                    c.execute(sql,{'std_id':user,'ins_id':ins_id,'from_':from_,'to_':to_,'designation':designation})
+                    conn.commit()
+                    print('Inserted Job')
+                    # except  IntegrityError:
+                        # print('Error')
                 else:
-
-                    sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_ from WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s"""
-
-                    c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_})
-                    row = c.fetchone()
-                    if row is None:
-                        sql = """ INSERT INTO WORKS (STD_ID,INSTITUTE_ID,FROM_,TO_,DESIGNATION)
-                                VALUES(%(std_id)s,%(ins_id)s,%(from_)s,%(to_)s,UPPER(%(designation)s))"""
-                        try:
-                            print({'std_id':user,'ins_id':ins_id[0],'from_':from_,'to_':to_,'designation':designation})
-                            c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'to_':to_,'designation':designation})
-                            conn.commit()
-                            print('Inserted Job')
-                        except  IntegrityError:
-                            print('Error')
-                    else:
-                        print('Exists')
-                        job_error = "Already Exists"
+                    print('Exists')
+                    job_error = "Already Exists"
     return redirect('Profile:edit_profile')
 
 
@@ -440,26 +445,25 @@ def delete_job(request):
             print(form)
             if form.is_valid():
                 name = form.cleaned_data['name']
-                from_ = form.cleaned_data['from_']
+                from_ = form.cleaned_data['from_'].strftime('%Y-%m-%d')
                 designation = form.cleaned_data['designation']
                 print('Accquired Delete Req')
                 conn = db()
                 c = conn.cursor()
-                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME%(name)s"""
+                sql = """SELECT INSTITUTE_ID FROM INSTITUTE WHERE NAME=%(name)s"""
                 c.execute(sql,{'name':name})
                 ins_id = c.fetchone()
                 if ins_id is None:
                     print('No Institute')
                     return redirect('Profile:edit_profile')
                 else:
-
                     sql = """ SELECT STD_ID,INSTITUTE_ID,FROM_,DESIGNATION from WORKS WHERE STD_ID =%(std_id)s 
-                    AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s AND DESIGNATION=UPPER%(designation)s)"""
+                    AND INSTITUTE_ID = %(ins_id)s AND FROM_ =%(from_)s AND DESIGNATION=UPPER(%(designation)s)"""
                     c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'designation':designation})
                     row = c.fetchone()
                     print(row)
                     if row is not None:
-                        sql = """ DELETE FROM WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = :%(ins_id)s AND FROM_ = %(from_)s AND DESIGNATION=UPPER(%(designation)s)"""
+                        sql = """ DELETE FROM WORKS WHERE STD_ID =%(std_id)s AND INSTITUTE_ID = %(ins_id)s AND FROM_ = TO_DATE(%(from_)s,'YYYY-MM-DD') AND DESIGNATION=UPPER(%(designation)s)"""
                         try:
                             c.execute(sql,{'std_id':user,'ins_id':ins_id[0],'from_':from_,'designation':designation})
                             conn.commit()

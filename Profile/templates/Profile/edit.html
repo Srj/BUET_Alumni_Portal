@@ -370,7 +370,7 @@
           p+=
           "<input type='hidden' name='from_' required id='id_from_' value=" + c +">";
           p+=
-          "<input type='hidden' name='to_' id='id_to_' value=" + d + ">";
+          "<input type='hidden' name='to_' id='id_to_' value='' >";
 
                       
 
@@ -461,7 +461,7 @@
             <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with your
               work and manage your projects or assigned tasks</p>
             <a href="{% url 'Profile:profile' %}" class="btn btn-info">Profile</a>
-            <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a>
+            <!-- <a href="{% url 'post:all_post' start_from=1 change=0 %}" class="btn btn-info">Timeline</a> -->
           </div>
         </div>
       </div>
@@ -477,7 +477,7 @@
                   <h3 class="mb-0">My account</h3>
                 </div>
                 <div class="col-4 text-right">
-                  <a href="#!" class="btn btn-sm btn-primary">Settings</a>
+                  <!-- <a href="#!" class="btn btn-sm btn-primary">Settings</a> -->
                 </div>
               </div>
             </div>
@@ -736,9 +736,9 @@
                             </span>
                           </td>
                           <td class="Topic">{{key}}</td>
-                          <td>
-                            <a href="#editEmployeeModal" class="edit" data-toggle="modal" ><i class="material-icons"
-                                data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                          <td style="text-align:center;">
+                            <!-- <a href="#editEmployeeModal" class="edit" data-toggle="modal" ><i class="material-icons"
+                                data-toggle="tooltip" title="Edit">&#xE254;</i></a> -->
                             <a href="#deleteTopic" class="delete" data-toggle="modal"><i class="material-icons"
                                 data-toggle="tooltip" data-target="#deleteTopic" title="Delete">&#xE872;</i></a>
                           </td>
@@ -803,9 +803,9 @@
                           {% else %}
                             -
                           {% endif %}</td>
-                          <td>
-                            <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
-                                data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                          <td style="text-align:center;">
+                            <!-- <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
+                                data-toggle="tooltip" title="Edit">&#xE254;</i></a> -->
                             <a href="#deleteJob" class="delete deleteJob" data-toggle="modal"><i class="material-icons"
                                 data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                           </td>
