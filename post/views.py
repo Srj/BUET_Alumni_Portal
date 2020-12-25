@@ -222,11 +222,11 @@ def all_post(request, start_from, change):
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, %(end_post)s RNUM
                                 FROM (SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION FROM POST ORDER BY DATE_OF_POST DESC, POST_ID DESC) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
-                        WHERE RNUM >= %(begin_post)s'''
+                                LIMIT %(end_post)s
+                            ) DUMMY_ALIAS
+                        LIMIT %(end_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                 rows = c.fetchall()
@@ -763,7 +763,8 @@ def make_post(request):
         c = conn.cursor()
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
         columnNames = [d[0] for d in c.description]
         
         try:
@@ -774,7 +775,8 @@ def make_post(request):
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -782,8 +784,8 @@ def make_post(request):
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
         columnNames = [d[0] for d in c.description]
         job_list = []
         for job in jobs:
@@ -915,8 +917,8 @@ def upload_post(request):
 
             
             #c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (TO_DATE('"+date_today+"', 'dd-mm-yyyy'), '"+description+"')")
-            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (NOW()::timestamp, '"+description+"')")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO USER_POSTS (USER_ID, POST_ID) VALUES ('"+str(user_id)+"', '"+post_id+"')")
             c.execute("INSERT INTO HELP (POST_ID, TYPE_OF_HELP, REASON, CELL_NO) VALUES ('"+post_id+"', '"+type_of_help+"', '"+reason+"', '"+cell+"')")
@@ -930,8 +932,8 @@ def upload_post(request):
             topic_name = topic_name.replace("'", "''")
 
 
-            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (NOW(), '"+description+"')")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) DUMMY_ALIAs LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO USER_POSTS (USER_ID, POST_ID) VALUES ('"+str(user_id)+"', '"+post_id+"')")
             c.execute("INSERT INTO CAREER (POST_ID) VALUES ('"+post_id+"')")
@@ -955,8 +957,8 @@ def upload_post(request):
 
 
 
-            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (NOW(), '"+description+"')")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) DUMMY LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO USER_POSTS (USER_ID, POST_ID) VALUES ('"+str(user_id)+"', '"+post_id+"')")
             c.execute("INSERT INTO RESEARCH (POST_ID, TOPIC_NAME, DATE_OF_PUBLICATION, JOURNAL, DOI) VALUES ('"+post_id+"', '"+topic_name+"', TO_DATE('"+date_of_publication+"', 'dd-mm-yyyy'), '"+journal+"', '"+doi+"')")
@@ -970,8 +972,8 @@ def upload_post(request):
             description = request.GET.get('description')
             description = description.replace("'", "''")
 
-            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (NOW(), '"+description+"')")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) DUMMY  LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO USER_POSTS (USER_ID, POST_ID) VALUES ('"+str(user_id)+"', '"+post_id+"')")
             c.execute("INSERT INTO JOB_POST (POST_ID, COMPANY_NAME, DESIGNATION, LOCATION, REQUIREMENTs, SALARY) VALUES ('"+post_id+"', '"+company_name+"', '"+designation+"', '"+location+"', '"+min_requirement+"', '"+salary+"')")
