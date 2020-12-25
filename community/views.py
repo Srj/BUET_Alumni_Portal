@@ -131,7 +131,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         else:
             sql = '''SELECT COUNT(*) 
                     FROM COMM_MEMBERS CM, COMMUNITY C 
-                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )'''
+                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )'''
             c.execute(sql, {"comm_search_name":comm_search_name, "user_id":user_id})
         rows = c.fetchall()
         for row in rows:
@@ -168,7 +168,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
                                     FROM COMMUNITY C, COMM_MEMBERS CM 
-                                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                    WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
                             WHERE ROWNUM < %(end_community)s
@@ -203,7 +203,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             sql = '''
                     SELECT COUNT(*)
                     FROM COMMUNITY
-                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( INSTR(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( STRPOS(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                 '''
             c.execute(sql, {"comm_search_name":comm_search_name, "user_id":user_id})
 
@@ -243,7 +243,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                             FROM (
                                     SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
                                     FROM COMMUNITY
-                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( INSTR(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                    WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( STRPOS(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(COMMUNITY_ID) DESC, DATE_OF_CREATION 
                                 ) A
                             WHERE ROWNUM < %(end_community)s
@@ -277,7 +277,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP
-                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
@@ -320,7 +320,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -328,7 +328,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -336,7 +336,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -344,7 +344,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -385,7 +385,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < %(end_post)s
@@ -480,7 +480,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -498,7 +498,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -516,7 +516,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -534,7 +534,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -548,13 +548,13 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         else:
 
             if (search_post_typ is None) and ( (search_std_id is None) or (len(search_std_id) == 0 ) ):
-                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS CUP, COMMUNITY C WHERE CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 ) ", {"user_id":user_id, "comm_search_name":comm_search_name})
+                c.execute("SELECT COUNT(*) FROM COMMUNITY_USER_POSTS CUP, COMMUNITY C WHERE CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 ) ", {"user_id":user_id, "comm_search_name":comm_search_name})
 
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -564,7 +564,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -572,7 +572,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -580,7 +580,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -588,7 +588,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {"user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -597,7 +597,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -605,7 +605,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -613,7 +613,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
 
@@ -621,7 +621,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP, COMMUNITY C
-                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
             
@@ -643,7 +643,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM (
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < %(end_post)s
@@ -662,7 +662,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < %(end_post)s
@@ -683,7 +683,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -701,7 +701,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -719,7 +719,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -737,7 +737,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -757,7 +757,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -775,7 +775,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -793,7 +793,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -811,7 +811,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -1187,7 +1187,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 sql = '''
                             SELECT COUNT(*) 
                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP
-                            WHERE ( CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                            WHERE ( CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             
                         '''
                 c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
@@ -1230,7 +1230,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_HELP H, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = H.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -1238,7 +1238,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_CAREER C, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = C.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "user_id":user_id})
 
@@ -1246,7 +1246,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_RESEARCH R, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = R.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
 
@@ -1254,7 +1254,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                                 SELECT COUNT(*)
                                 FROM COMMUNITY_USER_POSTS CUP, COMMUNITY_JOB_POST J, COMMUNITY_POST CP
-                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = J.POST_ID) AND (CUP.POST_ID = CP.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                             '''
                     c.execute(sql, {'search_std_id':search_std_id, "community_id":community_id})
             rows = c.fetchall()
@@ -1294,7 +1294,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                 FROM(
                                         SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
-                                        WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                        WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < %(end_post)s
@@ -1389,7 +1389,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
-                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -1407,7 +1407,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
-                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -1425,7 +1425,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
-                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -1443,7 +1443,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                                     FROM(
                                             SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
-                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( INSTR(CP.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
