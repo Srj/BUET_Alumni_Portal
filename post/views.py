@@ -104,6 +104,7 @@ def description_after_text_search2(desc, text):
 def all_post(request, start_from, change):
     print("IN ALL POST")
     if "std_id" in request.session:
+        data = None
         conn = db()
         c = conn.cursor()
         print("IN ALL POST")
