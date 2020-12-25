@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'Profile',
     'widget_tweaks',
     'post',
-    'Timeline',
     'Search',
     'Events',
     'community',

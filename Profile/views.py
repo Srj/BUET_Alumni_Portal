@@ -244,7 +244,7 @@ def visit_profile(request,std_id):
         data =None
         conn = db()
         c = conn.cursor()
-        sql = """SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         c.execute(sql,{'std_id':std_id})
         row = c.fetchone()
         columnNames = [d[0].upper() for d in c.description]
@@ -255,16 +255,16 @@ def visit_profile(request,std_id):
             print('cannot Visit User')
         #---------------------------------Expertise with Endorse Count----------------------------------
         sql = """ SELECT  EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-        EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
+        EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
         c.execute(sql,{'std_id':std_id})
-        row = c.fetchall()
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         print(skills)
 
         #Job----------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID =%(std_id)s ORDER BY FROM_ DESC"""
         c.execute(sql,{'std_id':std_id})
         jobs = c.fetchall()
         columnNames = [d[0].upper() for d in c.description]
@@ -364,19 +364,13 @@ def delete_expertise(request):
                 print(row)
                 if not row is None:
                     sql = """ DELETE FROM EXPERTISE WHERE STD_ID =%(std_id)s AND TOPIC=%(topic)s"""
-                    try:
-                        c.execute(sql,{'std_id':user,"topic":topic})
-                        conn.commit()
-                        print('Deleted Skill')
-                    except  IntegrityError:
-                        print('Error Deleting Skill')
-                    sql = """ DELETE FROM ENDORSE WHERE TAKER_ID =%(std_id)s AND TOPIC=%(topic)s"""
-                    try:
-                        c.execute(sql,{'std_id':user,"topic":topic})
-                        conn.commit()
-                        print('Inserted Skill')
-                    except  IntegrityError:
-                        print('Error')
+                    # try:
+                    c.execute(sql,{'std_id':user,"topic":topic})
+                    conn.commit()
+                    print('Deleted Skill')
+                    # except  IntegrityError:
+                        # print('Error Deleting Skill')
+                    
                 else:
                     print('Exists')
                     skill_error = "Not Exists"

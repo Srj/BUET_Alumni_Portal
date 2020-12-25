@@ -21,7 +21,7 @@ def search(request):
             }
             
             if not info['name'] is '':
-                info['name'] = '%' + info['name'].lower() + '%'
+                info['name'] = '%{}%'.format(info['name'].lower())                                #'%' + info['name'].lower() + '%'
             if not info['location'] is '':
                 info['location'] = '%' + info['location'].lower() + '%'
             if not info['interest'] is '':
@@ -41,26 +41,26 @@ def search(request):
             sql = """ 
                 SELECT DISTINCT * FROM USER_PROFILE WHERE STD_ID IN (
                 """
-            sql1 = """SELECT STD_ID from USER_TABLE WHERE LOWER(FULL_NAME) LIKE :name OR LOWER(NICK_NAME) LIKE :name OR STD_ID LIKE :name 
+            sql1 = """SELECT STD_ID from USER_TABLE WHERE LOWER(FULL_NAME) LIKE %(name)s OR LOWER(NICK_NAME) LIKE %(name)s OR STD_ID::varchar(16) LIKE %(name)s 
                  INTERSECT """
 
-            sql2 ="""SELECT STD_ID from  PROFILE WHERE LOWER(PROFILE.COUNTRY) LIKE :location OR LOWER(PROFILE.CITY) LIKE :location 
-                    OR LOWER(HOME_TOWN) LIKE :location 
+            sql2 ="""SELECT STD_ID from  PROFILE WHERE LOWER(PROFILE.COUNTRY) LIKE %(location)s OR LOWER(PROFILE.CITY) LIKE %(location)s 
+                    OR LOWER(HOME_TOWN) LIKE %(location)s 
                 INTERSECT """
 
-            sql3 ="""SELECT STD_ID from EXPERTISE WHERE LOWER(TOPIC) LIKE LOWER(:interest) 
+            sql3 ="""SELECT STD_ID from EXPERTISE WHERE LOWER(TOPIC) LIKE LOWER(%(interest)s) 
                 INTERSECT """
 
-            sql4 ="""SELECT STD_ID from PROFILE WHERE LOWER(DEPT) LIKE LOWER(:dept) 
+            sql4 ="""SELECT STD_ID from PROFILE WHERE LOWER(DEPT) LIKE LOWER(%(dept)s) 
                 INTERSECT """
 
-            sql5 ="""SELECT STD_ID from PROFILE WHERE LOWER(HALL) LIKE LOWER(:hall) 
+            sql5 ="""SELECT STD_ID from PROFILE WHERE LOWER(HALL) LIKE LOWER(%(hall)s) 
                 INTERSECT """
 
-            sql6 ="""SELECT STD_ID from PROFILE WHERE LOWER(LVL) LIKE LOWER(:lvl) 
+            sql6 ="""SELECT STD_ID from PROFILE WHERE LOWER(LVL::varchar(8)) LIKE LOWER(%(lvl)s) 
                 INTERSECT """
             sql7 ="""SELECT STD_ID from WORKS LEFT JOIN INSTITUTE USING(INSTITUTE_ID)  
-                WHERE LOWER(NAME) LIKE LOWER(:institute)
+                WHERE LOWER(NAME) LIKE LOWER(%(institute)s)
                 INTERSECT """
                 
             if not info['name'] is '':
@@ -90,8 +90,8 @@ def search(request):
             else:
                 msg = 'Please Type'
                 return render(request,'Search/search.html',{'form':form, 'msg' : message})
-            rows =  c.execute(sql,values).fetchall()
-            rows = rows
+            c.execute(sql,values)
+            rows = c.fetchall()
 
             print("Result Found : " + str(len(rows)))
             if len(rows) ==  0 :
@@ -99,7 +99,7 @@ def search(request):
                 return render(request,'Search/search.html',{'form':form, 'msg' : message})
             else:
                 for row in rows:
-                    columnNames = [d[0] for d in c.description]
+                    columnNames = [d[0].upper() for d in c.description]
                     data = (zip(columnNames,row))
                     results.append(dict(data))
                 return render(request,'Search/search.html',{'form':form, 'msg' : message,'data':results,'count':len(results)})
