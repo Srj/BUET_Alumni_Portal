@@ -14,8 +14,9 @@ class DPForm(forms.Form):
      file = forms.FileField()
 
 def modify_c(c):
+    rows = c.fetchall()
     data = []
-    for row in c:
+    for row in rows:
         row = str(row)
         for char in "()',":
             row = row.replace(char, "")
@@ -167,7 +168,7 @@ def all_post(request, start_from, change):
             c.execute('Select count(*) from post;')
 
         if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
-            sql = '''SELECT COUNT(*) FROM POST WHERE INSTR(DESCRIPTION, :search_std_id) > 0'''
+            sql = '''SELECT COUNT(*) FROM POST WHERE INSTR(DESCRIPTION, %(search_std_id)s ) > 0'''
             c.execute(sql, {'search_std_id':search_std_id})
 
         if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -182,21 +183,21 @@ def all_post(request, start_from, change):
 
         if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
             if search_post_typ == 'Help':
-                sql = '''SELECT COUNT(*) FROM POST P, HELP H WHERE (H.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, HELP H WHERE (H.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Career':
-                sql = '''SELECT COUNT(*) FROM POST P, CAREER C WHERE (C.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, CAREER C WHERE (C.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Research':
-                sql = '''SELECT COUNT(*) FROM POST P, RESEARCH R WHERE (R.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, RESEARCH R WHERE (R.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Job Post':
-                sql = '''SELECT COUNT(*) FROM POST P, JOB_POST J WHERE (J.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, JOB_POST J WHERE (J.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
         
         num_post = modify_c(c)[0]
         if num_post == '0':
-            show = {
+            context = {
                 #'user':user,
                 'no_post':True,
                 'data':data,
@@ -206,7 +207,7 @@ def all_post(request, start_from, change):
                 'job':job_list,
             }
             print(data,skills,job_list)
-            return render(request, 'post/all_post.html', show)
+            return render(request, 'post/all_post.html', context)
 
         else:
             num_post = int(num_post)
@@ -222,12 +223,13 @@ def all_post(request, start_from, change):
                         FROM(
                                 SELECT A.*, ROWNUM RNUM
                                 FROM (SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION FROM POST ORDER BY DATE_OF_POST DESC, POST_ID DESC) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -237,15 +239,16 @@ def all_post(request, start_from, change):
                                 FROM(
                                         SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION
                                         FROM POST
-                                        WHERE ( INSTR(DESCRIPTION, :search_std_id) > 0 )
+                                        WHERE ( INSTR(DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY DATE_OF_POST DESC, POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < :end_post
+                                WHERE ROWNUM < %(end_post)s
                             )
-                        WHERE RNUM >= :begin_post'''
+                        WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
-                all_post = [row for row in c]
+                rows = c.fetchall()
+                all_post = [row for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -260,12 +263,13 @@ def all_post(request, start_from, change):
                                             WHERE (P.POST_ID = H.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -277,12 +281,13 @@ def all_post(request, start_from, change):
                                             WHERE (P.POST_ID = C.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -294,12 +299,13 @@ def all_post(request, start_from, change):
                                             WHERE (P.POST_ID = R.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -311,12 +317,13 @@ def all_post(request, start_from, change):
                                             WHERE (P.POST_ID = J.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
@@ -327,15 +334,16 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, HELP H
-                                            WHERE (P.POST_ID = H.POST_ID)  AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (P.POST_ID = H.POST_ID)  AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -344,15 +352,16 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, CAREER C
-                                            WHERE (P.POST_ID = C.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (P.POST_ID = C.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -361,15 +370,16 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, RESEARCH R
-                                            WHERE (P.POST_ID = R.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (P.POST_ID = R.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -378,15 +388,16 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, JOB_POST J
-                                            WHERE (P.POST_ID = J.POST_ID) AND ( INSTR(P.DESCRIPTION, :search_std_id) > 0 )
+                                            WHERE (P.POST_ID = J.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < :end_post
+                                    WHERE ROWNUM < %(end_post)s
                                 )
-                            WHERE RNUM >= :begin_post'''
+                            WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
-                    all_post = [row for row in c]
+                    rows = c.fetchall()
+                    all_post = [row for row in rows]
             
 
             all_post_dicts = []
@@ -397,38 +408,46 @@ def all_post(request, start_from, change):
                 post_dict['desc'] = post[2]
 
                 c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = '"+str(post_dict['post_id'])+"' ")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     user_id = row[0]
                     post_dict['user_id'] = user_id
                     post_dict['logged_in'] = user_id == request.session['std_id']
 
                 c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(user_id)+"' ")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['photo_path'] = row[0]
                 
                 c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(user_id)+"' ")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['full_name'] = row[0]
 
-                c.execute("SELECT COUNT(*) FROM USER_REPLIES WHERE POST_ID = :post_id", {'post_id':post_dict['post_id']})
-                for row in c:
+                c.execute("SELECT COUNT(*) FROM USER_REPLIES WHERE POST_ID = %(post_id)s", {'post_id':post_dict['post_id']})
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['num_comments'] = row[0]
                 
 
                 c.execute("SELECT * FROM HELP WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'help'
 
                 c.execute("SELECT * FROM CAREER WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'career'
 
                 c.execute("SELECT * FROM RESEARCH WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'research'
 
                 c.execute("SELECT * FROM JOB_POST WHERE POST_ID = '"+str(post_dict['post_id'])+"'")
-                for row in c:
+                rows = c.fetchall()
+                for row in rows:
                     post_dict['class'] = 'job'
 
                 if ( (search_std_id is not None) and (len(search_std_id) > 0) ):
@@ -442,7 +461,7 @@ def all_post(request, start_from, change):
 
             
             
-            show = {
+            context = {
                 'no_post':False,
                 'post_dicts':all_post_dicts,
                 'is_begin':is_begin,
@@ -460,7 +479,7 @@ def all_post(request, start_from, change):
                 'orig_start':start_from
             }
             print(data,skills)        
-            return render(request, 'post/all_post.html', show)
+            return render(request, 'post/all_post.html', context)
     else:
         return redirect('SignIn:signin')
 
@@ -472,12 +491,13 @@ def delete_post(request, post_id):
         user_id = request.session['std_id']
 
         
-        c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = :post_id", {"post_id":post_id})
-        for row in c:
+        c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = %(post_id)s", {"post_id":post_id})
+        rows = c.fetchall()
+        for row in rows:
             posted_by = row[0]
 
         if posted_by == user_id:
-            c.execute("DELETE FROM POST WHERE POST_ID = :post_id", {"post_id":post_id})
+            c.execute("DELETE FROM POST WHERE POST_ID = %(post_id)s", {"post_id":post_id})
             c.execute("COMMIT")
             return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
         else:
@@ -492,12 +512,13 @@ def delete_comment(request, post_id, comment_id):
         user_id = request.session['std_id']
 
         proper_request = False
-        c.execute("SELECT USER_ID FROM USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
-        for row in c:
+        c.execute("SELECT USER_ID FROM USER_REPLIES WHERE USR_REPLS_ROW = %(comment_id)s", {"comment_id":comment_id})
+        rows = c.fetchall()
+        for row in rows:
             commented_by = row[0]
         
         if commented_by == user_id:
-            c.execute("DELETE FROM USER_REPLIES WHERE USR_REPLS_ROW = :comment_id", {"comment_id":comment_id})
+            c.execute("DELETE FROM USER_REPLIES WHERE USR_REPLS_ROW = %(comment_id)s", {"comment_id":comment_id})
             c.execute("COMMIT")
             return HttpResponseRedirect(reverse('post:detail_post', args=(post_id, 1)))
         else:
@@ -534,8 +555,9 @@ def detail_post(request, post_id, start_from):
 
         user_id = request.session.get('std_id')
 
-        c.execute('SELECT COUNT(*) FROM USER_REPLIES WHERE POST_ID = :post_id', {'post_id':post_id})
-        for row in c:
+        c.execute('SELECT COUNT(*) FROM USER_REPLIES WHERE POST_ID = %(post_id)s', {'post_id':post_id})
+        rows = c.fetchall()
+        for row in rows:
             num_comments = row[0]
 
         begin_comment = start_from
@@ -550,15 +572,16 @@ def detail_post(request, post_id, start_from):
         sql= '''SELECT * 
                 FROM(
                         SELECT A.*, ROWNUM RNUM
-                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM USER_REPLIES  WHERE POST_ID = :post_id ORDER BY TIMESTAMP DESC, POST_ID DESC) A
-                        WHERE ROWNUM < :end_comment
+                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
+                        WHERE ROWNUM < %(end_comment)s
                     )
-                WHERE RNUM >= :begin_comment'''
+                WHERE RNUM >= %(begin_comment)s'''
 
         c.execute(sql, {'post_id':post_id, 'end_comment':end_comment, 'begin_comment':begin_comment})
+        rows = c.fetchall()
 
         comment_dicts = []
-        for row in c:
+        for row in rows:
             comment_dict = {}
             comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
@@ -572,49 +595,58 @@ def detail_post(request, post_id, start_from):
         for i in range(len(comment_dicts)):
 
             c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(comment_dicts[i]['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 comment_dicts[i]['photo_path'] = row[0]
             
             c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(comment_dicts[i]['user_id'])+"' ")
-            for row in c:
+            rows = c.fetchall()
+            for row in rows:
                 comment_dicts[i]['full_name'] = row[0]
 
         c.execute("SELECT * FROM POST WHERE POST_ID = '"+str(post_id)+"' ")
+        rows = c.fetchall()
 
         post_detail = {}
-        for row in c:
+        for row in rows:
             post_detail['date'] = row[1]
             post_detail['desc'] = row[2]
             post_detail['post_id'] = post_id
 
         c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = '"+str(post_id)+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['user_id'] = row[0]
             
         
         
         c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['photo_path'] = row[0]
 
         c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['full_name'] = row[0]
 
         c.execute("SELECT * FROM HELP WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['type_of_help'] = row[1]
             post_detail['reason'] = row[2]
             post_detail['cell'] = row[3]
             post_detail['class'] = 'Help'
 
         c.execute("SELECT * FROM CAREER WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['photo'] = row[1]
             post_detail['class'] = 'Career'
 
         c.execute("SELECT * FROM RESEARCH WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['topic_name'] = row[1]
             post_detail['date_of_publication'] = row[2]
             post_detail['journal'] = row[3]
@@ -622,7 +654,8 @@ def detail_post(request, post_id, start_from):
             post_detail['class'] = 'Research'
 
         c.execute("SELECT * FROM JOB_POST WHERE POST_ID = '"+str(post_id)+"'")
-        for row in c:
+        rows = c.fetchall()
+        for row in rows:
             post_detail['company_name'] = row[1]
             post_detail['location'] = row[2]
             post_detail['requirements'] = row[3]
@@ -630,11 +663,12 @@ def detail_post(request, post_id, start_from):
             post_detail['salary'] = row[5]
             post_detail['class'] = 'Job'
 
-        c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = :std_id", {'std_id': user_id})
-        for row in c:
+        c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = %(std_id)s", {'std_id': user_id})
+        rows = c.fetchall()
+        for row in rows:
             post_detail['commenter_photo'] = row[0]
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -645,15 +679,15 @@ def detail_post(request, post_id, start_from):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -664,25 +698,22 @@ def detail_post(request, post_id, start_from):
             except:
                 print('NULL')
         
+        context = {
+            'detail':post_detail, 
+            'comment_dicts':comment_dicts,
+            'is_begin':is_begin,
+            'the_end':the_end,
+            'next_id':end_comment,
+            'prev_id':(begin_comment-10) if begin_comment > 10 else 0,
+            'post_id':post_id,
+            'data':data,
+            'skills':skills,
+            'edit':True,
+            'dp':dp_form,
+            'job':job_list,
+        }
 
-
-        return render(request, 
-                    'post/detail_post.html', 
-                    {
-                        'detail':post_detail, 
-                        'comment_dicts':comment_dicts,
-                        'is_begin':is_begin,
-                        'the_end':the_end,
-                        'next_id':end_comment,
-                        'prev_id':(begin_comment-10) if begin_comment > 10 else 0,
-                        'post_id':post_id,
-                        'data':data,
-                        'skills':skills,
-                        'edit':True,
-                        'dp':dp_form,
-                        'job':job_list,
-                    }
-                )
+        return render(request, 'post/detail_post.html', context)
     else:
         return redirect('SignIn:signin')
 
@@ -730,7 +761,7 @@ def make_post(request):
         conn = db()
         c = conn.cursor()
         #-------------------------------------Profile Card---------------------------------
-        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+        sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
         columnNames = [d[0] for d in c.description]
         
@@ -741,15 +772,15 @@ def make_post(request):
 
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
         dp_form = DPForm()
 
         #--------------------------------------Job History--------------------------------
-        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+        sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = rows.fetchall()
         columnNames = [d[0] for d in c.description]
@@ -759,12 +790,17 @@ def make_post(request):
                 job_list.append(dict(zip(columnNames,job)))
             except:
                 print('NULL')
-        return render(request, 'post/make_post.html', {'type':request.GET.get('post_type'), 'unfilled':None, 
-                        'data':data,
-                        'skills':skills,
-                        'edit':True,
-                        'dp':dp_form,
-                        'job':job_list,})
+
+        context = {
+            'type':request.GET.get('post_type'),
+            'unfilled':None,
+            'data':data,
+            'skills':skills,
+            'edit':True,
+            'dp':dp_form,
+            'job':job_list, 
+        }
+        return render(request, 'post/make_post.html', context)
     else:
         return redirect('SignIn:signin')
 
@@ -809,7 +845,7 @@ def upload_post(request):
 
         if (len(unfilled_data) != 0) or (cell_wrong_type) or (salary_wrong_type):
             #-------------------------------------Profile Card---------------------------------
-            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = :std_id"""
+            sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
             row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
             columnNames = [d[0] for d in c.description]
             
@@ -820,15 +856,15 @@ def upload_post(request):
 
             #-----------------------------------Skills------------------------------------
             sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
-                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = :std_id GROUP BY EXPERTISE.TOPIC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
+                    EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
+            rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
             skills = {}
             for row in rows:
                 skills[row[0]] = row[1]
             dp_form = DPForm()
 
             #--------------------------------------Job History--------------------------------
-            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = :std_id ORDER BY FROM_ DESC"""
+            sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             jobs = rows.fetchall()
             columnNames = [d[0] for d in c.description]
@@ -839,7 +875,7 @@ def upload_post(request):
                 except:
                     print('NULL')
 
-            show = {
+            context = {
                 'type':post_class,
                 'unfilled':True,
                 'unfilled_list':unfilled_data,
@@ -852,7 +888,7 @@ def upload_post(request):
                 'dp':dp_form,
                 'job':job_list,
             }
-            return render(request, 'post/make_post.html', show)
+            return render(request, 'post/make_post.html', context)
 
         
 
