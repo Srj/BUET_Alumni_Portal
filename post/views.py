@@ -168,7 +168,7 @@ def all_post(request, start_from, change):
             c.execute('Select count(*) from post;')
 
         if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
-            sql = '''SELECT COUNT(*) FROM POST WHERE INSTR(DESCRIPTION, %(search_std_id)s ) > 0'''
+            sql = '''SELECT COUNT(*) FROM POST WHERE STRPOS(DESCRIPTION, %(search_std_id)s ) > 0'''
             c.execute(sql, {'search_std_id':search_std_id})
 
         if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -183,16 +183,16 @@ def all_post(request, start_from, change):
 
         if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
             if search_post_typ == 'Help':
-                sql = '''SELECT COUNT(*) FROM POST P, HELP H WHERE (H.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, HELP H WHERE (H.POST_ID = P.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Career':
-                sql = '''SELECT COUNT(*) FROM POST P, CAREER C WHERE (C.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, CAREER C WHERE (C.POST_ID = P.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Research':
-                sql = '''SELECT COUNT(*) FROM POST P, RESEARCH R WHERE (R.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, RESEARCH R WHERE (R.POST_ID = P.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
             if search_post_typ == 'Job Post':
-                sql = '''SELECT COUNT(*) FROM POST P, JOB_POST J WHERE (J.POST_ID = P.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
+                sql = '''SELECT COUNT(*) FROM POST P, JOB_POST J WHERE (J.POST_ID = P.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )'''
                 c.execute(sql, {'search_std_id':search_std_id})
         
         num_post = modify_c(c)[0]
@@ -239,7 +239,7 @@ def all_post(request, start_from, change):
                                 FROM(
                                         SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION
                                         FROM POST
-                                        WHERE ( INSTR(DESCRIPTION, %(search_std_id)s) > 0 )
+                                        WHERE ( STRPOS(DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY DATE_OF_POST DESC, POST_ID DESC
                                     ) A
                                 WHERE ROWNUM < %(end_post)s
@@ -334,7 +334,7 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, HELP H
-                                            WHERE (P.POST_ID = H.POST_ID)  AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (P.POST_ID = H.POST_ID)  AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -352,7 +352,7 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, CAREER C
-                                            WHERE (P.POST_ID = C.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (P.POST_ID = C.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -370,7 +370,7 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, RESEARCH R
-                                            WHERE (P.POST_ID = R.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (P.POST_ID = R.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
@@ -388,7 +388,7 @@ def all_post(request, start_from, change):
                                     FROM(
                                             SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, JOB_POST J
-                                            WHERE (P.POST_ID = J.POST_ID) AND ( INSTR(P.DESCRIPTION, %(search_std_id)s) > 0 )
+                                            WHERE (P.POST_ID = J.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
                                     WHERE ROWNUM < %(end_post)s
