@@ -135,7 +135,11 @@ This Portal consists of 4 core modules:
 ### Events
 * You can find information about various events that are held at BUET here.
 
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/Event.gif "Event")
+
 * You can also create events of your own.
+
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/CreateEvent.gif "CreateEvent")
 
 You can find a demonstration video of this project we used during our presentation [here](https://youtu.be/sk0_A8AHL7E).
 
