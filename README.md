@@ -119,9 +119,11 @@ This Portal consists of 4 core modules:
 ### Events
 * You can find information about various events that are held at BUET here.
 
-* You can also create event of your own.
+* You can also create events of your own.
 
-You can find a demonstration video of our project we used during our presentation [here](https://youtu.be/sk0_A8AHL7E).
+You can find a demonstration video of this project we used during our presentation [here](https://youtu.be/sk0_A8AHL7E).
+
+__For further inquiry, feel free to mail at srj.buet17@gmail.com__
 
  
 
