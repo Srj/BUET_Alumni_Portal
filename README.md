@@ -6,7 +6,15 @@ __N.B.__ : This is a modified version of the original project where [Oracle DBMS
 
 ### Table of Content
 * [Installation](https://github.com/Srj/BUET_Alumni_Portal/blob/master/README.md#installation)
+    - [Testing](https://github.com/Srj/BUET_Alumni_Portal#testing)
+    - [Local Development](https://github.com/Srj/BUET_Alumni_Portal#local-development)
+        - [Virtualenv](https://github.com/Srj/BUET_Alumni_Portal#virtualenv)
+        - [Conda Environment](https://github.com/Srj/BUET_Alumni_Portal#conda-environment)
 * [Documentation](https://github.com/Srj/BUET_Alumni_Portal#documentation)
+    * [Users](https://github.com/Srj/BUET_Alumni_Portal#users)
+    * [Post](https://github.com/Srj/BUET_Alumni_Portal#post)
+    * [Communities](https://github.com/Srj/BUET_Alumni_Portal#communities)
+    * [Events](https://github.com/Srj/BUET_Alumni_Portal#events)
 
 ## Installation
 
@@ -14,11 +22,13 @@ __N.B.__ : This is a modified version of the original project where [Oracle DBMS
 If you have [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed on your machine, you can test this project with a single line of code. Refer to [here](https://docs.docker.com/docker-for-windows/install/) for detailed instructions on installation of Docker and Docker Compose.
 
 * Firstly, Clone this repository into a folder in your machine.
+
 ````
 git clone https://github.com/Srj/BUET_Alumni_Portal.git
 ````
 
 * After that, run the following command in the BUET_Alumni_Portal directory to instantiate the docker image in your machine.
+
 ````
 docker-compose up
 ````
@@ -37,6 +47,7 @@ __Caution :__
 If you want to work on this project and create a local version of it on your local machine follow the instructions below.
 
 * Firstly, Clone this repository into a folder in your machine.
+
 ````
 git clone https://github.com/Srj/BUET_Alumni_Portal.git
 ````
@@ -45,7 +56,8 @@ git clone https://github.com/Srj/BUET_Alumni_Portal.git
 
 * Now create a virtualenv or conda env based on your preferences and activate it.
 
-#### virtualenv
+#### Virtualenv
+
 ````
 python -m virtualenv venv
 
@@ -55,18 +67,22 @@ python -m virtualenv venv
 #Linux
 source /venv/bin/activate
 ````
-#### conda env
+
+#### Conda Environment
+
 ````
 conda create --name myenv
 conda activate myenv
 ````
 
 * Now install the required packages for this project using the following command.
+
 ````
 pip install -r requirements.txt
 ````
 
 * Make necessary changes in [Alumni_Portal/utils.py](https://github.com/Srj/BUET_Alumni_Portal/blob/master/Alumni_Portal/utils.py) to connect to your postgres database you have just created.
+
 ````python
 #--------------------------Connect Database----------------------------- 
 def db():
