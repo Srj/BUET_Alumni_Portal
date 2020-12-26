@@ -84,7 +84,7 @@
                     </div>
                     <div class="team-content">
                     
-                      <a href={% url 'Events:visit_event' event_id=row.EVENT_ID %}><h3 class="name">{{row.EVENT_NAME}}</h3></a> 
+                      <a href="{% url 'Events:visit_event' event_id=row.EVENT_ID %}"><h3 class="name">{{row.EVENT_NAME}}</h3></a> 
                         <h4 class="title">{{row.EVENT_START.date}} - {{row.EVENT_END.date}}</h4>
                     </div>
                     <ul class="social">

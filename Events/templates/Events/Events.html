@@ -138,7 +138,11 @@
                                 <img class="img-fluid" src="{{MEDIA_URL}}{{data.PHOTO}}" height=130 weight=130>
                             </div> 
                             <br>
-                            <a href="{% url 'Events:join_event' event_id=data.EVENT_ID %}" class="btn btn-info">Join Event</a>
+                            {% if user_join %}
+                                <h2> You have already joined this event.</h2>
+                            {% else %}
+                                <a href="{% url 'Events:join_event' event_id=data.EVENT_ID %}" class="btn btn-info">Join Event</a>
+                            {% endif %}
                             <br>
                             <h2>{{data.EVENT_NAME}}</h2>
                             <h3>{{data.LOCATION}}</h3>

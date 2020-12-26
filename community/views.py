@@ -94,8 +94,9 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -105,7 +106,8 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -113,9 +115,9 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
@@ -156,7 +158,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
                             WHERE ROWNUM < %(end_community)s
-                        )
+                        ) DUMMY
                     WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_my_comm, "begin_community":begin_my_comm, "user_id":user_id})

@@ -222,34 +222,38 @@ def all_post(request, start_from, change):
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, %(end_post)s RNUM
-                                FROM (SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION FROM POST ORDER BY DATE_OF_POST DESC, POST_ID DESC) A
-                                LIMIT %(end_post)s
+                                SELECT A.*,ROW_NUMBER() over()
+                                FROM (SELECT ROW_NUMBER() over() AS RNUM, POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION FROM POST ORDER BY DATE_OF_POST DESC, POST_ID DESC) A
+                                WHERE RNUM < %(end_post)s
                             ) DUMMY_ALIAS
-                        LIMIT %(end_post)s'''
+                        WHERE RNUM >= %(begin_post)s  '''
+
+
+
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                 rows = c.fetchall()
-                all_post = [row for row in rows]
+                print(rows)
+                all_post = [row[1:] for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM(
-                                        SELECT POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION
+                                        SELECT ROW_NUMBER() over() AS RNUM, POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION
                                         FROM POST
                                         WHERE ( STRPOS(DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY DATE_OF_POST DESC, POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) AS DUMMY
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
                 rows = c.fetchall()
-                all_post = [row for row in rows]
+                all_post = [row[1:] for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -257,148 +261,148 @@ def all_post(request, start_from, change):
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, HELP H
                                             WHERE (P.POST_ID = H.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, CAREER C
                                             WHERE (P.POST_ID = C.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, RESEARCH R
                                             WHERE (P.POST_ID = R.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, JOB_POST J
                                             WHERE (P.POST_ID = J.POST_ID)
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, HELP H
                                             WHERE (P.POST_ID = H.POST_ID)  AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, CAREER C
                                             WHERE (P.POST_ID = C.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()  
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, RESEARCH R
                                             WHERE (P.POST_ID = R.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
+                                            SELECT ROW_NUMBER() over() AS RNUM, P.POST_ID, TIME_DIFF(P.DATE_OF_POST), P.DESCRIPTION
                                             FROM POST P, JOB_POST J
                                             WHERE (P.POST_ID = J.POST_ID) AND ( STRPOS(P.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY P.DATE_OF_POST DESC, P.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                )DUMMY
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
             
 
             all_post_dicts = []
@@ -411,6 +415,7 @@ def all_post(request, start_from, change):
                 c.execute("SELECT USER_ID FROM USER_POSTS WHERE POST_ID = '"+str(post_dict['post_id'])+"' ")
                 rows = c.fetchall()
                 for row in rows:
+                    print(f'USER ID {row[0]}')
                     user_id = row[0]
                     post_dict['user_id'] = user_id
                     post_dict['logged_in'] = user_id == request.session['std_id']
@@ -458,7 +463,7 @@ def all_post(request, start_from, change):
                 all_post_dicts.append(post_dict)
 
             print("IN ALL POST")
-            
+            print(all_post_dicts)
 
             
             
@@ -498,7 +503,7 @@ def delete_post(request, post_id):
             posted_by = row[0]
 
         if posted_by == user_id:
-            c.execute("DELETE FROM POST WHERE POST_ID = %(post_id)s", {"post_id":post_id})
+            c.execute("DELETE FROM POST CASCADE WHERE POST_ID = %(post_id)s", {"post_id":post_id})
             c.execute("COMMIT")
             return HttpResponseRedirect(reverse('post:all_post', args=(1, 0)))
         else:
@@ -540,7 +545,7 @@ def upload_comment(request, post_id):
         comment_body = request.GET.get('comment_body')
         comment_body = comment_body.replace("'", "''")
         if len(comment_body) != 0:
-            c.execute("INSERT INTO USER_REPLIES (USER_ID, POST_ID, TEXT, TIMESTAMP) VALUES ('"+str(user_id)+"', '"+str(post_id)+"', '"+comment_body+"', SYSDATE)")
+            c.execute("INSERT INTO USER_REPLIES (USER_ID, POST_ID, TEXT, TIMESTAMP) VALUES ('"+str(user_id)+"', '"+str(post_id)+"', '"+comment_body+"', NOW())")
             c.execute('COMMIT')
 
         return HttpResponseRedirect(reverse('post:detail_post', args=(post_id, 1)))
@@ -572,10 +577,10 @@ def detail_post(request, post_id, start_from):
 
         sql= '''SELECT * 
                 FROM(
-                        SELECT A.*, ROWNUM RNUM
-                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
-                        WHERE ROWNUM < %(end_comment)s
-                    )
+                        SELECT A.*, ROW_NUMBER() over()
+                        FROM (SELECT ROW_NUMBER() over() as RNUM, USR_REPLS_ROW, USER_ID, POST_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
+                        WHERE RNUM < %(end_comment)s
+                    ) DUMMY
                 WHERE RNUM >= %(begin_comment)s'''
 
         c.execute(sql, {'post_id':post_id, 'end_comment':end_comment, 'begin_comment':begin_comment})
@@ -583,6 +588,7 @@ def detail_post(request, post_id, start_from):
 
         comment_dicts = []
         for row in rows:
+            row = row[1:]  #Ignore duplicate row_number()
             comment_dict = {}
             comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
@@ -670,8 +676,9 @@ def detail_post(request, post_id, start_from):
             post_detail['commenter_photo'] = row[0]
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -681,7 +688,8 @@ def detail_post(request, post_id, start_from):
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -689,9 +697,9 @@ def detail_post(request, post_id, start_from):
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
@@ -765,7 +773,7 @@ def make_post(request):
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
         c.execute(sql,{'std_id':request.session.get('std_id')})
         row = c.fetchone()
-        columnNames = [d[0] for d in c.description]
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -786,14 +794,14 @@ def make_post(request):
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         c.execute(sql,{'std_id':request.session.get('std_id')})
         jobs = c.fetchall()
-        columnNames = [d[0] for d in c.description]
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
                 job_list.append(dict(zip(columnNames,job)))
             except:
                 print('NULL')
-
+        print(data)
         context = {
             'type':request.GET.get('post_type'),
             'unfilled':None,
@@ -850,7 +858,7 @@ def upload_post(request):
             #-------------------------------------Profile Card---------------------------------
             sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
             row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-            columnNames = [d[0] for d in c.description]
+            columnNames = [d[0].upper() for d in c.description]
             
             try:
                 data = dict(zip(columnNames,row))
@@ -870,7 +878,7 @@ def upload_post(request):
             sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
             rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
             jobs = rows.fetchall()
-            columnNames = [d[0] for d in c.description]
+            columnNames = [d[0].upper() for d in c.description]
             job_list = []
             for job in jobs:
                 try:
@@ -976,7 +984,10 @@ def upload_post(request):
             c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM POST ORDER BY POST_ID DESC) DUMMY  LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO USER_POSTS (USER_ID, POST_ID) VALUES ('"+str(user_id)+"', '"+post_id+"')")
-            c.execute("INSERT INTO JOB_POST (POST_ID, COMPANY_NAME, DESIGNATION, LOCATION, REQUIREMENTs, SALARY) VALUES ('"+post_id+"', '"+company_name+"', '"+designation+"', '"+location+"', '"+min_requirement+"', '"+salary+"')")
+            if salary is '':
+                c.execute("INSERT INTO JOB_POST (POST_ID, COMPANY_NAME, DESIGNATION, LOCATION, REQUIREMENTs) VALUES ('"+post_id+"', '"+company_name+"', '"+designation+"', '"+location+"', '"+min_requirement+"')")
+            else:
+                c.execute("INSERT INTO JOB_POST (POST_ID, COMPANY_NAME, DESIGNATION, LOCATION, REQUIREMENTs, SALARY) VALUES ('"+post_id+"', '"+company_name+"', '"+designation+"', '"+location+"', '"+min_requirement+"', '"+ salary +"')")
             c.execute('COMMIT')
 
         conn.close()
