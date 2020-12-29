@@ -136,6 +136,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )'''
             c.execute(sql, {"comm_search_name":comm_search_name, "user_id":user_id})
         rows = c.fetchall()
+        print(rows)
         for row in rows:
             num_my_comms = row[0]
 
@@ -181,7 +182,9 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         
         my_communities_infos = []
         rows = c.fetchall()
+        print(f'HEREEEEEEEEEEEEEEE{rows}')
         for row in rows:
+            row = row[1:]
             community_dict = {}
             community_dict['community_id'] = row[0]
             community_dict['community_name'] = row[1]
@@ -260,6 +263,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
         rows = c.fetchall()
         for row in rows:
             #print(row)
+            row = row[1:]
             community_dict = {}
             community_dict['community_id'] = row[0]
             community_dict['community_name'] = row[1]
@@ -654,7 +658,7 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
                 rows = c.fetchall()
-                all_post = [row for row in rpws]
+                all_post = [row for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -825,18 +829,21 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     all_post = [row for row in rows]
         
         all_post_dicts = []
+        print(all_post)
         for post in all_post:
+            post = post[1:]
             post_dict = {}
             post_dict['community_id'] = post[0]
             post_dict['post_id'] = post[1]
             post_dict['date'] = post[2]
             post_dict['desc'] = post[3]
             post_dict['community_name'] = post[4]
-
+            print(f'IN COMU {str(post_dict)}')
             #c.execute("SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE POST_ID = '"+str(post_dict['post_id'])+"' ")
             sql = "SELECT USER_ID FROM COMMUNITY_USER_POSTS WHERE (POST_ID = %(post_id)s) AND (COMMUNITY_ID = %(community_id)s) "
             c.execute(sql, {'post_id':post_dict['post_id'], "community_id":post_dict['community_id']})
             rows = c.fetchall()
+            print(f'IN COMU {rows}')
             for row in rows:
                 post_dict['user_id'] = row[0]
 
@@ -936,8 +943,10 @@ def create_community(request):
 
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -947,7 +956,8 @@ def create_community(request):
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -955,9 +965,9 @@ def create_community(request):
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
@@ -1009,8 +1019,9 @@ def create_comm_upload(request):
         if len(unfilled_data) > 0:
             #-------------------------------------Profile Card---------------------------------
             sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-            row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-            columnNames = [d[0] for d in c.description]
+            c.execute(sql,{'std_id':request.session.get('std_id')})
+            row = c.fetchone()
+            columnNames = [d[0].upper() for d in c.description]
             
             try:
                 data = dict(zip(columnNames,row))
@@ -1020,7 +1031,8 @@ def create_comm_upload(request):
             #-----------------------------------Skills------------------------------------
             sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                     EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+            c.execute(sql,{'std_id':request.session.get('std_id')})
+            rows = c.fetchall()
             skills = {}
             for row in rows:
                 skills[row[0]] = row[1]
@@ -1028,9 +1040,9 @@ def create_comm_upload(request):
 
             #--------------------------------------Job History--------------------------------
             sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-            rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-            jobs = rows.fetchall()
-            columnNames = [d[0] for d in c.description]
+            c.execute(sql,{'std_id':request.session.get('std_id')})
+            jobs = c.fetchall()
+            columnNames = [d[0].upper() for d in c.description]
             job_list = []
             for job in jobs:
                 try:
@@ -1050,7 +1062,7 @@ def create_comm_upload(request):
             }
             return render(request, "community/create_community.html", show)
         else:
-            sql = '''INSERT INTO COMMUNITY (COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION) VALUES (%(community_name)s, %(description)s, %(criteria)s, SYSDATE)  '''
+            sql = '''INSERT INTO COMMUNITY (COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION) VALUES (%(community_name)s, %(description)s, %(criteria)s, NOW())  '''
             c.execute(sql, {"community_name":community_name, "description":description, "criteria":criteria})
             c.execute("SELECT COMMUNITY_ID FROM (SELECT COMMUNITY_ID FROM COMMUNITY ORDER BY COMMUNITY_ID DESC) AS COMMUNITY_ALIAS LIMIT 1")
             rows = c.fetchall()
@@ -1058,7 +1070,7 @@ def create_comm_upload(request):
                 comm_id = row[0]
             sql = '''INSERT INTO MODERATOR VALUES (%(comm_id)s, %(user_id)s) '''
             c.execute(sql, {"comm_id":comm_id, "user_id":user_id})
-            sql = '''INSERT INTO COMM_MEMBERS VALUES (%(comm_id)s, %(user_id)s, SYSDATE) '''
+            sql = '''INSERT INTO COMM_MEMBERS VALUES (%(comm_id)s, %(user_id)s, NOW()) '''
             c.execute(sql, {"comm_id":comm_id, "user_id":user_id})
             c.execute("COMMIT")
 
@@ -1070,7 +1082,11 @@ def create_comm_upload(request):
 
 def detail_community(request, community_id, start_member_count, start_requ_count, post_start, post_change):
     if "std_id" in request.session:
-
+        community_name = ""
+        description = ""
+        criteria =""
+        creation = ""
+        creation_ago = ""
         conn = db()
         c = conn.cursor()
         user_id = request.session.get('std_id')
@@ -1099,8 +1115,9 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -1110,7 +1127,8 @@ def detail_community(request, community_id, start_member_count, start_requ_count
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -1119,8 +1137,8 @@ def detail_community(request, community_id, start_member_count, start_requ_count
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
         rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
@@ -1133,6 +1151,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
         c.execute("SELECT COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION, TIME_DIFF(DATE_OF_CREATION) FROM COMMUNITY WHERE COMMUNITY_ID = %(community_id)s", {"community_id":community_id})
         rows = c.fetchall()
+        print(rows)
         for row in rows:
             community_name = row[0]
             description = row[1]
@@ -1286,7 +1305,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
                 rows = c.fetchall()
-                all_post = [row for row in rows]
+                all_post = [row[1:] for row in rows]
             
             if (search_post_typ is None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 sql = '''
@@ -1305,7 +1324,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "community_id":community_id})
                 rows = c.fetchall()
-                all_post = [row for row in rows]
+                all_post = [row[1:] for row in rows]
             
 
             if (search_post_typ is not None) and ((search_std_id is None) or (len(search_std_id) == 0 )):
@@ -1326,7 +1345,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -1344,7 +1363,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -1362,7 +1381,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -1380,7 +1399,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
 
             if (search_post_typ is not None) and ( (search_std_id is not None) and (len(search_std_id) > 0) ):
                 if search_post_typ == 'Help':
@@ -1400,7 +1419,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Career':
                     sql = '''
                             SELECT * 
@@ -1418,7 +1437,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Research':
                     sql = '''
                             SELECT * 
@@ -1436,7 +1455,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
                 if search_post_typ == 'Job Post':
                     sql = '''
                             SELECT * 
@@ -1454,7 +1473,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
                     rows = c.fetchall()
-                    all_post = [row for row in rows]
+                    all_post = [row[1:] for row in rows]
 
 
             all_post_dicts = []
@@ -1472,7 +1491,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 rows = c.fetchall()
                 for row in rows:
                     post_dict['user_id'] = row[0]
-
+                print(f'POST DICT : {str(rows) + str(post_dict)}')
                 c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_dict['user_id'])+"' ")
                 rows = c.fetchall()
                 for row in rows:
@@ -1556,6 +1575,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
             members_info = []
             rows = c.fetchall()
             for row in rows:
+                row = row[1:]
                 member_dict = {}
                 member_dict['user_id'] = row[0]
                 member_dict['full_name'] = row[1]
@@ -1654,6 +1674,7 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 request_infos = []
                 rows = c.fetchall()
                 for row in rows:
+                    row = row[1:]
                     request_dict = {}
                     request_dict['user_id'] = row[0]
                     request_dict['full_name'] = row[1]
@@ -1737,7 +1758,7 @@ def join_request(request, community_id):
         c = conn.cursor()
         user_id = request.session.get('std_id')
 
-        c.execute("INSERT INTO JOIN_REQUEST VALUES (%(community_id)s, %(user_id)s, SYSDATE)", {"community_id":community_id, "user_id":user_id})
+        c.execute("INSERT INTO JOIN_REQUEST VALUES (%(community_id)s, %(user_id)s, now())", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
 
         return HttpResponseRedirect(reverse('community:home', args=(1,1,0,1,0)))
@@ -1858,7 +1879,7 @@ def join_community(request, community_id, user_id, start_member_count, start_req
         conn = db()
         c = conn.cursor()
 
-        c.execute("INSERT INTO COMM_MEMBERS VALUES (%(community_id)s, %(user_id)s, SYSDATE) ", {"community_id":community_id, "user_id":user_id})
+        c.execute("INSERT INTO COMM_MEMBERS VALUES (%(community_id)s, %(user_id)s, now()) ", {"community_id":community_id, "user_id":user_id})
         c.execute("COMMIT")
         return HttpResponseRedirect(reverse('community:detail_community', args=(community_id, start_member_count, start_requ_count, 1, 0)))
     else:
@@ -1882,8 +1903,9 @@ def make_post(request, community_id):
         c = conn.cursor()
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -1893,7 +1915,8 @@ def make_post(request, community_id):
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -1901,9 +1924,9 @@ def make_post(request, community_id):
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:
@@ -1971,7 +1994,7 @@ def form_unfilled_message(unfilled_data):
     if len(unfilled_data) != 0:
         for attribute in unfilled_data:
             txt += (attribute + ",   ")
-        txt += 'missing. Unfilled date data will be filled with SYSDATE.'
+        txt += 'missing. Unfilled date data will be filled with now().'
     return txt
 
 def modify_c(c):
@@ -2110,7 +2133,7 @@ def upload_post(request, community_id):
 
             
             #c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (TO_DATE('"+date_today+"', 'dd-mm-yyyy'), '"+description+"')")
-            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
+            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (now(), '"+description+"')")
             c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
@@ -2125,7 +2148,7 @@ def upload_post(request, community_id):
             topic_name = topic_name.replace("'", "''")
 
 
-            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
+            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (now(), '"+description+"')")
             c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
@@ -2152,7 +2175,7 @@ def upload_post(request, community_id):
 
 
 
-            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
+            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (now(), '"+description+"')")
             c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
@@ -2167,7 +2190,7 @@ def upload_post(request, community_id):
             description = request.GET.get('description')
             description = description.replace("'", "''")
 
-            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
+            c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (now(), '"+description+"')")
             c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
@@ -2194,7 +2217,7 @@ def upload_comment(request, community_id, post_id):
         comment_body = request.GET.get('comment_body')
         comment_body = comment_body.replace("'", "''")
         if len(comment_body) != 0:
-            c.execute("INSERT INTO COMMUNITY_USER_REPLIES (USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIMESTAMP) VALUES ('"+str(user_id)+"', '"+str(post_id)+"', '"+str(community_id)+"', '"+comment_body+"', SYSDATE)")
+            c.execute("INSERT INTO COMMUNITY_USER_REPLIES (USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIMESTAMP) VALUES ('"+str(user_id)+"', '"+str(post_id)+"', '"+str(community_id)+"', '"+comment_body+"', now())")
             c.execute('COMMIT')
 
         return HttpResponseRedirect(reverse('community:detail_post', args=(community_id, post_id, 1)))
@@ -2236,7 +2259,9 @@ def detail_post(request, community_id, post_id, start_from):
 
         comment_dicts = []
         rows = c.fetchall()
+        
         for row in rows:
+            row = row[1:]
             comment_dict = {}
             comment_dict['comment_id'] = row[0]
             comment_dict['user_id'] = row[1]
@@ -2277,7 +2302,7 @@ def detail_post(request, community_id, post_id, start_from):
         
         c.execute("SELECT PHOTO FROM PROFILE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
         rows = c.fetchall()
-        for row in rpws:
+        for row in rows:
             post_detail['photo_path'] = row[0]
 
         c.execute("SELECT FULL_NAME FROM USER_TABLE WHERE STD_ID = '"+str(post_detail['user_id'])+"' ")
@@ -2324,8 +2349,9 @@ def detail_post(request, community_id, post_id, start_from):
             post_detail['commenter_photo'] = row[0]
         #-------------------------------------Profile Card---------------------------------
         sql = """ SELECT * from USER_PROFILE WHERE STD_ID = %(std_id)s"""
-        row =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchone()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        row = c.fetchone()
+        columnNames = [d[0].upper() for d in c.description]
         
         try:
             data = dict(zip(columnNames,row))
@@ -2335,7 +2361,8 @@ def detail_post(request, community_id, post_id, start_from):
         #-----------------------------------Skills------------------------------------
         sql = """ SELECT EXPERTISE.TOPIC, COUNT( ENDORSE.GIVER_ID) AS C from EXPERTISE LEFT JOIN ENDORSE ON 
                 EXPERTISE.STD_ID = ENDORSE.TAKER_ID AND EXPERTISE.TOPIC = ENDORSE.TOPIC WHERE EXPERTISE.STD_ID = %(std_id)s GROUP BY EXPERTISE.TOPIC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')}).fetchall()
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        rows = c.fetchall()
         skills = {}
         for row in rows:
             skills[row[0]] = row[1]
@@ -2343,9 +2370,9 @@ def detail_post(request, community_id, post_id, start_from):
 
         #--------------------------------------Job History--------------------------------
         sql = """ SELECT * from WORKS JOIN INSTITUTE USING(INSTITUTE_ID) WHERE STD_ID = %(std_id)s ORDER BY FROM_ DESC"""
-        rows =  c.execute(sql,{'std_id':request.session.get('std_id')})
-        jobs = rows.fetchall()
-        columnNames = [d[0] for d in c.description]
+        c.execute(sql,{'std_id':request.session.get('std_id')})
+        jobs = c.fetchall()
+        columnNames = [d[0].upper() for d in c.description]
         job_list = []
         for job in jobs:
             try:

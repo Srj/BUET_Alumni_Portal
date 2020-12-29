@@ -762,7 +762,7 @@ def form_unfilled_message(unfilled_data):
     if len(unfilled_data) != 0:
         for attribute in unfilled_data:
             txt += (attribute + ",   ")
-        txt += 'missing. Unfilled date data will be filled with SYSDATE.'
+        txt += 'missing. Unfilled date data will be filled with now().'
     return txt
 
 def make_post(request):
