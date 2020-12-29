@@ -33,7 +33,7 @@ git clone https://github.com/Srj/BUET_Alumni_Portal.git
 docker-compose up
 ````
 
-That's all. Now this project is running in your local machine. You need not install anything or initialize any database to run this project. Docker has handled everything for you. Visit http://127.0.0.1:8000/ on Windows (or http://0.0.0.0:8000/ on Linux) to run BUET ALumni Portal on your browser. 
+That's all. Now this project is running in your local machine. You need not install anything or initialize any database to run this project. Docker has handled everything for you. Visit http://127.0.0.1:8000/ on Windows (or http://0.0.0.0:8000/ on Linux) to run BUET Alumni Portal on your browser. 
 
 
 __Caution :__ 
@@ -127,15 +127,21 @@ This Portal consists of 4 core modules:
 ### Post
 * You can post various post like Job Post, General Information post, Research Post, Help post on General Section which will appear in everyone's timeline.
 
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/Post.gif "Post")
+
 ### Communities
 * You can join different communites based on different criterion to post and see specific posts related to that community. Only members of that community will see your post.
 
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/JoinCom.gif)
+
 * You can also create communities and invite others to join it or delete the community later.
+
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/CreateCom.gif)
 
 ### Events
 * You can find information about various events that are held at BUET here.
 
-![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/Event.gif "Event")
+![alt text](https://github.com/Srj/BUET_Alumni_Portal/blob/master/media/EventPage.gif "Event")
 
 * You can also create events of your own.
 
