@@ -222,7 +222,7 @@ def all_post(request, start_from, change):
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*,ROW_NUMBER() over()
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM (SELECT ROW_NUMBER() over() AS RNUM, POST_ID, TIME_DIFF(DATE_OF_POST), DESCRIPTION FROM POST ORDER BY DATE_OF_POST DESC, POST_ID DESC) A
                                 WHERE RNUM < %(end_post)s
                             ) DUMMY_ALIAS

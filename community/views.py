@@ -150,15 +150,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
+                                    SELECT ROW_NUMBER() over() AS RNUM, C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
                                     FROM COMMUNITY C, COMM_MEMBERS CM 
                                     WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID)
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < %(end_community)s
-                        ) DUMMY
+                            WHERE RNUM < %(end_community)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_my_comm, "begin_community":begin_my_comm, "user_id":user_id})
@@ -166,15 +166,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
+                                    SELECT  ROW_NUMBER() over() AS RNUM, C.COMMUNITY_ID, C.COMMUNITY_NAME, COUNT_COMM_MEMBER(C.COMMUNITY_ID) AS NUM_MEMBERS, TIME_DIFF(C.DATE_OF_CREATION) 
                                     FROM COMMUNITY C, COMM_MEMBERS CM 
                                     WHERE (CM.USER_ID = %(user_id)s) AND (CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(C.COMMUNITY_ID) DESC, C.DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < %(end_community)s
-                        )
+                            WHERE RNUM < %(end_community)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_my_comm, "begin_community":begin_my_comm, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -225,15 +225,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
+                                    SELECT  ROW_NUMBER() over() AS RNUM, COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
                                     FROM COMMUNITY
                                     WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) )
                                     ORDER BY COUNT_COMM_MEMBER(COMMUNITY_ID) DESC, DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < %(end_community)s
-                        )
+                            WHERE RNUM < %(end_community)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_community)s'''
 
             c.execute(sql, {"end_community":end_other_comm, "begin_community":begin_other_comm, "user_id":user_id})
@@ -241,15 +241,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
             sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
+                                    SELECT  ROW_NUMBER() over() AS RNUM, COMMUNITY_ID, COMMUNITY_NAME, COUNT_COMM_MEMBER(COMMUNITY_ID) , TIME_DIFF(DATE_OF_CREATION)
                                     FROM COMMUNITY
                                     WHERE COMMUNITY_ID IN ( SELECT DISTINCT C.COMMUNITY_ID FROM COMMUNITY C, COMM_MEMBERS CM WHERE ( CM.COMMUNITY_ID = C.COMMUNITY_ID) AND ( CM.COMMUNITY_ID NOT IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) ) AND ( STRPOS(COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                     ORDER BY COUNT_COMM_MEMBER(COMMUNITY_ID) DESC, DATE_OF_CREATION 
                                 ) A
-                            WHERE ROWNUM < %(end_community)s
-                        )
+                            WHERE RNUM < %(end_community)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_community)s'''
 
             
@@ -364,15 +364,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM (
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
@@ -383,15 +383,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM(
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "user_id":user_id})
@@ -404,15 +404,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
@@ -422,15 +422,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
@@ -440,15 +440,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
@@ -458,15 +458,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id})
@@ -478,15 +478,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
@@ -496,15 +496,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
@@ -514,15 +514,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
@@ -532,15 +532,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id})
@@ -641,15 +641,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM (
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -660,15 +660,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM(
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -681,15 +681,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -699,15 +699,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -717,15 +717,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -735,15 +735,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "comm_search_name":comm_search_name})
@@ -755,15 +755,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
@@ -773,15 +773,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
@@ -791,15 +791,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
@@ -809,15 +809,15 @@ def home(request, my_groups_start, other_groups_start, comm_search_change, post_
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID IN (SELECT COMMUNITY_ID FROM COMM_MEMBERS WHERE USER_ID = %(user_id)s) ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 ) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(C.COMMUNITY_NAME, %(comm_search_name)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "user_id":user_id, "search_std_id":search_std_id, "comm_search_name":comm_search_name})
@@ -1052,7 +1052,7 @@ def create_comm_upload(request):
         else:
             sql = '''INSERT INTO COMMUNITY (COMMUNITY_NAME, DESCRIPTION, CRITERIA, DATE_OF_CREATION) VALUES (%(community_name)s, %(description)s, %(criteria)s, SYSDATE)  '''
             c.execute(sql, {"community_name":community_name, "description":description, "criteria":criteria})
-            c.execute("SELECT COMMUNITY_ID FROM (SELECT COMMUNITY_ID FROM COMMUNITY ORDER BY COMMUNITY_ID DESC) WHERE ROWNUM=1")
+            c.execute("SELECT COMMUNITY_ID FROM (SELECT COMMUNITY_ID FROM COMMUNITY ORDER BY COMMUNITY_ID DESC) AS COMMUNITY_ALIAS LIMIT 1")
             rows = c.fetchall()
             for row in rows:
                 comm_id = row[0]
@@ -1273,15 +1273,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM (
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME 
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID)
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
@@ -1292,15 +1292,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 sql = '''
                         SELECT * 
                         FROM(
-                                SELECT A.*, ROWNUM RNUM
+                                SELECT A.*, ROW_NUMBER() over()
                                 FROM(
-                                        SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                        SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                         FROM  COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C
                                         WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                         ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                     ) A
-                                WHERE ROWNUM < %(end_post)s
-                            )
+                                WHERE RNUM < %(end_post)s
+                            ) DUMMY_ALIAS
                         WHERE RNUM >= %(begin_post)s'''
 
                 c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, 'search_std_id':search_std_id, "community_id":community_id})
@@ -1313,15 +1313,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
@@ -1331,15 +1331,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
@@ -1349,15 +1349,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
@@ -1367,15 +1367,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID)
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id})
@@ -1387,15 +1387,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_HELP H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
@@ -1405,15 +1405,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_CAREER H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
@@ -1423,15 +1423,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_RESEARCH H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
@@ -1441,15 +1441,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                     sql = '''
                             SELECT * 
                             FROM(
-                                    SELECT A.*, ROWNUM RNUM
+                                    SELECT A.*, ROW_NUMBER() over()
                                     FROM(
-                                            SELECT CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
+                                            SELECT  ROW_NUMBER() over() AS RNUM, CUP.COMMUNITY_ID, CP.POST_ID, TIME_DIFF(CP.DATE_OF_POST), CP.DESCRIPTION, C.COMMUNITY_NAME
                                             FROM COMMUNITY_POST CP, COMMUNITY_USER_POSTS CUP, COMMUNITY C, COMMUNITY_JOB_POST H
                                             WHERE (CUP.COMMUNITY_ID = %(community_id)s ) AND (CUP.POST_ID = CP.POST_ID) AND (CUP.COMMUNITY_ID = C.COMMUNITY_ID) AND (CUP.POST_ID = H.POST_ID) AND ( STRPOS(CP.DESCRIPTION, %(search_std_id)s) > 0 )
                                             ORDER BY CP.DATE_OF_POST DESC, CP.POST_ID DESC
                                         ) A
-                                    WHERE ROWNUM < %(end_post)s
-                                )
+                                    WHERE RNUM < %(end_post)s
+                                ) DUMMY_ALIAS
                             WHERE RNUM >= %(begin_post)s'''
 
                     c.execute(sql, {'end_post':end_post, 'begin_post':begin_post, "community_id":community_id, "search_std_id":search_std_id})
@@ -1540,15 +1540,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
             sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT U.STD_ID, U.FULL_NAME, TIME_DIFF(CM.JOIN_DATE)
+                                    SELECT  ROW_NUMBER() over() AS RNUM, U.STD_ID, U.FULL_NAME, TIME_DIFF(CM.JOIN_DATE)
                                     FROM USER_TABLE U, COMM_MEMBERS CM
                                     WHERE (CM.USER_ID = U.STD_ID) AND (CM.USER_ID <> %(user_id)s) AND (CM.COMMUNITY_ID = %(community_id)s)
                                     ORDER BY CM.JOIN_DATE ASC, U.std_id ASC
                                 ) A
-                            WHERE ROWNUM < %(end_member)s
-                        )
+                            WHERE RNUM < %(end_member)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_member)s'''
             
             c.execute(sql, {"end_member":end_member, "begin_member":begin_member, "user_id":user_id, "community_id":community_id})
@@ -1638,15 +1638,15 @@ def detail_community(request, community_id, start_member_count, start_requ_count
                 sql = ''' 
                     SELECT * 
                     FROM(
-                            SELECT A.*, ROWNUM RNUM
+                            SELECT A.*, ROW_NUMBER() over()
                             FROM (
-                                    SELECT U.STD_ID, U.FULL_NAME, TIME_DIFF(J.REQUEST_TIME)
+                                    SELECT  ROW_NUMBER() over() AS RNUM, U.STD_ID, U.FULL_NAME, TIME_DIFF(J.REQUEST_TIME)
                                     FROM USER_TABLE U, JOIN_REQUEST J
                                     WHERE (J.USER_ID = U.STD_ID) AND (J.COMMUNITY_ID = %(community_id)s)
                                     ORDER BY J.REQUEST_TIME ASC, U.std_id ASC
                                 ) A
-                            WHERE ROWNUM < %(end_requ)s
-                        )
+                            WHERE RNUM < %(end_requ)s
+                        ) DUMMY_ALIAS
                     WHERE RNUM >= %(begin_requ)s'''
                 
                 c.execute(sql, {"end_requ":end_requ, "begin_requ":begin_requ, "community_id":community_id})
@@ -2111,7 +2111,7 @@ def upload_post(request, community_id):
             
             #c.execute("INSERT INTO POST (DATE_OF_POST, Description) VALUES (TO_DATE('"+date_today+"', 'dd-mm-yyyy'), '"+description+"')")
             c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
             c.execute("INSERT INTO COMMUNITY_HELP (POST_ID, TYPE_OF_HELP, REASON, CELL_NO) VALUES ('"+post_id+"', '"+type_of_help+"', '"+reason+"', '"+cell+"')")
@@ -2126,7 +2126,7 @@ def upload_post(request, community_id):
 
 
             c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
             c.execute("INSERT INTO COMMUNITY_CAREER (POST_ID, TOPIC_NAME) VALUES ('"+post_id+"', '"+topic_name+"')")
@@ -2153,7 +2153,7 @@ def upload_post(request, community_id):
 
 
             c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
             c.execute("INSERT INTO COMMUNITY_RESEARCH (POST_ID, TOPIC_NAME, DATE_OF_PUBLICATION, JOURNAL, DOI) VALUES ('"+post_id+"', '"+topic_name+"', TO_DATE('"+date_of_publication+"', 'dd-mm-yyyy'), '"+journal+"', '"+doi+"')")
@@ -2168,7 +2168,7 @@ def upload_post(request, community_id):
             description = description.replace("'", "''")
 
             c.execute("INSERT INTO COMMUNITY_POST (DATE_OF_POST, Description) VALUES (SYSDATE, '"+description+"')")
-            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) WHERE ROWNUM=1")
+            c.execute("SELECT POST_ID FROM (SELECT POST_ID FROM COMMUNITY_POST ORDER BY POST_ID DESC) AS POST_ALIAS LIMIT 1")
             post_id = modify_c(c)[0]
             c.execute("INSERT INTO COMMUNITY_USER_POSTS (USER_ID, POST_ID, COMMUNITY_ID) VALUES ('"+str(user_id)+"', '"+post_id+"', '"+str(community_id)+"')")
             c.execute("INSERT INTO COMMUNITY_JOB_POST (POST_ID, COMPANY_NAME, DESIGNATION, LOCATION, REQUIREMENTs, SALARY) VALUES ('"+post_id+"', '"+company_name+"', '"+designation+"', '"+location+"', '"+min_requirement+"', '"+salary+"')")
@@ -2226,10 +2226,10 @@ def detail_post(request, community_id, post_id, start_from):
 
         sql= '''SELECT * 
                 FROM(
-                        SELECT A.*, ROWNUM RNUM
-                        FROM (SELECT USR_REPLS_ROW, USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM COMMUNITY_USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
-                        WHERE ROWNUM < %(end_comment)s
-                    )
+                        SELECT A.*, ROW_NUMBER() over()
+                        FROM (SELECT  ROW_NUMBER() over() AS RNUM, USR_REPLS_ROW, USER_ID, POST_ID, COMMUNITY_ID, TEXT, TIME_DIFF(TIMESTAMP) FROM COMMUNITY_USER_REPLIES  WHERE POST_ID = %(post_id)s ORDER BY TIMESTAMP DESC, POST_ID DESC) A
+                        WHERE RNUM < %(end_comment)s
+                    ) DUMMY_ALIAS
                 WHERE RNUM >= %(begin_comment)s'''
 
         c.execute(sql, {'post_id':post_id, 'end_comment':end_comment, 'begin_comment':begin_comment})
