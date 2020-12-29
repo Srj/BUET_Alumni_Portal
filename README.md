@@ -37,6 +37,12 @@ That's all. Now this project is running in your local machine. You need not inst
 
 
 __Caution :__ 
+* If your database cannot be initiated, Run the following command in this directory to clear any pre-existing database with same configuration. This will delete any database existing with configuration in the [database.env](https://github.com/Srj/BUET_Alumni_Portal/blob/master/database.env) file.
+
+````
+docker-compose down
+````
+
 * Make sure Docker Daemon is running in your machine or you won't be able to instantiate this project in your machine.
 
 * Any data produced during your testing will be destroyed when you close the docker image. So Each Docker Compose command will run a fresh version. If you want to persist your data in your local machine, feel free to bind volume in [docker-compose.yml](https://github.com/Srj/BUET_Alumni_Portal/blob/master/docker-compose.yml). Refer to [here](https://docs.docker.com/storage/volumes/#use-a-volume-with-docker-compose) for details on binding volume to docker image.
