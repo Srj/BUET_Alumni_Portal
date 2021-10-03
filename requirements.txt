@@ -10,4 +10,4 @@ psycopg2==2.8.6
 python-ptrace==0.9.7
 pytz==2020.4
 six==1.15.0
-sqlparse==0.4.1
+sqlparse==0.4.2
